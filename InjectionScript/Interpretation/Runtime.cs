@@ -23,11 +23,11 @@ namespace InjectionScript.Interpretation
             collector.Visit(file);
         }
 
-        public void CallSubrutine(string name, params string[] arguments)
+        public InjectionValue CallSubrutine(string name, params string[] arguments)
         {
             if (Metadata.TryGet(name, out var subrutine))
             {
-                Interpreter.Visit(subrutine.Subrutine);
+                return Interpreter.Visit(subrutine.Subrutine);
             }
             else
                 throw new NotImplementedException();

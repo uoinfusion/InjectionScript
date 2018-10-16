@@ -48,11 +48,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interpretation\DefinitionCollector.cs" />
+    <Compile Include="Interpretation\ForScope.cs" />
     <Compile Include="Interpretation\InjectionValue.cs" />
     <Compile Include="Interpretation\InjectionValueKind.cs" />
     <Compile Include="Interpretation\Interpreter.cs" />
     <Compile Include="Interpretation\Metadata.cs" />
     <Compile Include="Interpretation\Runtime.cs" />
+    <Compile Include="Interpretation\SemanticScope.cs" />
+    <Compile Include="Interpretation\StatementFlattener.cs" />
+    <Compile Include="Interpretation\StatementMap.cs" />
     <Compile Include="Interpretation\SubrutineDefinition.cs" />
     <Compile Include="Parsing\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

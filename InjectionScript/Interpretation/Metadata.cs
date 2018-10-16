@@ -1,4 +1,5 @@
-﻿using InjectionScript.Parsing.Syntax;
+﻿using Antlr4.Runtime.Tree;
+using InjectionScript.Parsing.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +22,7 @@ namespace InjectionScript.Interpretation
         {
             return subrutines.TryGetValue(name, out subrutine);
         }
+
+        internal SubrutineDefinition Get(string name) => subrutines[name];
     }
 }

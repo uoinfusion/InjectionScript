@@ -9,26 +9,34 @@ using System.Threading.Tasks;
 
 namespace InjectionScript.Parsing
 {
-    public static class Parser
+    public class Parser
     {
-        public static injectionParser.FileContext ParseFile(string fileName)
+        private readonly List<BaseErrorListener> errorListeners = new List<BaseErrorListener>();
+
+        public injectionParser.FileContext ParseFile(string file)
         {
-            var inputStream = new AntlrInputStream(File.ReadAllText(fileName));
+            var inputStream = new AntlrInputStream(file);
             var lexer = new injectionLexer(inputStream);
             var tokenStream = new CommonTokenStream(lexer);
             var parser = new injectionParser(tokenStream);
+            foreach (var listener in errorListeners)
+                parser.AddErrorListener(listener);
 
             return parser.file();
         }
 
-        public static injectionParser.ExpressionContext ParseExpression(string expression)
+        public injectionParser.ExpressionContext ParseExpression(string expression)
         {
             var inputStream = new AntlrInputStream(expression);
             var lexer = new injectionLexer(inputStream);
             var tokenStream = new CommonTokenStream(lexer);
             var parser = new injectionParser(tokenStream);
+            foreach (var listener in errorListeners)
+                parser.AddErrorListener(listener);
 
             return parser.expression();
         }
+
+        public void AddErrorListener(BaseErrorListener errorListener) => errorListeners.Add(errorListener);
     }
 }

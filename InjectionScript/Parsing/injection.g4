@@ -5,12 +5,14 @@ subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock END_SUB (NEWLIN
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+;
-statement: if | while | repeat | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next;
+statement: if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next;
 
 if: IF expression THEN NEWLINE codeBlock? else? END_IF NEWLINE | EOF;
 else: ELSE NEWLINE codeBlock?;
-while: WHILE expression NEWLINE codeBlock? WEND;
-repeat: REPEAT NEWLINE codeBlock? UNTIL expression NEWLINE;
+while: WHILE expression NEWLINE;
+wend: WEND NEWLINE;
+repeat: REPEAT NEWLINE;
+until: UNTIL expression NEWLINE;
 for: FOR assignment TO expression NEWLINE;
 next: NEXT NEWLINE;
 assignStatement: assignment NEWLINE;
@@ -23,7 +25,7 @@ varDef: SYMBOL | assignment;
 dim: DIM dimDef NEWLINE;
 dimDef: SYMBOL '[' number ']';
 
-call: callNamespace? SYMBOL argumentList?;
+call: callNamespace? SYMBOL argumentList;
 argumentList: '(' arguments? ')';
 callNamespace: SYMBOL '.';
 arguments: argument (',' argument)*;

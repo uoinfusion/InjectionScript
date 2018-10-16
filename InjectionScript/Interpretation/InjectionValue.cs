@@ -126,6 +126,14 @@ namespace InjectionScript.Interpretation
             throw new NotImplementedException();
         }
 
+        public static explicit operator int(InjectionValue v1)
+        {
+            if (v1.Kind != InjectionValueKind.Number)
+                throw new NotImplementedException();
+
+            return v1.Number;
+        }
+
         public override string ToString()
         {
             switch (Kind)

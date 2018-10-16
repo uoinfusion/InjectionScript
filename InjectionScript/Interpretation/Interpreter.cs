@@ -1,13 +1,16 @@
 ﻿using Antlr4.Runtime.Misc;
 using InjectionScript.Parsing.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace InjectionScript.Interpretation
 {
     public class Interpreter : injectionBaseVisitor<InjectionValue>
     {
         private readonly Metadata metadata;
+        private readonly SemanticScope semanticScope = new SemanticScope();
 
         public Interpreter(Metadata metadata)
         {
@@ -16,7 +19,153 @@ namespace InjectionScript.Interpretation
 
         public override InjectionValue VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
         {
-            return Visit(context.codeBlock());
+            var forScopes = new Stack<ForScope>();
+            var repeatIndexes = new Stack<int>();
+            var whileIndexes = new Stack<int>();
+            var flattener = new StatementFlattener();
+            flattener.Visit(context);
+            var statementsMap = flattener.Statements;
+
+            semanticScope.Start();
+            try
+            {
+                var statementIndex = 0;
+                while (statementIndex < statementsMap.Count)
+                {
+                    var statement = statementsMap.GetStatement(statementIndex);
+                    if (statement.returnStatement() != null)
+                    {
+                        return Visit(statement.returnStatement());
+                    }
+                    else if (statement.@if() != null)
+                    {
+                        var nextStatement = InterpretIf(statement.@if());
+                        if (nextStatement != null)
+                            statementIndex = statementsMap.GetIndex(nextStatement) + 1;
+                        else
+                            statementIndex++;
+                    }
+                    else if (statement.@for() != null)
+                    {
+                        statementIndex++;
+                        forScopes.Push(InterpretFor(statementIndex, statement.@for()));
+                    }
+                    else if (statement.next() != null)
+                    {
+                        var forScope = forScopes.Peek();
+                        var variable = semanticScope.GetLocalVariable(forScope.VariableName);
+                        variable = variable + new InjectionValue(1);
+                        semanticScope.SetLocalVariable(forScope.VariableName, variable);
+                        if (variable < forScope.Range)
+                        {
+                            statementIndex = forScope.StatementIndex;
+                        }
+                        else
+                            statementIndex++;
+                    }
+                    else if (statement.repeat() != null)
+                    {
+                        statementIndex++;
+                        repeatIndexes.Push(statementIndex);
+                    }
+                    else if (statement.until() != null)
+                    {
+                        var condition = Visit(statement.until().expression());
+                        if (condition == InjectionValue.False)
+                        {
+                            statementIndex++;
+                            repeatIndexes.Pop();
+                        }
+                        else
+                            statementIndex = repeatIndexes.Peek();
+                    }
+                    else if (statement.@while() != null)
+                    {
+                        var condition = Visit(statement.@while().expression());
+                        if (condition == InjectionValue.False)
+                        {
+                            while (statementIndex < statementsMap.Count && statementsMap.GetStatement(statementIndex).wend() == null)
+                            {
+                                statementIndex++;
+                            }
+                            if (statementsMap.GetStatement(statementIndex).wend() != null)
+                            {
+                                statementIndex++;
+                                whileIndexes.Pop();
+                            }
+                            else
+                                throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            whileIndexes.Push(statementIndex);
+                            statementIndex++;
+                        }
+                    }
+                    else if (statement.wend() != null)
+                    {
+                        statementIndex = whileIndexes.Peek();
+                    }
+                    else
+                    {
+                        Visit(statement);
+                        statementIndex++;
+                    }
+                }
+
+                return InjectionValue.Unit;
+            }
+            finally
+            {
+                semanticScope.End();
+            }
+        }
+
+        private ForScope InterpretFor(int statementIndex, injectionParser.ForContext forContext)
+        {
+            var variableName = forContext.assignment().lvalue().SYMBOL().GetText();
+            Visit(forContext.assignment());
+            var range = Visit(forContext.expression());
+
+            return new ForScope(variableName, range, statementIndex);
+        }
+
+        private injectionParser.StatementContext InterpretIf(injectionParser.IfContext context)
+        {
+            var condition = Visit(context.expression());
+            if (condition != InjectionValue.False)
+                return (injectionParser.StatementContext)context.Parent;
+            else
+                return context.codeBlock()?.statement()?.LastOrDefault();
+        }
+
+        public override InjectionValue VisitVarDef([NotNull] injectionParser.VarDefContext context)
+        {
+            if (context.assignment() != null)
+            {
+                if (context.assignment().lvalue().SYMBOL() != null)
+                {
+                    semanticScope.DefineVariable(context.assignment().lvalue().SYMBOL().GetText());
+                }
+                else
+                    throw new NotImplementedException();
+                Visit(context.assignment());
+            }
+            else if (context.SYMBOL() != null)
+                semanticScope.DefineVariable(context.SYMBOL().GetText());
+
+
+            return InjectionValue.Unit;
+        }
+
+        public override InjectionValue VisitAssignment([NotNull] injectionParser.AssignmentContext context)
+        {
+            var name = context.lvalue().SYMBOL().GetText();
+            var value = Visit(context.expression());
+
+            semanticScope.SetLocalVariable(name, value);
+
+            return InjectionValue.Unit;
         }
 
         public override InjectionValue VisitExpression([NotNull] injectionParser.ExpressionContext context)
@@ -129,6 +278,14 @@ namespace InjectionScript.Interpretation
                 throw new NotImplementedException();
         }
 
+        public override InjectionValue VisitOperand([NotNull] injectionParser.OperandContext context)
+        {
+            if (context.SYMBOL() != null)
+                return semanticScope.GetLocalVariable(context.SYMBOL().GetText());
+
+            return base.VisitOperand(context);
+        }
+
         public override InjectionValue VisitNumber([NotNull] injectionParser.NumberContext context)
         {
             if (context.HEX_NUMBER() != null)
@@ -153,11 +310,11 @@ namespace InjectionScript.Interpretation
         {
             if (context.statement() != null)
             {
-                foreach (var statement in context.statement())
+                var statements = context.statement();
+                for (var i = 0; i < statements.Length; i++)
                 {
-                    if (statement.returnStatement() != null)
-                        return Visit(statement.returnStatement());
-                    else
+                    var statement = statements[i];
+                    if (statement.@for() != null)
                         Visit(statement);
                 }
             }
@@ -165,12 +322,20 @@ namespace InjectionScript.Interpretation
             return InjectionValue.Unit;
         }
 
-        public override InjectionValue VisitStatement([NotNull] injectionParser.StatementContext context)
+        public override InjectionValue VisitReturnStatement([NotNull] injectionParser.ReturnStatementContext context)
         {
-            if (context.returnStatement() != null)
-                throw new NotImplementedException();
+            if (context.expression() != null)
+                return Visit(context.expression());
 
-            throw new NotImplementedException();
+            return InjectionValue.Unit;
+        }
+
+        public override InjectionValue VisitCall([NotNull] injectionParser.CallContext context)
+        {
+            var name = context.SYMBOL().GetText();
+            var subrutine = metadata.Get(name);
+
+            return Visit(subrutine.Subrutine);
         }
     }
 }

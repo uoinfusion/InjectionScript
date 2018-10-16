@@ -11,7 +11,6 @@ namespace InjectionScript.Cli
     {
         static void Main(string[] args)
         {
-            Parser.ParseFile(@"c:\Users\jakub\sources\ultima\injscripts\jooky\Mining2016.sc");
         }
     }
 }
