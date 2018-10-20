@@ -22,8 +22,9 @@ returnStatement: RETURN expression? NEWLINE;
 
 var: VAR varDef (',' varDef)* NEWLINE;
 varDef: SYMBOL | assignment;
-dim: DIM dimDef NEWLINE;
-dimDef: SYMBOL '[' number ']';
+dim: DIM dimDef (',' dimDef)* NEWLINE;
+dimDef: SYMBOL '[' expression ']' dimDefAssignment?;
+dimDefAssignment: '=' expression;
 
 call: callNamespace? SYMBOL argumentList;
 argumentList: '(' arguments? ')';

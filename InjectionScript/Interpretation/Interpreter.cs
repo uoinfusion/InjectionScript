@@ -53,9 +53,9 @@ namespace InjectionScript.Interpretation
                     else if (statement.next() != null)
                     {
                         var forScope = forScopes.Peek();
-                        var variable = semanticScope.GetLocalVariable(forScope.VariableName);
+                        var variable = semanticScope.GetVar(forScope.VariableName);
                         variable = variable + new InjectionValue(1);
-                        semanticScope.SetLocalVariable(forScope.VariableName, variable);
+                        semanticScope.SetVar(forScope.VariableName, variable);
                         if (variable < forScope.Range)
                         {
                             statementIndex = forScope.StatementIndex;
@@ -145,25 +145,43 @@ namespace InjectionScript.Interpretation
             {
                 if (context.assignment().lvalue().SYMBOL() != null)
                 {
-                    semanticScope.DefineVariable(context.assignment().lvalue().SYMBOL().GetText());
+                    semanticScope.DefineVar(context.assignment().lvalue().SYMBOL().GetText());
                 }
                 else
                     throw new NotImplementedException();
                 Visit(context.assignment());
             }
             else if (context.SYMBOL() != null)
-                semanticScope.DefineVariable(context.SYMBOL().GetText());
+                semanticScope.DefineVar(context.SYMBOL().GetText());
 
+
+            return InjectionValue.Unit;
+        }
+
+        public override InjectionValue VisitDimDef([NotNull] injectionParser.DimDefContext context)
+        {
+            var name = context.SYMBOL().GetText();
+            var limit = (int)Visit(context.expression());
+            semanticScope.DefineDim(name, limit);
 
             return InjectionValue.Unit;
         }
 
         public override InjectionValue VisitAssignment([NotNull] injectionParser.AssignmentContext context)
         {
-            var name = context.lvalue().SYMBOL().GetText();
             var value = Visit(context.expression());
+            if (context.lvalue().indexedSymbol() != null)
+            {
+                var name = context.lvalue().indexedSymbol().SYMBOL().GetText();
+                var index = (int)Visit(context.lvalue().indexedSymbol().expression());
 
-            semanticScope.SetLocalVariable(name, value);
+                semanticScope.SetDim(name, index, value);
+            }
+            else
+            {
+                var name = context.lvalue().SYMBOL().GetText();
+                semanticScope.SetVar(name, value);
+            }
 
             return InjectionValue.Unit;
         }
@@ -281,9 +299,17 @@ namespace InjectionScript.Interpretation
         public override InjectionValue VisitOperand([NotNull] injectionParser.OperandContext context)
         {
             if (context.SYMBOL() != null)
-                return semanticScope.GetLocalVariable(context.SYMBOL().GetText());
+                return semanticScope.GetVar(context.SYMBOL().GetText());
 
             return base.VisitOperand(context);
+        }
+
+        public override InjectionValue VisitIndexedSymbol([NotNull] injectionParser.IndexedSymbolContext context)
+        {
+            var index = (int)Visit(context.expression());
+            var name = context.SYMBOL().GetText();
+
+            return semanticScope.GetDim(name, index);
         }
 
         public override InjectionValue VisitNumber([NotNull] injectionParser.NumberContext context)

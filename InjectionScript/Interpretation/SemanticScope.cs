@@ -8,25 +8,52 @@ namespace InjectionScript.Interpretation
 {
     public class SemanticScope
     {
-        private readonly Stack<Dictionary<string, InjectionValue>> scopes = new Stack<Dictionary<string, InjectionValue>>();
-
-        public void SetLocalVariable(string name, InjectionValue value)
+        private class Scope
         {
-            var locals = scopes.Peek();
-            if (locals.ContainsKey(name))
-                locals[name] = value;
+            public Dictionary<string, InjectionValue> vars = new Dictionary<string, InjectionValue>();
+            public Dictionary<string, InjectionValue[]> dims = new Dictionary<string, InjectionValue[]>();
+        }
+
+        private readonly Stack<Scope> scopes = new Stack<Scope>();
+
+        public void Start() => scopes.Push(new Scope());
+        public void End() => scopes.Pop();
+
+        public void SetVar(string name, InjectionValue value)
+        {
+            var vars = scopes.Peek().vars;
+            if (vars.ContainsKey(name))
+                vars[name] = value;
+            else if (scopes.Peek().dims.ContainsKey(name))
+            {
+                scopes.Peek().dims.Remove(name);
+                vars[name] = value;
+            }
             else
                 throw new NotImplementedException();
         }
-        public InjectionValue GetLocalVariable(string name) => scopes.Peek()[name];
+        public InjectionValue GetVar(string name) => scopes.Peek().vars[name];
 
-        public void Start() => scopes.Push(new Dictionary<string, InjectionValue>());
-        public void End() => scopes.Pop();
-
-        internal void DefineVariable(string name)
+        internal void DefineVar(string name)
         {
-            var locals = scopes.Peek();
-            locals[name] = InjectionValue.Unit;
+            var vars = scopes.Peek().vars;
+            vars[name] = InjectionValue.Unit;
+        }
+
+        public void SetDim(string name, int index, InjectionValue value)
+        {
+            var dims = scopes.Peek().dims;
+            if (dims.ContainsKey(name))
+                dims[name][index] = value;
+            else
+                throw new NotImplementedException();
+        }
+        public InjectionValue GetDim(string name, int index) => scopes.Peek().dims[name][index];
+
+        internal void DefineDim(string name, int limit)
+        {
+            var dims = scopes.Peek().dims;
+            dims[name] = new InjectionValue[limit + 1];
         }
     }
 }

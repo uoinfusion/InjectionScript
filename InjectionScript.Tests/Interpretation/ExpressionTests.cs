@@ -61,7 +61,6 @@ namespace InjectionScript.Tests.Interpretation
             TestExpression("1 + (0 == 0) + 1", 3);
             TestExpression("5 * 1 == 5", 1);
             TestExpression("5 * (1 == 5)", 0);
-
         }
     }
 }
