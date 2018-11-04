@@ -53,11 +53,13 @@
     <Compile Include="Interpretation\InjectionValueKind.cs" />
     <Compile Include="Interpretation\Interpreter.cs" />
     <Compile Include="Interpretation\Metadata.cs" />
+    <Compile Include="Interpretation\NativeSubrutineDefinition.cs" />
     <Compile Include="Interpretation\Runtime.cs" />
     <Compile Include="Interpretation\SemanticScope.cs" />
     <Compile Include="Interpretation\StatementFlattener.cs" />
     <Compile Include="Interpretation\StatementMap.cs" />
     <Compile Include="Interpretation\SubrutineDefinition.cs" />
+    <Compile Include="Interpretation\Globals.cs" />
     <Compile Include="Parsing\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

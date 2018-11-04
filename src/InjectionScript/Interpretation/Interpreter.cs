@@ -214,6 +214,12 @@ namespace InjectionScript.Interpretation
             return result;
         }
 
+        public override InjectionValue VisitLiteral([NotNull] injectionParser.LiteralContext context)
+        {
+            return new InjectionValue(context.DOUBLEQUOTED_LITERAL()?.GetText().Trim('\"')
+                ?? context.SINGLEQUOTED_LITERAL()?.GetText().Trim('\''));
+        }
+
         public override InjectionValue VisitLogicalOperand([NotNull] injectionParser.LogicalOperandContext context)
         {
             var result = Visit(context.additiveOperand());
@@ -358,10 +364,23 @@ namespace InjectionScript.Interpretation
 
         public override InjectionValue VisitCall([NotNull] injectionParser.CallContext context)
         {
+            var ns = context.callNamespace()?.SYMBOL().GetText();
             var name = context.SYMBOL().GetText();
-            var subrutine = metadata.Get(name);
 
-            return Visit(subrutine.Subrutine);
+            var nativeSubrutine = metadata.GetNativeSubrutine(ns, name);
+            if (nativeSubrutine != null)
+            {
+                var argumentValues = context.argumentList().arguments()?.argument()?
+                    .Select(arg => VisitExpression(arg.expression()))
+                    .ToArray() ?? Array.Empty<InjectionValue>();
+
+                return nativeSubrutine.Call(argumentValues);
+            }
+            else
+            {
+                var customSubrutine = metadata.GetCustomSubrutine(name);
+                return Visit(customSubrutine.Subrutine);
+            }
         }
     }
 }

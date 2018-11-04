@@ -11,10 +11,19 @@ namespace InjectionScript.Interpretation
     {
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter { get; }
+        public Globals Globals { get; }
 
         public Runtime()
         {
             Interpreter = new Interpreter(Metadata);
+            Globals = new Globals();
+            RegisterNatives();
+        }
+
+        private void RegisterNatives()
+        {
+            Metadata.Add(new NativeSubrutineDefinition("UO", "SetGlobal", (Action<string, string>)Globals.SetGlobal));
+            Metadata.Add(new NativeSubrutineDefinition("UO", "GetGlobal", (Func<string, string>)Globals.GetGlobal));
         }
 
         public void Load(injectionParser.FileContext file)

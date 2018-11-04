@@ -15,6 +15,30 @@ namespace InjectionScript.Interpretation
         public string String { get; }
         public InjectionValueKind Kind { get; set; }
 
+        public InjectionValue(object value, Type type)
+        {
+            if (type == typeof(void))
+            {
+                Number = 0;
+                String = null;
+                Kind = InjectionValueKind.Unit;
+            }
+            else if (value is string str)
+            {
+                String = str;
+                Number = 0;
+                Kind = InjectionValueKind.String;
+            }
+            else if (value is int i)
+            {
+                Number = i;
+                String = null;
+                Kind = InjectionValueKind.Number;
+            }
+            else
+                throw new NotSupportedException($"Unsupported return type {value.GetType()}");
+        }
+
         public InjectionValue(int number)
         {
             Number = number;
@@ -134,6 +158,21 @@ namespace InjectionScript.Interpretation
             return v1.Number;
         }
 
+        public object ToValue()
+        {
+            switch (Kind)
+            {
+                case InjectionValueKind.Number:
+                    return Number;
+                case InjectionValueKind.String:
+                    return String;
+                case InjectionValueKind.Unit:
+                    return InjectionValue.Unit;
+                default:
+                    throw new NotImplementedException(Kind.ToString());
+            }
+        }
+
         public override string ToString()
         {
             switch (Kind)
@@ -169,6 +208,11 @@ namespace InjectionScript.Interpretation
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(String);
             hashCode = hashCode * -1521134295 + Kind.GetHashCode();
             return hashCode;
+        }
+
+        public static bool IsSupported(Type type)
+        {
+            return type == typeof(string) || type == typeof(int) || type == typeof(void);
         }
     }
 }

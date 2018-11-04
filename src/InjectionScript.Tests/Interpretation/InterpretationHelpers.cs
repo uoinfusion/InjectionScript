@@ -41,6 +41,20 @@ namespace InjectionScript.Tests.Interpretation
             Assert.AreEqual(expected, actual.Number, codeBlock);
         }
 
+        public static void TestSubrutine(string expected, string codeBlock)
+        {
+            string subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
+            var runtime = new Runtime();
+            var parser = new Parser();
+            parser.AddErrorListener(new FailTestErrorListener());
+            runtime.Load(parser.ParseFile(subrutine));
+
+            var actual = runtime.CallSubrutine("test");
+
+            Assert.AreEqual(InjectionValueKind.String, actual.Kind, codeBlock);
+            Assert.AreEqual(expected, actual.String, codeBlock);
+        }
+
         public static void TestSubrutine(int expected, string subrutineName, string file)
         {
             var runtime = new Runtime();

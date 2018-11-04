@@ -1,28 +1,34 @@
-﻿using Antlr4.Runtime.Tree;
-using InjectionScript.Parsing.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace InjectionScript.Interpretation
 {
     public class Metadata
     {
-        private readonly Dictionary<string, SubrutineDefinition> subrutines 
+        private readonly Dictionary<string, SubrutineDefinition> subrutines
             = new Dictionary<string, SubrutineDefinition>();
+        private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
+            = new Dictionary<string, NativeSubrutineDefinition>();
 
-        public void Add(SubrutineDefinition subrutineDef)
+        public void Add(SubrutineDefinition subrutineDef) => subrutines.Add(subrutineDef.Name, subrutineDef);
+        public void Add(NativeSubrutineDefinition subrutineDef)
+            => nativeSubrutines.Add(GetNativeSubrutineKey(subrutineDef), subrutineDef);
+        public bool TryGet(string name, out SubrutineDefinition subrutine)
+            => subrutines.TryGetValue(name, out subrutine);
+
+        public SubrutineDefinition GetCustomSubrutine(string name) => subrutines[name];
+
+        public NativeSubrutineDefinition GetNativeSubrutine(string ns, string name)
         {
-            subrutines.Add(subrutineDef.Name, subrutineDef);
+            string key = string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            if (nativeSubrutines.TryGetValue(key, out NativeSubrutineDefinition value))
+                return value;
+
+            return null;
         }
 
-        internal bool TryGet(string name, out SubrutineDefinition subrutine)
-        {
-            return subrutines.TryGetValue(name, out subrutine);
-        }
-
-        internal SubrutineDefinition Get(string name) => subrutines[name];
+        private string GetNativeSubrutineKey(NativeSubrutineDefinition subrutineDef)
+            => string.IsNullOrEmpty(subrutineDef.NameSpace)
+                ? subrutineDef.Name
+                : $"{subrutineDef.NameSpace}.{subrutineDef.Name}";
     }
 }

@@ -151,6 +151,12 @@ sub dim_assignment_without_index()
    tst_assert_num(123, x, "dim_assignment_without_index - x")    
 end sub
 
+sub globals()
+    UO.SetGlobal("globname", "some text")
+    tst_assert_str("some text", UO.GetGlobal("globname"), "globals")
+    tst_assert_str("N/A", UO.GetGlobal("nonexisting"), "globals - empty")
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))
