@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace InjectionScript.Interpretation
 {
@@ -7,7 +8,7 @@ namespace InjectionScript.Interpretation
         private readonly Dictionary<string, SubrutineDefinition> subrutines
             = new Dictionary<string, SubrutineDefinition>();
         private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
-            = new Dictionary<string, NativeSubrutineDefinition>();
+            = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
         public void Add(SubrutineDefinition subrutineDef) => subrutines.Add(GetSubrutineKey(subrutineDef), subrutineDef);
         public void Add(NativeSubrutineDefinition subrutineDef)
@@ -26,15 +27,19 @@ namespace InjectionScript.Interpretation
         }
 
         private string GetSubrutineKey(string name, int paramCount)
-            => $"{name}'`'{paramCount}";
+            => $"{name}`{paramCount}";
 
-        public NativeSubrutineDefinition GetNativeSubrutine(string ns, string name)
+        public bool TryGetNativeSubrutine(string ns, string name, out NativeSubrutineDefinition subrutineDefinition)
         {
             var key = string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
             if (nativeSubrutines.TryGetValue(key, out var value))
-                return value;
+            {
+                subrutineDefinition = value;
+                return true;
+            }
 
-            return null;
+            subrutineDefinition = null;
+            return false;
         }
 
         private string GetNativeSubrutineKey(NativeSubrutineDefinition subrutineDef)

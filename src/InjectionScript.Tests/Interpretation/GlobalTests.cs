@@ -15,5 +15,12 @@ namespace InjectionScript.Tests.Interpretation
             TestSubrutine("some text", @"UO.SetGlobal(""globname"", ""some text"")
 return UO.GetGlobal(""globname"")");
         }
+
+        [TestMethod]
+        public void UO_method_names_are_case_insensitive()
+        {
+            TestSubrutine("some text", @"UO.setGLOBAL(""globname"", ""some text"")
+return Uo.GETgLoBaL(""globname"")");
+        }
     }
 }

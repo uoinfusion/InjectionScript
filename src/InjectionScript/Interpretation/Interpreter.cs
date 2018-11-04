@@ -370,8 +370,7 @@ namespace InjectionScript.Interpretation
                 .Select(arg => VisitExpression(arg.expression()))
                 .ToArray() ?? Array.Empty<InjectionValue>();
 
-            var nativeSubrutine = metadata.GetNativeSubrutine(ns, name);
-            if (nativeSubrutine != null)
+            if (metadata.TryGetNativeSubrutine(ns, name, out var nativeSubrutine))
             {
                 return nativeSubrutine.Call(argumentValues);
             }
