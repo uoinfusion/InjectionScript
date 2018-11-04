@@ -12,21 +12,26 @@ namespace InjectionScript.Interpretation
         private readonly Metadata metadata;
         private readonly SemanticScope semanticScope = new SemanticScope();
 
-        public Interpreter(Metadata metadata)
-        {
-            this.metadata = metadata;
-        }
+        public Interpreter(Metadata metadata) => this.metadata = metadata;
 
-        public override InjectionValue VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
+        public InjectionValue CallSubrutine(injectionParser.SubrutineContext subrutine)
+            => CallSubrutine(subrutine, Array.Empty<InjectionValue>());
+
+        public InjectionValue CallSubrutine(injectionParser.SubrutineContext subrutine, InjectionValue[] argumentValues)
         {
             var forScopes = new Stack<ForScope>();
             var repeatIndexes = new Stack<int>();
             var whileIndexes = new Stack<int>();
             var flattener = new StatementFlattener();
-            flattener.Visit(context);
+            flattener.Visit(subrutine);
             var statementsMap = flattener.Statements;
 
             semanticScope.Start();
+            var parameters = subrutine.parameters()?.parameterName()?.Select(x => x.SYMBOL().GetText()).ToArray()
+                ?? Array.Empty<string>();
+            for (int i = 0; i < parameters.Length; i++)
+                semanticScope.DefineVar(parameters[i], argumentValues[i]);
+
             try
             {
                 var statementIndex = 0;
@@ -214,11 +219,8 @@ namespace InjectionScript.Interpretation
             return result;
         }
 
-        public override InjectionValue VisitLiteral([NotNull] injectionParser.LiteralContext context)
-        {
-            return new InjectionValue(context.DOUBLEQUOTED_LITERAL()?.GetText().Trim('\"')
+        public override InjectionValue VisitLiteral([NotNull] injectionParser.LiteralContext context) => new InjectionValue(context.DOUBLEQUOTED_LITERAL()?.GetText().Trim('\"')
                 ?? context.SINGLEQUOTED_LITERAL()?.GetText().Trim('\''));
-        }
 
         public override InjectionValue VisitLogicalOperand([NotNull] injectionParser.LogicalOperandContext context)
         {
@@ -333,10 +335,7 @@ namespace InjectionScript.Interpretation
                 throw new NotImplementedException();
         }
 
-        public override InjectionValue VisitSubExpression([NotNull] injectionParser.SubExpressionContext context)
-        {
-            return Visit(context.expression());
-        }
+        public override InjectionValue VisitSubExpression([NotNull] injectionParser.SubExpressionContext context) => Visit(context.expression());
 
         public override InjectionValue VisitCodeBlock([NotNull] injectionParser.CodeBlockContext context)
         {
@@ -367,19 +366,19 @@ namespace InjectionScript.Interpretation
             var ns = context.callNamespace()?.SYMBOL().GetText();
             var name = context.SYMBOL().GetText();
 
+            var argumentValues = context.argumentList().arguments()?.argument()?
+                .Select(arg => VisitExpression(arg.expression()))
+                .ToArray() ?? Array.Empty<InjectionValue>();
+
             var nativeSubrutine = metadata.GetNativeSubrutine(ns, name);
             if (nativeSubrutine != null)
             {
-                var argumentValues = context.argumentList().arguments()?.argument()?
-                    .Select(arg => VisitExpression(arg.expression()))
-                    .ToArray() ?? Array.Empty<InjectionValue>();
-
                 return nativeSubrutine.Call(argumentValues);
             }
             else
             {
-                var customSubrutine = metadata.GetCustomSubrutine(name);
-                return Visit(customSubrutine.Subrutine);
+                var customSubrutine = metadata.GetSubrutine(name, argumentValues.Length);
+                return CallSubrutine(customSubrutine.Subrutine, argumentValues);
             }
         }
     }

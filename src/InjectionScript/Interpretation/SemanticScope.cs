@@ -40,6 +40,12 @@ namespace InjectionScript.Interpretation
             vars[name] = InjectionValue.Unit;
         }
 
+        internal void DefineVar(string name, InjectionValue value)
+        {
+            var vars = scopes.Peek().vars;
+            vars[name] = value;
+        }
+
         public void SetDim(string name, int index, InjectionValue value)
         {
             var dims = scopes.Peek().dims;

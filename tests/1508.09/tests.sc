@@ -157,9 +157,29 @@ sub globals()
     tst_assert_str("N/A", UO.GetGlobal("nonexisting"), "globals - empty")
 end sub
 
+sub call_tests()
+   tst_assert_num(5, call_tests_sub1(2, 3, 5), "call_tests")
+   tst_assert_num(5, call_tests_sub1(2), "call_tests")
+end sub
+
+sub call_tests_sub1(a, b)
+   return a + b
+end sub
+sub call_tests_sub1(a)
+   return a * 10
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))
+   else
+      UO.Print("SUCCESS " + description)        
+   end if
+end sub
+
+sub tst_assert_str(expected, actual, description)
+   if (expected <> actual) then
+      UO.Print("FAILURE " + description + " - " + "expected: " + expected + ", actual: " + actual)
    else
       UO.Print("SUCCESS " + description)        
    end if

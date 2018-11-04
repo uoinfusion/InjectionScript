@@ -34,9 +34,10 @@ namespace InjectionScript.Interpretation
 
         public InjectionValue CallSubrutine(string name, params string[] arguments)
         {
-            if (Metadata.TryGet(name, out var subrutine))
+            if (Metadata.TryGetSubrutine(name, arguments.Length, out var subrutine))
             {
-                return Interpreter.Visit(subrutine.Subrutine);
+                return Interpreter.CallSubrutine(subrutine.Subrutine, 
+                    arguments.Select(x => new InjectionValue(x)).ToArray());
             }
             else
                 throw new NotImplementedException();
