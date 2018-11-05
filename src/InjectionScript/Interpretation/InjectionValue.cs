@@ -53,6 +53,18 @@ namespace InjectionScript.Interpretation
             Kind = InjectionValueKind.String;
         }
 
+        public static InjectionValueKind GetKind(Type type)
+        {
+            if (type.Equals(typeof(string)))
+                return InjectionValueKind.String;
+            else if (type.Equals(typeof(int)))
+                return InjectionValueKind.Number;
+            else if (type.Equals(typeof(void)))
+                return InjectionValueKind.Unit;
+
+            throw new NotSupportedException($"Unsupported type {type.Name}.");
+        }
+
         private InjectionValue(InjectionValueKind kind) : this()
         {
             Number = 0;

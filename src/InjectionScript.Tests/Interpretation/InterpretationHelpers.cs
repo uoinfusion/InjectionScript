@@ -27,10 +27,13 @@ namespace InjectionScript.Tests.Interpretation
             Assert.AreEqual(expectedValue, result.Number, expression);
         }
 
-        public static void TestSubrutine(int expected, string codeBlock)
+        public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
             string subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
             var runtime = new Runtime();
+            if (natives != null)
+                runtime.Metadata.Add(natives);
+
             var parser = new Parser();
             parser.AddErrorListener(new FailTestErrorListener());
             runtime.Load(parser.ParseFile(subrutine));
@@ -41,10 +44,13 @@ namespace InjectionScript.Tests.Interpretation
             Assert.AreEqual(expected, actual.Number, codeBlock);
         }
 
-        public static void TestSubrutine(string expected, string codeBlock)
+        public static void TestSubrutine(string expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
             string subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
             var runtime = new Runtime();
+            if (natives != null)
+                runtime.Metadata.Add(natives);
+
             var parser = new Parser();
             parser.AddErrorListener(new FailTestErrorListener());
             runtime.Load(parser.ParseFile(subrutine));

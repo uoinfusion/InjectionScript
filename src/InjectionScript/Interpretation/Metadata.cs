@@ -11,8 +11,14 @@ namespace InjectionScript.Interpretation
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
         public void Add(SubrutineDefinition subrutineDef) => subrutines.Add(GetSubrutineKey(subrutineDef), subrutineDef);
+
+        public void Add(NativeSubrutineDefinition[] subrutineDefs)
+        {
+            foreach (var subrutineDef in subrutineDefs)
+                nativeSubrutines.Add(subrutineDef.GetSignature(), subrutineDef);
+        }
         public void Add(NativeSubrutineDefinition subrutineDef)
-            => nativeSubrutines.Add(GetNativeSubrutineKey(subrutineDef), subrutineDef);
+            => nativeSubrutines.Add(subrutineDef.GetSignature(), subrutineDef);
 
         public bool TryGetSubrutine(string name, int argumentCount, out SubrutineDefinition definition)
             => subrutines.TryGetValue(GetSubrutineKey(name, argumentCount), out definition);
@@ -29,9 +35,9 @@ namespace InjectionScript.Interpretation
         private string GetSubrutineKey(string name, int paramCount)
             => $"{name}`{paramCount}";
 
-        public bool TryGetNativeSubrutine(string ns, string name, out NativeSubrutineDefinition subrutineDefinition)
+        public bool TryGetNativeSubrutine(string ns, string name, IEnumerable<InjectionValue> argumentValues, out NativeSubrutineDefinition subrutineDefinition)
         {
-            var key = string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            var key = NativeSubrutineDefinition.GetSignature(ns, name, argumentValues);
             if (nativeSubrutines.TryGetValue(key, out var value))
             {
                 subrutineDefinition = value;
@@ -41,10 +47,5 @@ namespace InjectionScript.Interpretation
             subrutineDefinition = null;
             return false;
         }
-
-        private string GetNativeSubrutineKey(NativeSubrutineDefinition subrutineDef)
-            => string.IsNullOrEmpty(subrutineDef.NameSpace)
-                ? subrutineDef.Name
-                : $"{subrutineDef.NameSpace}.{subrutineDef.Name}";
     }
 }
