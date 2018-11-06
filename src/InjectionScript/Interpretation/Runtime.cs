@@ -13,13 +13,13 @@ namespace InjectionScript.Interpretation
     {
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter { get; }
-        public Globals Globals { get; }
+        public Globals Globals { get; } = new Globals();
+        public Objects Objects { get; } = new Objects();
         public string CurrentFileName { get; private set; }
 
         public Runtime()
         {
             Interpreter = new Interpreter(Metadata);
-            Globals = new Globals();
             RegisterNatives();
         }
 
@@ -42,6 +42,7 @@ namespace InjectionScript.Interpretation
                 throw new SyntaxErrorException(fileName, errorListener.Errors);
             }
 
+            Metadata.ResetSubrutines();
             var collector = new DefinitionCollector(Metadata);
             collector.Visit(file);
         }
@@ -62,5 +63,15 @@ namespace InjectionScript.Interpretation
             else
                 throw new NotImplementedException();
         }
+
+        public int GetObject(string id)
+        {
+            if (Objects.TryGet(id, out int value))
+                return value;
+
+            return NumberConversions.Str2Int(id);
+        }
+
+        public void SetObject(string name, int value) => Objects.Set(name, value);
     }
 }

@@ -32,6 +32,7 @@ namespace InjectionScript.Interpretation
             return GetSubrutineKey(definition.Name, paramCount);
         }
 
+        internal void ResetSubrutines() => subrutines.Clear();
         private string GetSubrutineKey(string name, int paramCount)
             => $"{name}`{paramCount}";
 
