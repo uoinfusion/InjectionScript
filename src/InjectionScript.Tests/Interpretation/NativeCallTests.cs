@@ -38,7 +38,15 @@ namespace InjectionScript.Tests.Interpretation
                 new NativeSubrutineDefinition("UO", "sub1", (Func<int, int>)((a) => 2)),
                 new NativeSubrutineDefinition("UO", "sub1", (Func<string, int>)((a) => 3))
             });
+        }
 
+        [TestMethod]
+        public void Namespaced_symbol_can_call_native_subrutine()
+        {
+            TestSubrutine(123, @"return UO.Mana", new[]
+            {
+                new NativeSubrutineDefinition("UO", "Mana", (Func<int>)(() => 123)),
+            });
         }
     }
 }

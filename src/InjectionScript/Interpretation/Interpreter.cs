@@ -324,6 +324,20 @@ namespace InjectionScript.Interpretation
             return semanticScope.GetDim(name, index);
         }
 
+        public override InjectionValue VisitNamespacedSymbol([NotNull] injectionParser.NamespacedSymbolContext context)
+        {
+            var ns = context.callNamespace().SYMBOL().GetText();
+            var name = context.SYMBOL().GetText();
+            var argumentValues = Array.Empty<InjectionValue>();
+
+            if (metadata.TryGetNativeSubrutine(ns, name, argumentValues, out var nativeSubrutine))
+            {
+                return nativeSubrutine.Call(argumentValues);
+            }
+            else
+                throw new NotImplementedException();
+        }
+
         public override InjectionValue VisitNumber([NotNull] injectionParser.NumberContext context)
         {
             if (context.HEX_NUMBER() != null)

@@ -54,12 +54,13 @@ multiplicativeOperation: multiplicativeOperator signedOperand;
 multiplicativeOperator: MULTIPLY | DIVIDE;
 
 signedOperand: unaryOperator signedOperand | operand;
-operand: call | subExpression | number | SYMBOL | literal | indexedSymbol;
+operand: call | subExpression | number | SYMBOL | literal | indexedSymbol | namespacedSymbol;
 subExpression: '(' expression ')' ;
 unaryOperator: MINUS | NOT;
 number: HEX_NUMBER | DEC_NUMBER;
 literal: DOUBLEQUOTED_LITERAL | SINGLEQUOTED_LITERAL;
 indexedSymbol: SYMBOL '[' expression ']';
+namespacedSymbol: callNamespace SYMBOL;
 
 LineComment: ('#' | ';') ~[\r\n]* -> channel(HIDDEN);
 END_SUB: [eE][nN][dD] WS* [sS][uU][bB];
