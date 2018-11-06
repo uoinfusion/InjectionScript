@@ -42,6 +42,20 @@ namespace InjectionScript.Tests.Interpretation
             TestExpression("5 == 5", 1);
             TestExpression("1 <> 0", 1);
             TestExpression("5 <> 5", 0);
+
+            TestExpression("5 < 5", 0);
+            TestExpression("5 < 6", 1);
+            TestExpression("6 < 5", 0);
+            TestExpression("5 <= 5", 1);
+            TestExpression("5 <= 6", 1);
+            TestExpression("6 <= 5", 0);
+
+            TestExpression("5 > 5", 0);
+            TestExpression("5 > 6", 0);
+            TestExpression("6 > 5", 1);
+            TestExpression("5 >= 5", 1);
+            TestExpression("5 >= 6", 0);
+            TestExpression("6 >= 5", 1);
         }
 
         [TestMethod]

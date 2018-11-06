@@ -169,6 +169,27 @@ sub call_tests_sub1(a)
    return a * 10
 end sub
 
+sub goto_backward()
+   var x = 0
+
+label1:
+   x = x + 1
+   if (x == 2) then
+      tst_assert_num(2, x, "goto_backward")
+      return
+   end if
+   goto label1
+end sub
+
+sub goto_forward()
+   var x = 0
+   goto label1
+   x = 3
+
+label1:
+   tst_assert_num(0, x, "goto_forward")
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))

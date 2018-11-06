@@ -11,10 +11,12 @@ namespace InjectionScript.Interpretation
     {
         private readonly injectionParser.StatementContext[] statements;
         private readonly Dictionary<injectionParser.StatementContext, int> statementToIndex;
+        private readonly Dictionary<string, int> labels;
 
-        public StatementMap(IEnumerable<injectionParser.StatementContext> statements)
+        public StatementMap(IEnumerable<injectionParser.StatementContext> statements, Dictionary<string, int> labels)
         {
             this.statements = statements.ToArray();
+            this.labels = labels;
 
             statementToIndex = new Dictionary<injectionParser.StatementContext, int>();
             var index = 0;
@@ -29,6 +31,7 @@ namespace InjectionScript.Interpretation
         public int Count => statements.Length;
 
         public int GetIndex(injectionParser.StatementContext statement) => statementToIndex[statement];
+        public int GetIndex(string labelName) => labels[labelName];
 
         public injectionParser.StatementContext GetStatement(int index) => statements[index];
     }

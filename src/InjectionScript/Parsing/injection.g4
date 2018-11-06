@@ -4,8 +4,8 @@ file: subrutine*;
 subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock END_SUB (NEWLINE | EOF);
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
-codeBlock: statement+;
-statement: if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next;
+codeBlock: statement+?;
+statement: label | if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next | goto;
 
 if: IF expression THEN NEWLINE codeBlock? else? END_IF NEWLINE | EOF;
 else: ELSE NEWLINE codeBlock?;
@@ -19,6 +19,8 @@ assignStatement: assignment NEWLINE;
 callStatement: call NEWLINE;
 emptyStatement: NEWLINE;
 returnStatement: RETURN expression? NEWLINE;
+goto: GOTO SYMBOL NEWLINE;
+label: SYMBOL ':' NEWLINE;
 
 var: VAR varDef (',' varDef)* NEWLINE;
 varDef: SYMBOL | assignment;
@@ -75,6 +77,7 @@ VAR: [vV][aA][rR];
 DIM: [dD][iI][mM];
 RETURN: [rR][eE][tT][uU][rR][nN];
 FOR: [fF][oO][rR];
+GOTO: [gG][oO][tT][oO];
 TO: [tT][oO];
 NEXT: [nN][eE][xX][tT];
 

@@ -12,14 +12,25 @@ namespace InjectionScript.Interpretation
     {
         private readonly List<injectionParser.StatementContext> statements
             = new List<injectionParser.StatementContext>();
-        public StatementMap Statements => new StatementMap(statements);
+        private readonly Dictionary<string, int> labels = new Dictionary<string, int>();
+        private int lineNumber;
+
+        public StatementMap Statements => new StatementMap(statements, labels);
 
         public override bool VisitStatement([NotNull] injectionParser.StatementContext context)
         {
             statements.Add(context);
+            lineNumber++;
 
             return base.VisitStatement(context);
         }
 
+        public override bool VisitLabel([NotNull] injectionParser.LabelContext context)
+        {
+            string labelName = context.SYMBOL().GetText();
+            labels.Add(labelName, lineNumber);
+
+            return base.VisitLabel(context);
+        }
     }
 }

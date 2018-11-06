@@ -111,6 +111,10 @@ namespace InjectionScript.Interpretation
                     {
                         statementIndex = whileIndexes.Peek();
                     }
+                    else if (statement.@goto() != null)
+                    {
+                        statementIndex = statementsMap.GetIndex(statement.@goto().SYMBOL().GetText());
+                    }
                     else
                     {
                         Visit(statement);
@@ -207,7 +211,7 @@ namespace InjectionScript.Interpretation
                 else if (comparativeOperator.MORE_THAN() != null)
                     result = result >= operand ? InjectionValue.True : InjectionValue.False;
                 else if (comparativeOperator.MORE_THAN_STRICT() != null)
-                    result = result < operand ? InjectionValue.True : InjectionValue.False;
+                    result = result > operand ? InjectionValue.True : InjectionValue.False;
                 else if (comparativeOperator.EQUAL() != null)
                     result = result == operand ? InjectionValue.True : InjectionValue.False;
                 else if (comparativeOperator.NOT_EQUAL() != null)
