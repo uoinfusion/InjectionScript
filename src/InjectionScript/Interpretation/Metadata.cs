@@ -6,11 +6,16 @@ namespace InjectionScript.Interpretation
     public class Metadata
     {
         private readonly Dictionary<string, SubrutineDefinition> subrutines
-            = new Dictionary<string, SubrutineDefinition>();
+            = new Dictionary<string, SubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> subrutineNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
-        public void Add(SubrutineDefinition subrutineDef) => subrutines.Add(GetSubrutineKey(subrutineDef), subrutineDef);
+        public void Add(SubrutineDefinition subrutineDef)
+        {
+            subrutineNames.Add(subrutineDef.Name);
+            subrutines.Add(GetSubrutineKey(subrutineDef), subrutineDef);
+        }
 
         public void Add(NativeSubrutineDefinition[] subrutineDefs)
         {
@@ -24,6 +29,7 @@ namespace InjectionScript.Interpretation
             => subrutines.TryGetValue(GetSubrutineKey(name, argumentCount), out definition);
         public SubrutineDefinition GetSubrutine(string name, int argumentCount)
             => subrutines[GetSubrutineKey(name, argumentCount)];
+        public bool SubrutineExists(string name) => subrutineNames.Contains(name);
 
         private string GetSubrutineKey(SubrutineDefinition definition)
         {

@@ -16,6 +16,7 @@ namespace InjectionScript.Interpretation
         public Globals Globals { get; } = new Globals();
         public Objects Objects { get; } = new Objects();
         public string CurrentFileName { get; private set; }
+        public injectionParser.FileContext CurrentFileSyntax { get; private set; }
 
         public Runtime()
         {
@@ -34,7 +35,7 @@ namespace InjectionScript.Interpretation
             var parser = new Parser();
             var errorListener = new MemorySyntaxErrorListener();
             parser.AddErrorListener(errorListener);
-            var file = parser.ParseFile(File.ReadAllText(fileName));
+            CurrentFileSyntax = parser.ParseFile(File.ReadAllText(fileName));
             CurrentFileName = fileName;
 
             if (errorListener.Errors.Any())
@@ -44,7 +45,7 @@ namespace InjectionScript.Interpretation
 
             Metadata.ResetSubrutines();
             var collector = new DefinitionCollector(Metadata);
-            collector.Visit(file);
+            collector.Visit(CurrentFileSyntax);
         }
 
         public void Load(injectionParser.FileContext file)
