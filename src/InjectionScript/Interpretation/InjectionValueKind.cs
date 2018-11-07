@@ -3,7 +3,8 @@
     public enum InjectionValueKind
     {
         Unit,
-        Number,
+        Integer,
+        Decimal,
         String
     }
 }

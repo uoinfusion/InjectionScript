@@ -345,10 +345,12 @@ namespace InjectionScript.Interpretation
                 var hex = context.HEX_NUMBER().GetText().Substring(2);
                 return new InjectionValue(int.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture));
             }
-            else if (context.DEC_NUMBER() != null)
+            else if (context.INT_NUMBER() != null)
             {
-                return new InjectionValue(int.Parse(context.DEC_NUMBER().GetText(), CultureInfo.InvariantCulture));
+                return new InjectionValue(int.Parse(context.INT_NUMBER().GetText(), CultureInfo.InvariantCulture));
             }
+            else if (context.DEC_NUMBER() != null)
+                return new InjectionValue(double.Parse(context.DEC_NUMBER().GetText(), CultureInfo.InvariantCulture));
             else
                 throw new NotImplementedException();
         }

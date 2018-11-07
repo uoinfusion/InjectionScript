@@ -1,6 +1,6 @@
 ﻿grammar injection;
 
-file: subrutine*;
+file: NEWLINE* subrutine*;
 subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock END_SUB (NEWLINE | EOF);
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
@@ -57,7 +57,8 @@ signedOperand: unaryOperator signedOperand | operand;
 operand: call | subExpression | number | SYMBOL | literal | indexedSymbol | namespacedSymbol;
 subExpression: '(' expression ')' ;
 unaryOperator: MINUS | NOT;
-number: HEX_NUMBER | DEC_NUMBER;
+number: HEX_NUMBER | INT_NUMBER | DEC_NUMBER;
+
 literal: DOUBLEQUOTED_LITERAL | SINGLEQUOTED_LITERAL;
 indexedSymbol: SYMBOL '[' expression ']';
 namespacedSymbol: callNamespace SYMBOL;
@@ -97,7 +98,8 @@ AND: [aA][nN][dD] | '&&';
 NOT: [nN][oO][tT];
 
 SYMBOL: VALID_SYMBOL_START VALID_SYMBOL_CHAR*;
-DEC_NUMBER: ('0'..'9')+;
+INT_NUMBER: ('0'..'9')+;
+DEC_NUMBER: ('0'..'9')+ '.' ('0'..'9')+;
 HEX_NUMBER: '0x' HEX_DIGIT* ;
 NEWLINE: ('\r'? '\n')+;
 WS: (' '|'\r'|'\n'|'\t') -> channel(HIDDEN);

@@ -1,9 +1,6 @@
 ﻿using InjectionScript.Interpretation;
 using InjectionScript.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace InjectionScript.Tests.Interpretation
 {
@@ -23,13 +20,20 @@ namespace InjectionScript.Tests.Interpretation
         {
             var result = EvalExpression(expression);
 
-            Assert.AreEqual(InjectionValueKind.Number, result.Kind, expression);
-            Assert.AreEqual(expectedValue, result.Number, expression);
+            Assert.AreEqual(new InjectionValue(expectedValue), result, expression);
         }
+
+        public static void TestExpression(string expression, double expectedValue)
+        {
+            var result = EvalExpression(expression);
+
+            Assert.AreEqual(new InjectionValue(expectedValue), result, expression);
+        }
+
 
         public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
-            string subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
+            var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
             var runtime = new Runtime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
@@ -40,13 +44,13 @@ namespace InjectionScript.Tests.Interpretation
 
             var actual = runtime.CallSubrutine("test");
 
-            Assert.AreEqual(InjectionValueKind.Number, actual.Kind, codeBlock);
-            Assert.AreEqual(expected, actual.Number, codeBlock);
+            Assert.AreEqual(InjectionValueKind.Integer, actual.Kind, codeBlock);
+            Assert.AreEqual(expected, actual.Integer, codeBlock);
         }
 
         public static void TestSubrutine(string expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
-            string subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
+            var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
             var runtime = new Runtime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
@@ -70,8 +74,8 @@ namespace InjectionScript.Tests.Interpretation
 
             var actual = runtime.CallSubrutine(subrutineName);
 
-            Assert.AreEqual(InjectionValueKind.Number, actual.Kind, file);
-            Assert.AreEqual(expected, actual.Number, file);
+            Assert.AreEqual(InjectionValueKind.Integer, actual.Kind, file);
+            Assert.AreEqual(expected, actual.Integer, file);
         }
     }
 }
