@@ -34,6 +34,9 @@ namespace InjectionScript.Interpretation
             var args = argumentValues.Select(x => x.ToValue()).ToArray();
             var returnValue = subrutine.DynamicInvoke(args);
 
+            if (returnValue is InjectionValue injVal)
+                return injVal;
+
             return new InjectionValue(returnValue, subrutine.Method.ReturnType);
         }
 

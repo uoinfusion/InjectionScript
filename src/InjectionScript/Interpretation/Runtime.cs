@@ -28,6 +28,12 @@ namespace InjectionScript.Interpretation
         {
             Metadata.Add(new NativeSubrutineDefinition("UO", "SetGlobal", (Action<string, string>)Globals.SetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("UO", "GetGlobal", (Func<string, string>)Globals.GetGlobal));
+            Metadata.Add(new NativeSubrutineDefinition("str", (Func<int, string>)InternalSubrutines.Str));
+            Metadata.Add(new NativeSubrutineDefinition("str", (Func<double, string>)InternalSubrutines.Str));
+            Metadata.Add(new NativeSubrutineDefinition("val", (Func<string, InjectionValue>)InternalSubrutines.Val));
+            Metadata.Add(new NativeSubrutineDefinition("len", (Func<string, int>)InternalSubrutines.Len));
+            Metadata.Add(new NativeSubrutineDefinition("len", (Func<int, int>)InternalSubrutines.Len));
+            Metadata.Add(new NativeSubrutineDefinition("len", (Func<double, int>)InternalSubrutines.Len));
         }
 
         public void Load(string fileName)

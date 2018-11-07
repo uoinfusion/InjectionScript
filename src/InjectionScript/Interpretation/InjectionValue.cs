@@ -105,6 +105,8 @@ namespace InjectionScript.Interpretation
                 return new InjectionValue(v1.Integer + v2.Decimal);
             else if (v1.Kind == InjectionValueKind.Decimal && v2.Kind == InjectionValueKind.Decimal)
                 return new InjectionValue(v1.Decimal + v2.Decimal);
+            else if (v1.Kind == InjectionValueKind.String && v2.Kind == InjectionValueKind.String)
+                return new InjectionValue(v1.String + v2.String);
 
             throw new NotImplementedException();
         }
@@ -322,7 +324,8 @@ namespace InjectionScript.Interpretation
 
         public static bool IsSupported(Type type)
         {
-            return type == typeof(string) || type == typeof(int) || type == typeof(void) || type == typeof(double);
+            return type == typeof(string) || type == typeof(int) || type == typeof(void) || type == typeof(double)
+                || type == typeof(InjectionValue);
         }
     }
 }

@@ -190,6 +190,42 @@ label1:
    tst_assert_num(0, x, "goto_forward")
 end sub
 
+sub string_expressions_sum()
+   tst_assert_str("asdfqwer", "asdf"+"qwer", "string_expressions_sum - 2 string")
+   tst_assert_str("", ""+"", "string_expressions_sum - 2 empty strings")
+   tst_assert_str("asdfqwerzxcv", "asdf"+"qwer"+"zxcv", "string_expressions_sum - 3 string")
+end sub
+
+sub string_expressions_str()
+   tst_assert_str("asdf1", "asdf"+str(1), "string_expressions_str - sum with int number")
+   tst_assert_str("asdf6844", "asdf"+str(0x1abc), "string_expressions_str - sum with hex number")
+   tst_assert_str("asdf4.99", "asdf"+str(4.99), "string_expressions_str - sum with dec number")
+end sub
+
+sub string_expressions_comparison()
+   tst_assert_num(0, "asdf"=="qwer", "string_expressions_comparison - equal - false")
+   tst_assert_num(1, "asdf"=="asdf", "string_expressions_comparison - equal - true")
+   tst_assert_num(0, "ASDF"=="asdf", "string_expressions_comparison - equal - false, case sensitivity")
+   tst_assert_num(1, "asdf"<>"qwer", "string_expressions_comparison - nonequal - true")
+   tst_assert_num(0, "asdf"<>"asdf", "string_expressions_comparison - nonequal - false")
+   tst_assert_num(1, "ASDF"<>"asdf", "string_expressions_comparison - nonequal - false, case sensitivity")
+end sub
+
+sub string_expression_val()
+   tst_assert_num(123, val("123"), "string_expression_val - int")
+   tst_assert_num(4.99, val("4.99"), "string_expression_val - dec")
+   tst_assert_num(0, val("asdf"), "string_expression_val - invalid format")
+   tst_assert_num(0, val("abc"), "string_expression_val - invalid format (but could be a hex number)")
+   tst_assert_num(0, val("0x123"), "string_expression_val - invalid format (but could be a hex number prefixed with 0x)")
+end sub
+
+sub string_expression_len()
+   tst_assert_num(4, len("asdf"), "string_expression_len")
+   tst_assert_num(0, len(""), "string_expression_len - empty string")
+   tst_assert_num(0, len(123), "string_expression_len - int")
+   tst_assert_num(0, len(4.99), "string_expression_len - dec")
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))

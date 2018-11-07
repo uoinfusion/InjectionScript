@@ -30,6 +30,13 @@ namespace InjectionScript.Tests.Interpretation
             Assert.AreEqual(new InjectionValue(expectedValue), result, expression);
         }
 
+        public static void TestExpression(string expression, string expectedValue)
+        {
+            var result = EvalExpression(expression);
+
+            Assert.AreEqual(new InjectionValue(expectedValue), result, expression);
+        }
+
 
         public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
