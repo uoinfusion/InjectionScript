@@ -16,12 +16,12 @@ namespace InjectionScript.Cli
             {
                 ExtractCallsFromDirectory(args[1]);
 
-                foreach (var call in extractedCalls.OrderBy(x => x))
-                    Console.WriteLine(call);
+                foreach (var call in extractedCallsCount.OrderByDescending(x => x.Value))
+                    Console.WriteLine($"{call.Value}\t\t\t{call.Key}");
             }
         }
 
-        private static HashSet<string> extractedCalls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<string, int> extractedCallsCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         private static void ExtractCallsFromDirectory(string path)
         {
@@ -63,7 +63,11 @@ namespace InjectionScript.Cli
                 builder.Append('`');
                 builder.Append(argsCount);
 
-                extractedCalls.Add(builder.ToString());
+                string key = builder.ToString();
+                if (extractedCallsCount.TryGetValue(key, out int count))
+                    extractedCallsCount[key] = count + 1;
+                else
+                    extractedCallsCount[key] = 1;
             };
 
             walker.Walk(runtime.CurrentFileSyntax);
