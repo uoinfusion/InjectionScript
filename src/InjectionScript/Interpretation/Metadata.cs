@@ -11,6 +11,8 @@ namespace InjectionScript.Interpretation
         private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
+        public IEnumerable<SubrutineDefinition> Subrutines => subrutines.Values;
+
         public void Add(SubrutineDefinition subrutineDef)
         {
             subrutineNames.Add(subrutineDef.Name);
