@@ -32,7 +32,9 @@ namespace InjectionScript.Interpretation
             else
                 throw new NotImplementedException();
         }
-        public InjectionValue GetVar(string name) => scopes.Peek().vars[name];
+
+        public bool TryGetVar(string name, out InjectionValue value)
+            => scopes.Peek().vars.TryGetValue(name, out value);
 
         internal void DefineVar(string name)
         {

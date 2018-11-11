@@ -58,7 +58,9 @@ namespace InjectionScript.Interpretation
                     else if (statement.next() != null)
                     {
                         var forScope = forScopes.Peek();
-                        var variable = semanticScope.GetVar(forScope.VariableName);
+                        if (semanticScope.TryGetVar(forScope.VariableName, out var variable))
+                            throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
+
                         variable = variable + new InjectionValue(1);
                         semanticScope.SetVar(forScope.VariableName, variable);
                         if (variable < forScope.Range)
@@ -310,8 +312,14 @@ namespace InjectionScript.Interpretation
 
         public override InjectionValue VisitOperand([NotNull] injectionParser.OperandContext context)
         {
-            if (context.SYMBOL() != null)
-                return semanticScope.GetVar(context.SYMBOL().GetText());
+            var name = context.SYMBOL()?.GetText();
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (!semanticScope.TryGetVar(name, out var variable))
+                    throw new ScriptFailedException($"Variable undefined - {name}", context.Start.Line);
+
+                return variable;
+            }
 
             return base.VisitOperand(context);
         }
@@ -396,8 +404,10 @@ namespace InjectionScript.Interpretation
             }
             else
             {
-                var customSubrutine = metadata.GetSubrutine(name, argumentValues.Length);
-                return CallSubrutine(customSubrutine.Subrutine, argumentValues);
+                if (metadata.TryGetSubrutine(name, argumentValues.Length, out var customSubrutine))
+                    return CallSubrutine(customSubrutine.Subrutine, argumentValues);
+                else
+                    throw new ScriptFailedException($"Function not found {name}", context.Start.Line);
             }
         }
     }
