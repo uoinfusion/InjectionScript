@@ -15,5 +15,13 @@ namespace InjectionScript.Tests.Interpretation
             TestSubrutine("some text", @"UO.SetGlobal(""globname"", ""some text"")
 return UO.GetGlobal(""globname"")");
         }
+
+        [TestMethod]
+        public void Can_set_multiple_times()
+        {
+            TestSubrutine("some text", @"UO.SetGlobal('globname', 'some text')
+UO.SetGlobal('globname', 'some text')
+return UO.GetGlobal('globname')");
+        }
     }
 }

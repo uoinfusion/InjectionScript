@@ -12,7 +12,7 @@ namespace InjectionScript.Interpretation
 
         public void SetGlobal(string name, string value)
         {
-            globals.Add(name, value);
+            globals[name] = value;
         }
 
         public string GetGlobal(string name)
