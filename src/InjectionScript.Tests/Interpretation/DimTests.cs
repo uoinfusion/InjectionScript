@@ -19,6 +19,15 @@ return x[5]
         }
 
         [TestMethod]
+        public void Dim_name_can_contain_dot()
+        {
+            TestSubrutine(123, @"dim x.y...[10]
+x.y...[5] = 123
+return x.y...[5]
+");
+        }
+
+        [TestMethod]
         public void Dim_multiple_on_one_line_with_constant_limit()
         {
             TestSubrutine(3, @"   dim x[10], y[10]

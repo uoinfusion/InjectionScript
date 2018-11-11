@@ -44,18 +44,11 @@ namespace InjectionScript.Cli
             var walker = new CallWalker();
             walker.VisitCall = (context) =>
             {
-                var ns = context.callNamespace()?.SYMBOL()?.GetText();
                 var name = context.SYMBOL().GetText();
-                if (string.IsNullOrEmpty(ns) && runtime.Metadata.SubrutineExists(name))
+                if (runtime.Metadata.SubrutineExists(name))
                     return;
 
                 var builder = new StringBuilder();
-
-                if (!string.IsNullOrEmpty(ns))
-                {
-                    builder.Append(ns);
-                    builder.Append('.');
-                }
 
                 builder.Append(name);
 

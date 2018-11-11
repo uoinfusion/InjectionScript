@@ -10,6 +10,8 @@ namespace InjectionScript.Interpretation
         private readonly HashSet<string> subrutineNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, NativeSubrutineDefinition> intrinsicVariables
+            = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
         public IEnumerable<SubrutineDefinition> Subrutines => subrutines.Values;
 
@@ -26,6 +28,14 @@ namespace InjectionScript.Interpretation
         }
         public void Add(NativeSubrutineDefinition subrutineDef)
             => nativeSubrutines.Add(subrutineDef.GetSignature(), subrutineDef);
+
+        public void AddIntrinsicVariables(NativeSubrutineDefinition[] subrutineDefs)
+        {
+            foreach (var subrutineDef in subrutineDefs)
+                AddIntrinsicVariable(subrutineDef);
+        }
+        public void AddIntrinsicVariable(NativeSubrutineDefinition subrutineDef)
+            => intrinsicVariables.Add(subrutineDef.Name, subrutineDef);
 
         public bool TryGetSubrutine(string name, int argumentCount, out SubrutineDefinition definition)
             => subrutines.TryGetValue(GetSubrutineKey(name, argumentCount), out definition);
@@ -44,9 +54,9 @@ namespace InjectionScript.Interpretation
         private string GetSubrutineKey(string name, int paramCount)
             => $"{name}`{paramCount}";
 
-        public bool TryGetNativeSubrutine(string ns, string name, IEnumerable<InjectionValue> argumentValues, out NativeSubrutineDefinition subrutineDefinition)
+        public bool TryGetNativeSubrutine(string name, IEnumerable<InjectionValue> argumentValues, out NativeSubrutineDefinition subrutineDefinition)
         {
-            var key = NativeSubrutineDefinition.GetSignature(ns, name, argumentValues);
+            var key = NativeSubrutineDefinition.GetSignature(name, argumentValues);
             if (nativeSubrutines.TryGetValue(key, out var value))
             {
                 subrutineDefinition = value;
@@ -56,5 +66,8 @@ namespace InjectionScript.Interpretation
             subrutineDefinition = null;
             return false;
         }
+
+        public bool TryGetIntrinsicVariable(string name, out NativeSubrutineDefinition variable)
+            => intrinsicVariables.TryGetValue(name, out variable);
     }
 }

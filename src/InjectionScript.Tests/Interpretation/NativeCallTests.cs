@@ -15,7 +15,7 @@ namespace InjectionScript.Tests.Interpretation
         {
             TestSubrutine("some text", @"return UO.MyNaTiVe()", new[]
             {
-                new NativeSubrutineDefinition("UO", "mynative", (Func<string>)(() => "some text"))
+                new NativeSubrutineDefinition("UO.mynative", (Func<string>)(() => "some text"))
             });
         }
 
@@ -24,8 +24,8 @@ namespace InjectionScript.Tests.Interpretation
         {
             TestSubrutine(5, @"return UO.sub1() + UO.sub1(3)", new[]
             {
-                new NativeSubrutineDefinition("UO", "sub1", (Func<int>)(() => 2)),
-                new NativeSubrutineDefinition("UO", "sub1", (Func<int, int>)((a) => a))
+                new NativeSubrutineDefinition("UO.sub1", (Func<int>)(() => 2)),
+                new NativeSubrutineDefinition("UO.sub1", (Func<int, int>)((a) => a))
             });
 
         }
@@ -35,17 +35,17 @@ namespace InjectionScript.Tests.Interpretation
         {
             TestSubrutine(5, @"return UO.sub1(""0x123"") + UO.sub1(0x123)", new[]
             {
-                new NativeSubrutineDefinition("UO", "sub1", (Func<int, int>)((a) => 2)),
-                new NativeSubrutineDefinition("UO", "sub1", (Func<string, int>)((a) => 3))
+                new NativeSubrutineDefinition("UO.sub1", (Func<int, int>)((a) => 2)),
+                new NativeSubrutineDefinition("UO.sub1", (Func<string, int>)((a) => 3))
             });
         }
 
         [TestMethod]
-        public void Namespaced_symbol_can_call_native_subrutine()
+        public void Intrinsic_variable_can_call_native_subrutine()
         {
-            TestSubrutine(123, @"return UO.Mana", new[]
+            TestSubrutine(123, @"return UO.Mana", intrinsicVariables: new[]
             {
-                new NativeSubrutineDefinition("UO", "Mana", (Func<int>)(() => 123)),
+                new NativeSubrutineDefinition("UO.Mana", (Func<int>)(() => 123)),
             });
         }
     }

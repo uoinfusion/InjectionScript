@@ -39,5 +39,13 @@ y = 3
 x = y * 2
 return x");
         }
+
+        [TestMethod]
+        public void Variable_name_can_contain_dot()
+        {
+            TestSubrutine(123, @"var x.y = 123
+return x.y");
+
+        }
     }
 }

@@ -28,9 +28,8 @@ dim: DIM dimDef (',' dimDef)* NEWLINE;
 dimDef: SYMBOL '[' expression ']' dimDefAssignment?;
 dimDefAssignment: '=' expression;
 
-call: callNamespace? SYMBOL argumentList;
+call: SYMBOL argumentList;
 argumentList: '(' arguments? ')';
-callNamespace: SYMBOL '.';
 arguments: argument (',' argument)*;
 argument: expression | literal;
 
@@ -54,14 +53,13 @@ multiplicativeOperation: multiplicativeOperator signedOperand;
 multiplicativeOperator: MULTIPLY | DIVIDE;
 
 signedOperand: unaryOperator signedOperand | operand;
-operand: call | subExpression | number | SYMBOL | literal | indexedSymbol | namespacedSymbol;
+operand: call | subExpression | number | SYMBOL | literal | indexedSymbol;
 subExpression: '(' expression ')' ;
 unaryOperator: MINUS | NOT;
 number: HEX_NUMBER | INT_NUMBER | DEC_NUMBER;
 
 literal: DOUBLEQUOTED_LITERAL | SINGLEQUOTED_LITERAL;
 indexedSymbol: SYMBOL '[' expression ']';
-namespacedSymbol: callNamespace SYMBOL;
 
 LineComment: ('#' | ';') ~[\r\n]* -> channel(HIDDEN);
 END_SUB: [eE][nN][dD] WS* [sS][uU][bB];
@@ -107,6 +105,6 @@ DOUBLEQUOTED_LITERAL: '"' ~('"')*? '"';
 SINGLEQUOTED_LITERAL: '\'' ~('\'')*? '\'';
 
 fragment VALID_SYMBOL_START: ('a' .. 'z') | ('A' .. 'Z') | '_';
-fragment VALID_SYMBOL_CHAR: VALID_SYMBOL_START | DEC_DIGIT;
+fragment VALID_SYMBOL_CHAR: VALID_SYMBOL_START | DEC_DIGIT | '.';
 fragment DEC_DIGIT : ('0' .. '9');
 fragment HEX_DIGIT : DEC_DIGIT | ('a' .. 'f') | ('A' .. 'F');

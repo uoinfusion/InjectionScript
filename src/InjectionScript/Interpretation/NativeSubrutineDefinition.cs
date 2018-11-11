@@ -7,11 +7,7 @@ namespace InjectionScript.Interpretation
     public class NativeSubrutineDefinition
     {
         private readonly Delegate subrutine;
-        public string NameSpace { get; }
         public string Name { get; }
-
-        public NativeSubrutineDefinition(string ns, string name, Delegate subrutine)
-            : this(name, subrutine) => NameSpace = ns;
 
         public NativeSubrutineDefinition(string name, Delegate subrutine)
         {
@@ -46,20 +42,18 @@ namespace InjectionScript.Interpretation
                 .GetParameters()
                 .Select(x => InjectionValue.GetKind(x.ParameterType));
 
-            return GetSignature(NameSpace, Name, parametersSignature);
+            return GetSignature(Name, parametersSignature);
         }
 
-        internal static string GetSignature(string ns, string name, IEnumerable<InjectionValue> parameters)
-            => GetSignature(ns, name, parameters.Select(x => x.Kind));
+        internal static string GetSignature(string name, IEnumerable<InjectionValue> parameters)
+            => GetSignature(name, parameters.Select(x => x.Kind));
 
-        internal static string GetSignature(string ns, string name, IEnumerable<InjectionValueKind> parameterTypes)
+        internal static string GetSignature(string name, IEnumerable<InjectionValueKind> parameterTypes)
         {
             var parametersSignature = parameterTypes.Select(x => x.ToString())
                 .Aggregate(string.Empty, (l, r) => l + "," + r);
 
-            return string.IsNullOrEmpty(ns)
-                ? $"{name}`{parametersSignature}"
-                : $"{ns}.{name}{parametersSignature}";
+            return $"{name}`{parametersSignature}";
         }
     }
 }

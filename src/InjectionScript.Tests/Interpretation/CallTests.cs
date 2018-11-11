@@ -49,5 +49,14 @@ sub sub2(a)
 end sub
 ");
         }
+
+        [TestMethod]
+        public void Subrutine_name_can_contain_dot()
+        {
+            TestSubrutine(9, "s.u.b.1...", @"sub s.u.b.1...()
+    return 9
+end sub
+");
+        }
     }
 }

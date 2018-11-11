@@ -151,6 +151,23 @@ sub dim_assignment_without_index()
    tst_assert_num(123, x, "dim_assignment_without_index - x")    
 end sub
 
+sub dim_name_can_contain_dot()
+    dim x.y.z...[10]
+    
+    x.y.z...[1] = 123
+   tst_assert_num(123, x.y.z...[1], "dim_name_can_contain_dot")    
+end sub
+
+sub var_name_can_contain_dot()
+    var x.y.z... = 123
+
+   tst_assert_num(123, x.y.z..., "var_name_can_contain_dot")    
+end sub
+
+sub sub.name.can.contain.dot()
+   tst_assert_num(1, 1, "sub.name.can.contain.dot")    
+end sub
+
 sub globals()
     UO.SetGlobal("globname", "some text")
     tst_assert_str("some text", UO.GetGlobal("globname"), "globals")
@@ -188,6 +205,15 @@ sub goto_forward()
 
 label1:
    tst_assert_num(0, x, "goto_forward")
+end sub
+
+sub goto_label_can_contain_dot()
+   var x = 0
+   goto label.1.
+   x = 3
+
+label.1.:
+   tst_assert_num(0, x, "goto_label_can_contain_dot")
 end sub
 
 sub string_expressions_sum()

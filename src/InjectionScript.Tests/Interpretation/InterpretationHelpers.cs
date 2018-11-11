@@ -38,12 +38,14 @@ namespace InjectionScript.Tests.Interpretation
         }
 
 
-        public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
+        public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null, NativeSubrutineDefinition[] intrinsicVariables = null)
         {
             var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
             var runtime = new Runtime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
+            if (intrinsicVariables != null)
+                runtime.Metadata.AddIntrinsicVariables(intrinsicVariables);
 
             var parser = new Parser();
             parser.AddErrorListener(new FailTestErrorListener());

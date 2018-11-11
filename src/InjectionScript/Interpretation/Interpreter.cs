@@ -58,7 +58,7 @@ namespace InjectionScript.Interpretation
                     else if (statement.next() != null)
                     {
                         var forScope = forScopes.Peek();
-                        if (semanticScope.TryGetVar(forScope.VariableName, out var variable))
+                        if (!semanticScope.TryGetVar(forScope.VariableName, out var variable))
                             throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
 
                         variable = variable + new InjectionValue(1);
@@ -315,10 +315,12 @@ namespace InjectionScript.Interpretation
             var name = context.SYMBOL()?.GetText();
             if (!string.IsNullOrEmpty(name))
             {
-                if (!semanticScope.TryGetVar(name, out var variable))
-                    throw new ScriptFailedException($"Variable undefined - {name}", context.Start.Line);
+                if (metadata.TryGetIntrinsicVariable(name, out var intrinsicVariable))
+                    return intrinsicVariable.Call(Array.Empty<InjectionValue>());
+                if (semanticScope.TryGetVar(name, out var variable))
+                    return variable;
 
-                return variable;
+                throw new ScriptFailedException($"Variable undefined - {name}", context.Start.Line);
             }
 
             return base.VisitOperand(context);
@@ -330,20 +332,6 @@ namespace InjectionScript.Interpretation
             var name = context.SYMBOL().GetText();
 
             return semanticScope.GetDim(name, index);
-        }
-
-        public override InjectionValue VisitNamespacedSymbol([NotNull] injectionParser.NamespacedSymbolContext context)
-        {
-            var ns = context.callNamespace().SYMBOL().GetText();
-            var name = context.SYMBOL().GetText();
-            var argumentValues = Array.Empty<InjectionValue>();
-
-            if (metadata.TryGetNativeSubrutine(ns, name, argumentValues, out var nativeSubrutine))
-            {
-                return nativeSubrutine.Call(argumentValues);
-            }
-            else
-                throw new NotImplementedException();
         }
 
         public override InjectionValue VisitNumber([NotNull] injectionParser.NumberContext context)
@@ -391,14 +379,13 @@ namespace InjectionScript.Interpretation
 
         public override InjectionValue VisitCall([NotNull] injectionParser.CallContext context)
         {
-            var ns = context.callNamespace()?.SYMBOL().GetText();
             var name = context.SYMBOL().GetText();
 
             var argumentValues = context.argumentList().arguments()?.argument()?
                 .Select(arg => VisitExpression(arg.expression()))
                 .ToArray() ?? Array.Empty<InjectionValue>();
 
-            if (metadata.TryGetNativeSubrutine(ns, name, argumentValues, out var nativeSubrutine))
+            if (metadata.TryGetNativeSubrutine(name, argumentValues, out var nativeSubrutine))
             {
                 return nativeSubrutine.Call(argumentValues);
             }

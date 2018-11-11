@@ -18,6 +18,19 @@ x = x + 1
 return x
 
 end sub
+");[TestMethod]
+
+        public void Label_can_contain_dot() => TestSubrutine(2, "sub1", @"sub sub1()
+var x = 1
+goto label.1.
+x = x + 1
+
+label.1.:
+x = x + 1
+
+return x
+
+end sub
 ");
 
         [TestMethod]
