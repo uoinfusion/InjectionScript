@@ -12,6 +12,13 @@ namespace InjectionScript.Interpretation
         {
             public Dictionary<string, InjectionValue> vars = new Dictionary<string, InjectionValue>();
             public Dictionary<string, InjectionValue[]> dims = new Dictionary<string, InjectionValue[]>();
+
+            public Scope()
+            {
+                vars["lastcorpse"] = new InjectionValue("lastcorpse");
+                vars["self"] = new InjectionValue("self");
+                vars["finditem"] = new InjectionValue("finditem");
+            }
         }
 
         private readonly Stack<Scope> scopes = new Stack<Scope>();

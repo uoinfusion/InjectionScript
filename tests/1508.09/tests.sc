@@ -252,6 +252,17 @@ sub string_expression_len()
    tst_assert_num(0, len(4.99), "string_expression_len - dec")
 end sub
 
+sub value_change_of_shortcut_variable_is_inherited_in_call_chain()
+    self = "asdf"
+    value_change_of_shortcut_variable_is_inherited_in_call_chain.sub()    
+    tst_assert_str("qwer", self, "value_change_of_shortcut_variable_is_inherited_in_call_chain")
+end sub
+
+sub value_change_of_shortcut_variable_is_inherited_in_call_chain.sub()
+    tst_assert_str("asdf", self, "value_change_of_shortcut_variable_is_inherited_in_call_chain.sub")
+    self = "qwer"
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))
