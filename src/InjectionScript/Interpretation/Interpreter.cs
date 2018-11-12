@@ -430,7 +430,12 @@ namespace InjectionScript.Interpretation
                 if (metadata.TryGetSubrutine(name, argumentValues.Length, out var customSubrutine))
                     return CallSubrutine(customSubrutine.Subrutine, argumentValues);
                 else
-                    throw new ScriptFailedException($"Function not found {name}", context.Start.Line);
+                {
+                    var argumentKinds = argumentValues.Any()
+                        ? argumentValues.Select(x => x.Kind.ToString()).Aggregate((l, r) => l + "," + r)
+                        : "no arguments";
+                    throw new ScriptFailedException($"Function not found {name} ({argumentKinds})", context.Start.Line);
+                }
             }
         }
     }
