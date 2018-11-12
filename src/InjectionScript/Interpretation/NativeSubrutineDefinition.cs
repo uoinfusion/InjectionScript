@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace InjectionScript.Interpretation
 {
@@ -28,12 +29,22 @@ namespace InjectionScript.Interpretation
         internal InjectionValue Call(InjectionValue[] argumentValues)
         {
             var args = argumentValues.Select(x => x.ToValue()).ToArray();
-            var returnValue = subrutine.DynamicInvoke(args);
 
-            if (returnValue is InjectionValue injVal)
-                return injVal;
+            try
+            {
+                var returnValue = subrutine.DynamicInvoke(args);
+                if (returnValue is InjectionValue injVal)
+                    return injVal;
 
-            return new InjectionValue(returnValue, subrutine.Method.ReturnType);
+                return new InjectionValue(returnValue, subrutine.Method.ReturnType);
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null)
+                    throw ex.InnerException;
+                else
+                    throw;
+            }
         }
 
         internal string GetSignature()

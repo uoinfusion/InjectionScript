@@ -51,112 +51,120 @@ namespace InjectionScript.Interpretation
                 while (statementIndex < statementsMap.Count)
                 {
                     var statement = statementsMap.GetStatement(statementIndex);
-                    if (statement.returnStatement() != null)
-                    {
-                        return Visit(statement.returnStatement());
-                    }
-                    else if (statement.@if() != null)
-                    {
-                        injectionParser.StatementContext nextStatement;
 
-                        var condition = Visit(statement.@if().expression());
-                        if (condition != InjectionValue.False)
+                    try
+                    {
+                        if (statement.returnStatement() != null)
                         {
-                            nextStatement = (injectionParser.StatementContext)statement.@if().Parent;
-                            var triggerStatement = statement.@if().@else()?.codeBlock()?.statement()?.FirstOrDefault();
-                            var targetStatement = statement.@if().@else()?.codeBlock()?.statement()?.LastOrDefault();
-                            if (triggerStatement != null && targetStatement != null)
-                            {
-                                var conditionalGoto = new ConditionalGoto(statementsMap.GetIndex(triggerStatement),
-                                    statementsMap.GetIndex(targetStatement) + 1);
-                                conditionalGotos.Push(conditionalGoto);
-                            }
+                            return Visit(statement.returnStatement());
                         }
-                        else
-                            nextStatement = statement.@if().codeBlock()?.statement()?.LastOrDefault();
+                        else if (statement.@if() != null)
+                        {
+                            injectionParser.StatementContext nextStatement;
 
-                        if (nextStatement != null)
-                            statementIndex = statementsMap.GetIndex(nextStatement) + 1;
-                        else
-                            statementIndex++;
-                    }
-                    else if (statement.@for() != null)
-                    {
-                        statementIndex++;
-                        forScopes.Push(InterpretFor(statementIndex, statement.@for()));
-                    }
-                    else if (statement.next() != null)
-                    {
-                        var forScope = forScopes.Peek();
-                        if (!semanticScope.TryGetVar(forScope.VariableName, out var variable))
-                            throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
-
-                        variable = variable + new InjectionValue(1);
-                        semanticScope.SetVar(forScope.VariableName, variable);
-                        if (variable < forScope.Range)
-                        {
-                            statementIndex = forScope.StatementIndex;
-                        }
-                        else
-                            statementIndex++;
-                    }
-                    else if (statement.repeat() != null)
-                    {
-                        statementIndex++;
-                        repeatIndexes.Push(statementIndex);
-                    }
-                    else if (statement.until() != null)
-                    {
-                        var condition = Visit(statement.until().expression());
-                        if (condition == InjectionValue.False)
-                        {
-                            statementIndex++;
-                            repeatIndexes.Pop();
-                        }
-                        else
-                            statementIndex = repeatIndexes.Peek();
-                    }
-                    else if (statement.@while() != null)
-                    {
-                        var condition = Visit(statement.@while().expression());
-                        if (condition == InjectionValue.False)
-                        {
-                            while (statementIndex < statementsMap.Count && statementsMap.GetStatement(statementIndex).wend() == null)
+                            var condition = Visit(statement.@if().expression());
+                            if (condition != InjectionValue.False)
                             {
-                                statementIndex++;
-                            }
-                            if (statementsMap.GetStatement(statementIndex).wend() != null)
-                            {
-                                statementIndex++;
-                                whileIndexes.Pop();
+                                nextStatement = (injectionParser.StatementContext)statement.@if().Parent;
+                                var triggerStatement = statement.@if().@else()?.codeBlock()?.statement()?.FirstOrDefault();
+                                var targetStatement = statement.@if().@else()?.codeBlock()?.statement()?.LastOrDefault();
+                                if (triggerStatement != null && targetStatement != null)
+                                {
+                                    var conditionalGoto = new ConditionalGoto(statementsMap.GetIndex(triggerStatement),
+                                        statementsMap.GetIndex(targetStatement) + 1);
+                                    conditionalGotos.Push(conditionalGoto);
+                                }
                             }
                             else
-                                throw new NotImplementedException();
+                                nextStatement = statement.@if().codeBlock()?.statement()?.LastOrDefault();
+
+                            if (nextStatement != null)
+                                statementIndex = statementsMap.GetIndex(nextStatement) + 1;
+                            else
+                                statementIndex++;
+                        }
+                        else if (statement.@for() != null)
+                        {
+                            statementIndex++;
+                            forScopes.Push(InterpretFor(statementIndex, statement.@for()));
+                        }
+                        else if (statement.next() != null)
+                        {
+                            var forScope = forScopes.Peek();
+                            if (!semanticScope.TryGetVar(forScope.VariableName, out var variable))
+                                throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
+
+                            variable = variable + new InjectionValue(1);
+                            semanticScope.SetVar(forScope.VariableName, variable);
+                            if (variable < forScope.Range)
+                            {
+                                statementIndex = forScope.StatementIndex;
+                            }
+                            else
+                                statementIndex++;
+                        }
+                        else if (statement.repeat() != null)
+                        {
+                            statementIndex++;
+                            repeatIndexes.Push(statementIndex);
+                        }
+                        else if (statement.until() != null)
+                        {
+                            var condition = Visit(statement.until().expression());
+                            if (condition == InjectionValue.False)
+                            {
+                                statementIndex++;
+                                repeatIndexes.Pop();
+                            }
+                            else
+                                statementIndex = repeatIndexes.Peek();
+                        }
+                        else if (statement.@while() != null)
+                        {
+                            var condition = Visit(statement.@while().expression());
+                            if (condition == InjectionValue.False)
+                            {
+                                while (statementIndex < statementsMap.Count && statementsMap.GetStatement(statementIndex).wend() == null)
+                                {
+                                    statementIndex++;
+                                }
+                                if (statementsMap.GetStatement(statementIndex).wend() != null)
+                                {
+                                    statementIndex++;
+                                    whileIndexes.Pop();
+                                }
+                                else
+                                    throw new NotImplementedException();
+                            }
+                            else
+                            {
+                                whileIndexes.Push(statementIndex);
+                                statementIndex++;
+                            }
+                        }
+                        else if (statement.wend() != null)
+                        {
+                            statementIndex = whileIndexes.Peek();
+                        }
+                        else if (statement.@goto() != null)
+                        {
+                            statementIndex = statementsMap.GetIndex(statement.@goto().SYMBOL().GetText());
                         }
                         else
                         {
-                            whileIndexes.Push(statementIndex);
+                            Visit(statement);
                             statementIndex++;
                         }
-                    }
-                    else if (statement.wend() != null)
-                    {
-                        statementIndex = whileIndexes.Peek();
-                    }
-                    else if (statement.@goto() != null)
-                    {
-                        statementIndex = statementsMap.GetIndex(statement.@goto().SYMBOL().GetText());
-                    }
-                    else
-                    {
-                        Visit(statement);
-                        statementIndex++;
-                    }
 
-                    while (conditionalGotos.Count > 0 && conditionalGotos.Peek().TriggerIndex == statementIndex)
+                        while (conditionalGotos.Count > 0 && conditionalGotos.Peek().TriggerIndex == statementIndex)
+                        {
+                            var conditionalGoto = conditionalGotos.Pop();
+                            statementIndex = conditionalGoto.TargetIndex;
+                        }
+                    }
+                    catch (StatementFailedException ex)
                     {
-                        var conditionalGoto = conditionalGotos.Pop();
-                        statementIndex = conditionalGoto.TargetIndex;
+                        throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
                     }
                 }
 

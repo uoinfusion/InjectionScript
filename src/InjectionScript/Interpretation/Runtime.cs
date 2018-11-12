@@ -76,7 +76,10 @@ namespace InjectionScript.Interpretation
             if (Objects.TryGet(id, out int value))
                 return value;
 
-            return NumberConversions.Str2Int(id);
+            if (NumberConversions.TryStr2Int(id, out value))
+                return value;
+
+            throw new StatementFailedException($"Invalid object {id}.");
         }
 
         public void SetObject(string name, int value) => Objects.Set(name, value);
