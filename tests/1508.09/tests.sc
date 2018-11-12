@@ -229,7 +229,11 @@ sub string_expressions_str()
    tst_assert_str("asdf1", "asdf"+str(1), "string_expressions_str - sum with int number")
    tst_assert_str("asdf6844", "asdf"+str(0x1abc), "string_expressions_str - sum with hex number")
    tst_assert_str("asdf4.99", "asdf"+str(4.99), "string_expressions_str - sum with dec number")
+
+   tst_assert_str("0", str("str"), "string_expression_str - string")
+   tst_assert_str("0", str(""), "string_expression_str - empty string")
 end sub
+
 
 sub string_expressions_comparison()
    tst_assert_num(0, "asdf"=="qwer", "string_expressions_comparison - equal - false")

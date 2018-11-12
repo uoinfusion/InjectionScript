@@ -16,6 +16,7 @@ namespace InjectionScript.Interpretation
 
         public static string Str(int value) => value.ToString(CultureInfo.InvariantCulture);
         public static string Str(double value) => value.ToString(CultureInfo.InvariantCulture);
+        public static string Str(string value) => "0";
 
         public static int Len(string value) => value.Length;
         public static int Len(int value) => 0;

@@ -17,9 +17,11 @@ namespace InjectionScript.Tests.Interpretation
         [TestMethod]
         public void Str()
         {
-            TestExpression("'asdf'+str(1)", "asdf1");
-            TestExpression("'asdf'+str(0x1abc)", "asdf6844");
-            TestExpression("'asdf'+str(4.99)", "asdf4.99");
+            TestExpression("str(1)", "1");
+            TestExpression("str(0x1abc)", "6844");
+            TestExpression("str(4.99)", "4.99");
+            TestExpression("str('')", "0");
+            TestExpression("str('str')", "0");
         }
 
         [TestMethod]
