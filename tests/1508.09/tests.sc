@@ -255,6 +255,14 @@ sub string_expression_len()
    tst_assert_num(0, len(4.99), "string_expression_len - dec")
 end sub
 
+sub shortcut_variable_values()
+    tst_assert_str("laststatus", laststatus, "shortcut_variable_values - laststatus")
+    tst_assert_str("lasttarget", lasttarget, "shortcut_variable_values - lasttarget")
+    tst_assert_str("lastcorpse", lastcorpse, "shortcut_variable_values - lastcorpse")
+    tst_assert_str("finditem", finditem, "shortcut_variable_values - finditem")
+    tst_assert_str("self", self, "shortcut_variable_values - self")
+end sub
+
 sub value_change_of_shortcut_variable_is_inherited_in_call_chain()
     self = "asdf"
     value_change_of_shortcut_variable_is_inherited_in_call_chain.sub()    

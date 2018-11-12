@@ -18,6 +18,8 @@ namespace InjectionScript.Interpretation
                 vars["lastcorpse"] = new InjectionValue("lastcorpse");
                 vars["self"] = new InjectionValue("self");
                 vars["finditem"] = new InjectionValue("finditem");
+                vars["laststatus"] = new InjectionValue("laststatus");
+                vars["lasttarget"] = new InjectionValue("lasttarget");
             }
         }
 
