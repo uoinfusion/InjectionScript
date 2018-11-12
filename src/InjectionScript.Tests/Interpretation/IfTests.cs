@@ -32,13 +32,56 @@ return 1");
         [TestMethod]
         public void If_trivial_true_condition_with_else()
         {
-            TestSubrutine(2, @"if 1 then
-    return 2
+            TestSubrutine(1, @"var i = 0
+if 1 then
+    i = i + 1
 else
-    return 3
+    i = i + 333
 endif
 
-return 1");
+return i");
+        }
+
+        [TestMethod]
+        public void Nested_true_conditions_with_else()
+        {
+            TestSubrutine(1, @"var i = 0
+if 1 then
+    if 1 then
+        if 1 then
+            i = i + 1
+        else
+            i = i + 335
+        end if
+    else
+        i = i + 334
+    end if
+else
+    i = i + 333
+endif
+
+return i");
+        }
+
+        [TestMethod]
+        public void Nested_false_conditions_with_else()
+        {
+            TestSubrutine(1, @"var i = 0
+if 0 then
+    i = i + 333
+else
+    if 0 then
+        i = i + 334
+    else
+        if 0 then
+            i = i + 335
+        else
+            i = i + 1
+        end if
+    end if
+endif
+
+return i");
         }
 
         [TestMethod]
@@ -52,6 +95,5 @@ endif
 
 return 1");
         }
-
     }
 }

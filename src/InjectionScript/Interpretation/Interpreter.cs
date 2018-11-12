@@ -9,6 +9,18 @@ namespace InjectionScript.Interpretation
 {
     public class Interpreter : injectionBaseVisitor<InjectionValue>
     {
+        private struct ConditionalGoto
+        {
+            public int TriggerIndex { get; }
+            public int TargetIndex { get; }
+
+            public ConditionalGoto(int trigger, int target)
+            {
+                TriggerIndex = trigger;
+                TargetIndex = target;
+            }
+        }
+
         private readonly Metadata metadata;
         private readonly SemanticScope semanticScope = new SemanticScope();
 
@@ -22,6 +34,7 @@ namespace InjectionScript.Interpretation
             var forScopes = new Stack<ForScope>();
             var repeatIndexes = new Stack<int>();
             var whileIndexes = new Stack<int>();
+            var conditionalGotos = new Stack<ConditionalGoto>();
             var flattener = new StatementFlattener();
             flattener.Visit(subrutine);
             var statementsMap = flattener.Statements;
@@ -44,7 +57,24 @@ namespace InjectionScript.Interpretation
                     }
                     else if (statement.@if() != null)
                     {
-                        var nextStatement = InterpretIf(statement.@if());
+                        injectionParser.StatementContext nextStatement;
+
+                        var condition = Visit(statement.@if().expression());
+                        if (condition != InjectionValue.False)
+                        {
+                            nextStatement = (injectionParser.StatementContext)statement.@if().Parent;
+                            var triggerStatement = statement.@if().@else()?.codeBlock()?.statement()?.FirstOrDefault();
+                            var targetStatement = statement.@if().@else()?.codeBlock()?.statement()?.LastOrDefault();
+                            if (triggerStatement != null && targetStatement != null)
+                            {
+                                var conditionalGoto = new ConditionalGoto(statementsMap.GetIndex(triggerStatement),
+                                    statementsMap.GetIndex(targetStatement) + 1);
+                                conditionalGotos.Push(conditionalGoto);
+                            }
+                        }
+                        else
+                            nextStatement = statement.@if().codeBlock()?.statement()?.LastOrDefault();
+
                         if (nextStatement != null)
                             statementIndex = statementsMap.GetIndex(nextStatement) + 1;
                         else
@@ -122,6 +152,12 @@ namespace InjectionScript.Interpretation
                         Visit(statement);
                         statementIndex++;
                     }
+
+                    while (conditionalGotos.Count > 0 && conditionalGotos.Peek().TriggerIndex == statementIndex)
+                    {
+                        var conditionalGoto = conditionalGotos.Pop();
+                        statementIndex = conditionalGoto.TargetIndex;
+                    }
                 }
 
                 return InjectionValue.Unit;
@@ -139,15 +175,6 @@ namespace InjectionScript.Interpretation
             var range = Visit(forContext.expression());
 
             return new ForScope(variableName, range, statementIndex);
-        }
-
-        private injectionParser.StatementContext InterpretIf(injectionParser.IfContext context)
-        {
-            var condition = Visit(context.expression());
-            if (condition != InjectionValue.False)
-                return (injectionParser.StatementContext)context.Parent;
-            else
-                return context.codeBlock()?.statement()?.LastOrDefault();
         }
 
         public override InjectionValue VisitVarDef([NotNull] injectionParser.VarDefContext context)
