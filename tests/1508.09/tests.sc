@@ -49,6 +49,9 @@ sub operators_precedence()
    
    tst_assert_num(1, 5 * 1 == 5, "5 * 1 == 5; additive precede multiplicative")
    tst_assert_num(0, 5 * (1 == 5), "5 * (1 == 5)")
+ 
+   tst_assert_num(1, 5 == 5 and 1, "5 == 5 and 1; comparative precede logical")
+   tst_assert_num(1, 1 + 4 == 4 + 1 and 1, "1 + 4 == 4 + 1 and 1; comparative precede logical and additive");
 end sub
 
 sub for_out_of_range_without_next()

@@ -36,19 +36,19 @@ argument: expression | literal;
 assignment: lvalue '=' expression;
 lvalue: SYMBOL | indexedSymbol;
 
-expression: comparativeOperand comparativeOperation*;
-comparativeOperation: comparativeOperator comparativeOperand;
-comparativeOperator: EQUAL | NOT_EQUAL | LESS_THAN | LESS_THAN_STRICT | MORE_THAN | MORE_THAN_STRICT;
-
-comparativeOperand: logicalOperand logicalOperation*;
+expression: logicalOperand logicalOperation*;
 logicalOperation: logicalOperator logicalOperand;
 logicalOperator: OR | AND;
+logicalOperand: comparativeOperand comparativeOperation*;
 
-logicalOperand: additiveOperand additiveOperation*;
+comparativeOperation: comparativeOperator comparativeOperand;
+comparativeOperator: EQUAL | NOT_EQUAL | LESS_THAN | LESS_THAN_STRICT | MORE_THAN | MORE_THAN_STRICT;
+comparativeOperand: additiveOperand additiveOperation*;
+
 additiveOperation: additiveOperator additiveOperand;
 additiveOperator: PLUS | MINUS;
-
 additiveOperand: op1=signedOperand multiplicativeOperation*;
+
 multiplicativeOperation: multiplicativeOperator signedOperand;
 multiplicativeOperator: MULTIPLY | DIVIDE;
 

@@ -226,6 +226,29 @@ namespace InjectionScript.Interpretation
 
         public override InjectionValue VisitExpression([NotNull] injectionParser.ExpressionContext context)
         {
+            var result = Visit(context.logicalOperand());
+
+            foreach (var operation in context.logicalOperation())
+            {
+                var operand = Visit(operation.logicalOperand());
+                var logicalOperator = operation.logicalOperator();
+
+                if (logicalOperator.AND() != null)
+                    result = result & operand;
+                else if (logicalOperator.OR() != null)
+                    result = result | operand;
+                else
+                    throw new NotImplementedException();
+            }
+
+            return result;
+        }
+
+        public override InjectionValue VisitLiteral([NotNull] injectionParser.LiteralContext context) => new InjectionValue(context.DOUBLEQUOTED_LITERAL()?.GetText().Trim('\"')
+                ?? context.SINGLEQUOTED_LITERAL()?.GetText().Trim('\''));
+
+        public override InjectionValue VisitLogicalOperand([NotNull] injectionParser.LogicalOperandContext context)
+        {
             var result = Visit(context.comparativeOperand());
 
             foreach (var operation in context.comparativeOperation())
@@ -252,18 +275,16 @@ namespace InjectionScript.Interpretation
             return result;
         }
 
-        public override InjectionValue VisitLiteral([NotNull] injectionParser.LiteralContext context) => new InjectionValue(context.DOUBLEQUOTED_LITERAL()?.GetText().Trim('\"')
-                ?? context.SINGLEQUOTED_LITERAL()?.GetText().Trim('\''));
-
-        public override InjectionValue VisitLogicalOperand([NotNull] injectionParser.LogicalOperandContext context)
+        public override InjectionValue VisitComparativeOperand([NotNull] injectionParser.ComparativeOperandContext context)
         {
             var result = Visit(context.additiveOperand());
 
             foreach (var operation in context.additiveOperation())
             {
                 var operand = Visit(operation.additiveOperand());
+                var additiveOperator = operation.additiveOperator();
 
-                switch (operation.additiveOperator().GetText())
+                switch (additiveOperator.GetText())
                 {
                     case "+":
                         result = result + operand;
@@ -274,26 +295,6 @@ namespace InjectionScript.Interpretation
                     default:
                         throw new NotImplementedException();
                 }
-            }
-
-            return result;
-        }
-
-        public override InjectionValue VisitComparativeOperand([NotNull] injectionParser.ComparativeOperandContext context)
-        {
-            var result = Visit(context.logicalOperand());
-
-            foreach (var operation in context.logicalOperation())
-            {
-                var operand = Visit(operation.logicalOperand());
-                var logicalOperator = operation.logicalOperator();
-
-                if (logicalOperator.AND() != null)
-                    result = result & operand;
-                else if (logicalOperator.OR() != null)
-                    result = result | operand;
-                else
-                    throw new NotImplementedException();
             }
 
             return result;
