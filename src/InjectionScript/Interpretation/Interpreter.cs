@@ -131,7 +131,8 @@ namespace InjectionScript.Interpretation
                                 if (statementsMap.GetStatement(statementIndex).wend() != null)
                                 {
                                     statementIndex++;
-                                    whileIndexes.Pop();
+                                    if (whileIndexes.Any())
+                                        whileIndexes.Pop();
                                 }
                                 else
                                     throw new NotImplementedException();
