@@ -94,6 +94,15 @@ sub for_jumping_to_false_if()
    tst_assert_num(10, x, "for_jumping_to_false_if")
 end sub
 
+sub trivial_repeat()
+    var i = 0
+    repeat
+      i = i + 1
+    until i >= 10
+
+    tst_assert_num(10, i, "trivial_repeat")
+end sub
+
 sub repeat_without_until()
    var i = 0
    repeat

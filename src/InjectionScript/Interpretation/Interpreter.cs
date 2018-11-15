@@ -111,7 +111,7 @@ namespace InjectionScript.Interpretation
                         else if (statement.until() != null)
                         {
                             var condition = Visit(statement.until().expression());
-                            if (condition == InjectionValue.False)
+                            if (condition != InjectionValue.False)
                             {
                                 statementIndex++;
                                 repeatIndexes.Pop();
