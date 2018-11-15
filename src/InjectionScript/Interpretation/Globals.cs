@@ -10,10 +10,8 @@ namespace InjectionScript.Interpretation
     {
         private readonly Dictionary<string, string> globals = new Dictionary<string, string>();
 
-        public void SetGlobal(string name, string value)
-        {
-            globals[name] = value;
-        }
+        public void SetGlobal(string name, string value) => globals[name] = value;
+        public void SetGlobal(string name, int value) => SetGlobal(name, NumberConversions.Int2Hex(value));
 
         public string GetGlobal(string name)
         {

@@ -1,11 +1,8 @@
 ﻿using InjectionScript.Parsing;
 using InjectionScript.Parsing.Syntax;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InjectionScript.Interpretation
 {
@@ -27,6 +24,7 @@ namespace InjectionScript.Interpretation
         private void RegisterNatives()
         {
             Metadata.Add(new NativeSubrutineDefinition("UO.SetGlobal", (Action<string, string>)Globals.SetGlobal));
+            Metadata.Add(new NativeSubrutineDefinition("UO.SetGlobal", (Action<string, int>)Globals.SetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("UO.GetGlobal", (Func<string, string>)Globals.GetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("str", (Func<int, string>)InternalSubrutines.Str));
             Metadata.Add(new NativeSubrutineDefinition("str", (Func<double, string>)InternalSubrutines.Str));
@@ -35,6 +33,10 @@ namespace InjectionScript.Interpretation
             Metadata.Add(new NativeSubrutineDefinition("len", (Func<string, int>)InternalSubrutines.Len));
             Metadata.Add(new NativeSubrutineDefinition("len", (Func<int, int>)InternalSubrutines.Len));
             Metadata.Add(new NativeSubrutineDefinition("len", (Func<double, int>)InternalSubrutines.Len));
+            Metadata.Add(new NativeSubrutineDefinition("UO.exec", (Action<string>)Exec));
+
+            Metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("true", (Func<int>)(() => 1)));
+            Metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("false", (Func<int>)(() => 0)));
         }
 
         public void Load(string fileName)
@@ -65,7 +67,7 @@ namespace InjectionScript.Interpretation
         {
             if (Metadata.TryGetSubrutine(name, arguments.Length, out var subrutine))
             {
-                return Interpreter.CallSubrutine(subrutine.Subrutine, 
+                return Interpreter.CallSubrutine(subrutine.Subrutine,
                     arguments.Select(x => new InjectionValue(x)).ToArray());
             }
             else
@@ -74,15 +76,48 @@ namespace InjectionScript.Interpretation
 
         public int GetObject(string id)
         {
-            if (Objects.TryGet(id, out int value))
+            if (Objects.TryGet(id, out var value))
                 return value;
 
             if (NumberConversions.TryStr2Int(id, out value))
                 return value;
 
-            throw new StatementFailedException($"Invalid object {id}.");
+            return 0;
         }
 
-        public void SetObject(string name, int value) => Objects.Set(name, value);
+        public void SetObject(string name, int value)
+        {
+            Objects.Set(name, value);
+        }
+
+        private string GetExecName(string name)
+        {
+            return $"UO.{name}";
+        }
+
+        public void Exec(string parameters)
+        {
+            var parts = parameters.Split(' ');
+            if (parts.Length == 1)
+            {
+                CallNativeSubrutine(GetExecName(parts[0]));
+            }
+            else if (parts.Length == 2)
+            {
+                CallNativeSubrutine(GetExecName(parts[0]), new InjectionValue(parts[1].Trim('\'')));
+            }
+            else
+                throw new NotImplementedException();
+        }
+
+        private void CallNativeSubrutine(string name, params InjectionValue[] args)
+        {
+            if (Metadata.TryGetNativeSubrutine(name, args, out var subrutine))
+            {
+                subrutine.Call(args);
+            }
+            else
+                throw new NotImplementedException();
+        }
     }
 }
