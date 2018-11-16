@@ -10,8 +10,8 @@ namespace InjectionScript.Interpretation
     {
         private class Scope
         {
-            public Dictionary<string, InjectionValue> vars = new Dictionary<string, InjectionValue>();
-            public Dictionary<string, InjectionValue[]> dims = new Dictionary<string, InjectionValue[]>();
+            public readonly Dictionary<string, InjectionValue> vars = new Dictionary<string, InjectionValue>();
+            public readonly Dictionary<string, InjectionValue?[]> dims = new Dictionary<string, InjectionValue?[]>();
 
             public Scope()
             {
@@ -65,12 +65,26 @@ namespace InjectionScript.Interpretation
             else
                 throw new NotImplementedException();
         }
-        public InjectionValue GetDim(string name, int index) => scopes.Peek().dims[name][index];
+
+        public InjectionValue GetDim(string name, int index)
+        {
+            var scope = scopes.Peek();
+            if (!scope.dims.TryGetValue(name, out var dim))
+                throw new StatementFailedException($"Variable '{name}' is not defined.");
+
+            if (index < 0 && index > dim.Length)
+                throw new StatementFailedException($"Index {index} is out of range for variable '{name}' (maximum size of this array is {dim.Length})");
+
+            if (!dim[index].HasValue)
+                throw new StatementFailedException($"Reading value from variable '{name}' at  index {index} that is not initialized. Assign some value to '{name}[{index}]' first.");
+
+            return dim[index].Value;
+        }
 
         internal void DefineDim(string name, int limit)
         {
             var dims = scopes.Peek().dims;
-            dims[name] = new InjectionValue[limit + 1];
+            dims[name] = new InjectionValue?[limit + 1];
         }
     }
 }

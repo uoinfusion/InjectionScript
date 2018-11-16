@@ -67,7 +67,7 @@ namespace InjectionScript.Interpretation
         {
             if (Metadata.TryGetSubrutine(name, arguments.Length, out var subrutine))
             {
-                return Interpreter.CallSubrutine(subrutine.Subrutine,
+                return Interpreter.CallSubrutine(subrutine.Syntax,
                     arguments.Select(x => new InjectionValue(x)).ToArray());
             }
             else
@@ -90,21 +90,16 @@ namespace InjectionScript.Interpretation
             Objects.Set(name, value);
         }
 
-        private string GetExecName(string name)
-        {
-            return $"UO.{name}";
-        }
-
         public void Exec(string parameters)
         {
             var parts = parameters.Split(' ');
             if (parts.Length == 1)
             {
-                CallNativeSubrutine(GetExecName(parts[0]));
+                CallNativeSubrutine(parts[0]);
             }
             else if (parts.Length == 2)
             {
-                CallNativeSubrutine(GetExecName(parts[0]), new InjectionValue(parts[1].Trim('\'')));
+                CallNativeSubrutine(parts[0], new InjectionValue(parts[1].Trim('\'')));
             }
             else
                 throw new NotImplementedException();
@@ -112,9 +107,13 @@ namespace InjectionScript.Interpretation
 
         private void CallNativeSubrutine(string name, params InjectionValue[] args)
         {
-            if (Metadata.TryGetNativeSubrutine(name, args, out var subrutine))
+            if (Metadata.TryGetNativeSubrutine("UO." + name, args, out var nativeSubrutine))
             {
-                subrutine.Call(args);
+                nativeSubrutine.Call(args);
+            }
+            else if (Metadata.TryGetSubrutine(name, args.Length, out var subrutine))
+            {
+                Interpreter.CallSubrutine(subrutine.Syntax, args);
             }
             else
                 throw new NotImplementedException();

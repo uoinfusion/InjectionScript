@@ -429,7 +429,7 @@ namespace InjectionScript.Interpretation
             else
             {
                 if (metadata.TryGetSubrutine(name, argumentValues.Length, out var customSubrutine))
-                    return CallSubrutine(customSubrutine.Subrutine, argumentValues);
+                    return CallSubrutine(customSubrutine.Syntax, argumentValues);
                 else
                 {
                     var argumentKinds = argumentValues.Any()

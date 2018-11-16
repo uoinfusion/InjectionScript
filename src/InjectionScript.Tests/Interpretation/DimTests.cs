@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using InjectionScript.Interpretation;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -68,6 +69,18 @@ return x.y...[5]
    x = 2
 
    return x
+");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ScriptFailedException))]
+        public void Exception_when_reading_from_uninitialized_index()
+        {
+            TestSubrutine(1, @"
+dim x[10]
+var y
+
+y = x[5]
 ");
         }
 

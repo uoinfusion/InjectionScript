@@ -45,7 +45,7 @@ namespace InjectionScript.Interpretation
 
         private string GetSubrutineKey(SubrutineDefinition definition)
         {
-            var paramCount = definition.Subrutine.parameters()?.parameterName()?.Length ?? 0;
+            var paramCount = definition.Syntax.parameters()?.parameterName()?.Length ?? 0;
 
             return GetSubrutineKey(definition.Name, paramCount);
         }

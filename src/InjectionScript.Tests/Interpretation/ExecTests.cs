@@ -15,7 +15,7 @@ namespace InjectionScript.Tests.Interpretation
         {
             bool executed = false;
 
-            TestSubrutine(@"exec(""mynative"")", natives: new[]
+            TestSubrutine(@"uo.exec(""mynative"")", natives: new[]
             {
                 new NativeSubrutineDefinition("UO.mynative", (Action)(() => executed = true))
             });
@@ -28,7 +28,7 @@ namespace InjectionScript.Tests.Interpretation
         {
             string passedValue = string.Empty;
 
-            TestSubrutine(@"exec(""mynative argumentvalue"")", natives: new[]
+            TestSubrutine(@"uo.exec(""mynative argumentvalue"")", natives: new[]
             {
                 new NativeSubrutineDefinition("UO.mynative", (Action<string>)((str) => passedValue = str))
             });
@@ -41,12 +41,28 @@ namespace InjectionScript.Tests.Interpretation
         {
             string passedValue = string.Empty;
 
-            TestSubrutine(@"exec(""mynative 'argumentvalue'"")", natives: new[]
+            TestSubrutine(@"uo.exec(""mynative 'argumentvalue'"")", natives: new[]
             {
                 new NativeSubrutineDefinition("UO.mynative", (Action<string>)((str) => passedValue = str))
             });
 
             Assert.AreEqual("argumentvalue", passedValue);
+        }
+
+        [TestMethod]
+        public void Can_execute_custom_subrutine_when_uo_subrutine_not_available()
+        {
+            TestSubrutine(123, "test", @"
+sub test()
+    UO.Exec('test2')
+
+    return val(UO.GetGlobal('myglobal'))
+end sub
+
+sub test2()
+    UO.SetGlobal('myglobal', 123)
+end sub
+");
         }
     }
 }
