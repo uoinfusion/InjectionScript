@@ -167,6 +167,14 @@ namespace InjectionScript.Interpretation
                     {
                         throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
                     }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InternalInterpretationException(statement.Start.Line, ex);
+                    }
                 }
 
                 return InjectionValue.Unit;
