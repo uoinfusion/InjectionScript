@@ -10,12 +10,12 @@ namespace InjectionScript.Parsing
 {
     internal sealed class MemorySyntaxErrorListener : BaseErrorListener
     {
-        public IEnumerable<SyntaxError> Errors => errors;
-        private readonly List<SyntaxError> errors = new List<SyntaxError>();
+        public IEnumerable<Message> Errors => errors;
+        private readonly List<Message> errors = new List<Message>();
 
         public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
         {
-            errors.Add(new SyntaxError(line, charPositionInLine, msg));
+            errors.Add(new Message(line, charPositionInLine, msg, MessageSeverity.Error));
         }
     }
 }

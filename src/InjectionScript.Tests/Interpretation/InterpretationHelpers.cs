@@ -101,5 +101,11 @@ namespace InjectionScript.Tests.Interpretation
             Assert.AreEqual(InjectionValueKind.Integer, actual.Kind, file);
             Assert.AreEqual(expected, actual.Integer, file);
         }
+
+        public static MessageCollection Parse(string fileContent)
+        {
+            var runtime = new Runtime();
+            return runtime.Load(fileContent, "test.sc");
+        }
     }
 }

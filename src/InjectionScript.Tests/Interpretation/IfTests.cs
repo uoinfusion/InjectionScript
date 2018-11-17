@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using static InjectionScript.Tests.Interpretation.InterpretationHelpers;
 
@@ -94,6 +95,19 @@ else
 endif
 
 return 1");
+        }
+
+        [TestMethod]
+        public void Parser_emits_warning_for_redundand_endif()
+        {
+            var messages = Parse(@"if 0 then
+    return 2
+endif
+endif
+
+return 1");
+
+            messages.Any(x => x.Severity == MessageSeverity.Warning && x.Line == 4);
         }
     }
 }

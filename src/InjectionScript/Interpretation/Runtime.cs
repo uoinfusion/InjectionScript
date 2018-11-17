@@ -1,4 +1,5 @@
-﻿using InjectionScript.Parsing;
+﻿using InjectionScript.Analysis;
+using InjectionScript.Parsing;
 using InjectionScript.Parsing.Syntax;
 using System;
 using System.IO;
@@ -42,22 +43,26 @@ namespace InjectionScript.Interpretation
             Metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("false", (Func<int>)(() => 0)));
         }
 
-        public void Load(string fileName)
+        public MessageCollection Load(string fileName) 
+            => Load(File.ReadAllText(fileName), fileName);
+
+        public MessageCollection Load(string content, string fileName)
         {
             var parser = new Parser();
             var errorListener = new MemorySyntaxErrorListener();
             parser.AddErrorListener(errorListener);
-            CurrentFileSyntax = parser.ParseFile(File.ReadAllText(fileName));
+            CurrentFileSyntax = parser.ParseFile(content);
             CurrentFileName = fileName;
 
             if (errorListener.Errors.Any())
-            {
-                throw new SyntaxErrorException(fileName, errorListener.Errors);
-            }
+                return new MessageCollection(errorListener.Errors);
 
             Metadata.ResetSubrutines();
             var collector = new DefinitionCollector(Metadata);
             collector.Visit(CurrentFileSyntax);
+
+            var sanityAnalyzer = new SanityAnalyzer();
+            return sanityAnalyzer.Analyze(CurrentFileSyntax);
         }
 
         public void Load(injectionParser.FileContext file)
