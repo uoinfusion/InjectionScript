@@ -3,13 +3,16 @@ using InjectionScript.Parsing.Syntax;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace InjectionScript.Interpretation
 {
     public class Runtime
     {
+        private readonly ThreadLocal<Interpreter> interpreter;
+
         public Metadata Metadata { get; } = new Metadata();
-        public Interpreter Interpreter { get; }
+        public Interpreter Interpreter => interpreter.Value;
         public Globals Globals { get; } = new Globals();
         public Objects Objects { get; } = new Objects();
         public string CurrentFileName { get; private set; }
@@ -17,7 +20,7 @@ namespace InjectionScript.Interpretation
 
         public Runtime()
         {
-            Interpreter = new Interpreter(Metadata);
+            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata));
             RegisterNatives();
         }
 
