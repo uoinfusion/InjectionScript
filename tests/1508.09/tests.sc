@@ -70,6 +70,37 @@ sub for_out_of_range()
    tst_assert_num(2, x, "for_out_of_range")
 end sub
 
+sub for_nested_loops()
+    var i, j, k
+    var num = 0
+    for i = 0 to 2
+        for j = 0 to 3 
+            for k = 0 to 4
+                num = num + 1
+            next
+        next
+   next
+   tst_assert_num(60, num, "for_nested_loops")
+end sub
+
+sub for_ranges_empty_body_starting_non_zero()
+    var i
+    var num = 0
+    for i = 5 to 10
+      num = num + 1
+    next
+    tst_assert_num(6, num, "for_ranges_empty_body_starting_non_zero")
+end sub
+
+sub Number_of_cycles_is_range_minus_start_plus_one()
+	var i
+	var x = 0
+	for i = 0 to 10
+	    x = x + 1
+	next
+    tst_assert_num(11, x, "Number_of_cycles_is_range_minus_start_plus_one")
+end sub
+
 sub for_jumping_to_if()
    var i, x = 1
    if 1 then
@@ -131,6 +162,7 @@ sub dim_with_constant_limit()
    x[5] = 123
    
    tst_assert_num(123, x[5], "dim_with_constant_limit")
+   tst_assert_num(0, x[0], "dim_with_constant_limit - not initialized value")
 end sub
 
 sub dim_multiple_on_one_line_with_constant_limit()

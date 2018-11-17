@@ -94,14 +94,17 @@ namespace InjectionScript.Interpretation
                             if (!semanticScope.TryGetVar(forScope.VariableName, out var variable))
                                 throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
 
-                            variable = variable + new InjectionValue(1);
-                            semanticScope.SetVar(forScope.VariableName, variable);
                             if (variable < forScope.Range)
                             {
                                 statementIndex = forScope.StatementIndex;
+                                variable = variable + new InjectionValue(1);
+                                semanticScope.SetVar(forScope.VariableName, variable);
                             }
                             else
+                            {
                                 statementIndex++;
+                                forScopes.Pop();
+                            }
                         }
                         else if (statement.repeat() != null)
                         {
@@ -166,6 +169,10 @@ namespace InjectionScript.Interpretation
                     catch (StatementFailedException ex)
                     {
                         throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
+                    }
+                    catch (ScriptFailedException)
+                    {
+                        throw;
                     }
                     catch (OperationCanceledException)
                     {
