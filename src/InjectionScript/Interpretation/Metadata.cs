@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace InjectionScript.Interpretation
 {
@@ -66,6 +67,10 @@ namespace InjectionScript.Interpretation
             subrutineDefinition = null;
             return false;
         }
+
+        internal bool NativeSubrutineExists(string name, int argumentCount)
+            => nativeSubrutines.Any(x => x.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
+                && x.Value.ArgumentCount == argumentCount);
 
         public bool TryGetIntrinsicVariable(string name, out NativeSubrutineDefinition variable)
             => intrinsicVariables.TryGetValue(name, out variable);

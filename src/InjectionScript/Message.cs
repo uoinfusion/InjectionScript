@@ -25,5 +25,7 @@ namespace InjectionScript
 
         public bool IsCode(string code) 
             => Code.Equals(code, StringComparison.OrdinalIgnoreCase);
+
+        public override string ToString() => $"{Severity} {Code}: {Line}, {CharPos} - {Text}";
     }
 }

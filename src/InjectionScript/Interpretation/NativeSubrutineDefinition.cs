@@ -9,6 +9,7 @@ namespace InjectionScript.Interpretation
     {
         private readonly Delegate subrutine;
         public string Name { get; }
+        internal int ArgumentCount { get; }
 
         public NativeSubrutineDefinition(string name, Delegate subrutine)
         {
@@ -19,11 +20,16 @@ namespace InjectionScript.Interpretation
             if (!InjectionValue.IsSupported(subrutine.Method.ReturnType))
                 throw new ArgumentException($"The retrun type {subrutine.Method.ReturnType} of {subrutine} is not compatible with native subrutine.");
 
+            int argumentCount = 0;
             foreach (var param in subrutine.Method.GetParameters())
             {
                 if (!InjectionValue.IsSupported(param.ParameterType))
                     throw new ArgumentException($"The type {param.ParameterType} of {param.Name} ({subrutine}) is not compatible with native subrutine.");
+
+                argumentCount++;
             }
+
+            ArgumentCount = argumentCount;
         }
 
         internal InjectionValue Call(InjectionValue[] argumentValues)

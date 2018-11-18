@@ -63,7 +63,7 @@ namespace InjectionScript.Interpretation
             collector.Visit(CurrentFileSyntax);
 
             var sanityAnalyzer = new SanityAnalyzer();
-            return sanityAnalyzer.Analyze(CurrentFileSyntax);
+            return sanityAnalyzer.Analyze(CurrentFileSyntax, Metadata);
         }
 
         public void Load(injectionParser.FileContext file)

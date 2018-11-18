@@ -15,7 +15,7 @@ namespace InjectionScript.Parsing
 
         public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
         {
-            errors.Add(new Message(line, charPositionInLine, MessageSeverity.Error, "SYNTAX", msg));
+            errors.Add(new Message(line, charPositionInLine, MessageSeverity.Error, MessageCodes.SyntaxError, msg));
         }
     }
 }

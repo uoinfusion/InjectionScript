@@ -23,7 +23,7 @@ sub test()
     return 1
 end sub");
 
-            messages.AssertWarning(6, "STM001");
+            messages.AssertWarning(6, MessageCodes.MisplacedEndIf);
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ sub test()
     while 0
 end sub");
 
-            messages.AssertWarning(3, "STM002");
+            messages.AssertWarning(3, MessageCodes.IncompleteWhile);
         }
 
         [TestMethod]
@@ -48,8 +48,8 @@ sub test()
     end if
 end sub");
 
-            messages.AssertWarning(3, "STM002");
-            messages.AssertWarning(5, "STM003");
+            messages.AssertWarning(3, MessageCodes.IncompleteWhile);
+            messages.AssertWarning(5, MessageCodes.MisplacedWend);
         }
     }
 }

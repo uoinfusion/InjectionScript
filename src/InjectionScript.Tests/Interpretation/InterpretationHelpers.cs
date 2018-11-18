@@ -122,5 +122,13 @@ namespace InjectionScript.Tests.Interpretation
 
             Assert.IsTrue(collection.Any(m => m.Severity == MessageSeverity.Warning && m.Line == line && m.IsCode(code)));
         }
+
+        public static void AssertNoWarning(this MessageCollection collection, int line, string code)
+        {
+            var message = collection.FirstOrDefault(x => x.Severity == MessageSeverity.Warning && x.Line == line && x.IsCode(code));
+
+            if (message != null)
+                Assert.Fail($"No warning expected on line {line}, but found:\n{message}");
+        }
     }
 }

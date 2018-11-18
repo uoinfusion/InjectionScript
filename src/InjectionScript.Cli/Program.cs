@@ -12,9 +12,9 @@ namespace InjectionScript.Cli
     {
         private static void Main(string[] args)
         {
-            if (args[0].Equals("extract-unkwnown-calls"))
+            if (args[0].Equals("analyse"))
             {
-                ExtractCallsFromDirectory(args[1]);
+                AnalyseDirectory(args[1]);
 
                 foreach (var call in extractedCallsCount.OrderByDescending(x => x.Value))
                     Console.WriteLine($"{call.Value}\t\t\t{call.Key}");
@@ -23,47 +23,43 @@ namespace InjectionScript.Cli
 
         private static Dictionary<string, int> extractedCallsCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-        private static void ExtractCallsFromDirectory(string path)
+        private static void AnalyseDirectory(string path)
         {
             var files = Directory.GetFiles(path, "*.sc");
 
             foreach (var file in files)
-                ExtractCallsFromFile(file);
+                AnalyseFile(file);
 
             var subDirectories = Directory.GetDirectories(path);
             foreach (var subDirectory in subDirectories)
-                ExtractCallsFromDirectory(subDirectory);
+                AnalyseDirectory(subDirectory);
         }
 
-        private static void ExtractCallsFromFile(string file)
+        private static void AnalyseFile(string file)
         {
-            Console.WriteLine($"Extracting file {file}");
+            Console.WriteLine($"Analysing {file}");
 
             var runtime = new Runtime();
-            runtime.Load(file);
-            var walker = new CallWalker();
-            walker.VisitCall = (context) =>
+
+            var messages = runtime.Load(file);
+            var originalCollor = Console.ForegroundColor;
+            foreach (var message in messages)
             {
-                var name = context.SYMBOL().GetText();
-                if (runtime.Metadata.SubrutineExists(name))
-                    return;
 
-                var builder = new StringBuilder();
+                switch (message.Severity)
+                {
+                    case MessageSeverity.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(message.ToString());
+                        break;
+                    case MessageSeverity.Warning:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(message.ToString());
+                        break;
 
-                builder.Append(name);
-
-                var argsCount = context.argumentList()?.arguments()?.argument()?.Count() ?? 0;
-                builder.Append('`');
-                builder.Append(argsCount);
-
-                string key = builder.ToString();
-                if (extractedCallsCount.TryGetValue(key, out int count))
-                    extractedCallsCount[key] = count + 1;
-                else
-                    extractedCallsCount[key] = 1;
-            };
-
-            walker.Walk(runtime.CurrentFileSyntax);
+                }
+            }
+            Console.ForegroundColor = originalCollor;
         }
     }
 }
