@@ -1,6 +1,7 @@
 ﻿using InjectionScript.Interpretation;
 using InjectionScript.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace InjectionScript.Tests.Interpretation
 {
@@ -106,6 +107,20 @@ namespace InjectionScript.Tests.Interpretation
         {
             var runtime = new Runtime();
             return runtime.Load(fileContent, "test.sc");
+        }
+
+        public static void AssertWarning(this MessageCollection collection, int line, string code)
+        {
+            if (!collection.Any(x => x.Severity == MessageSeverity.Warning))
+                Assert.Fail("No warning found.");
+
+            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.Line == line))
+                Assert.Fail($"No warning found on line {line}.");
+
+            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.Line == line && x.IsCode(code)))
+                Assert.Fail($"No warning found on line {line} with code {code}.");
+
+            Assert.IsTrue(collection.Any(m => m.Severity == MessageSeverity.Warning && m.Line == line && m.IsCode(code)));
         }
     }
 }

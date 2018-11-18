@@ -136,18 +136,5 @@ endif
 
 return 1");
         }
-
-        [TestMethod]
-        public void Parser_emits_warning_for_redundand_endif()
-        {
-            var messages = Parse(@"if 0 then
-    return 2
-endif
-endif
-
-return 1");
-
-            messages.Any(x => x.Severity == MessageSeverity.Warning && x.Line == 4);
-        }
     }
 }

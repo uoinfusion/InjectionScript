@@ -5,13 +5,13 @@ subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock END_SUB (NEWLIN
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+?;
-statement: label | if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif;
+statement: label | if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif | incompleteWhile;
 
 if: IF expression THEN NEWLINE codeBlock? else? END_IF NEWLINE | EOF;
 missplacedEndif: END_IF;
 else: ELSE NEWLINE codeBlock?;
-while: WHILE expression NEWLINE codeBlock? WEND NEWLINE | EOF;
-missplacedWhile: WHILE expression NEWLINE;
+while: WHILE expression NEWLINE codeBlock? WEND NEWLINE;
+incompleteWhile: WHILE expression NEWLINE;
 wend: WEND NEWLINE;
 repeat: REPEAT NEWLINE;
 until: UNTIL expression NEWLINE;

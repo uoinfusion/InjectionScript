@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using static InjectionScript.Tests.Interpretation.InterpretationHelpers;
 
 

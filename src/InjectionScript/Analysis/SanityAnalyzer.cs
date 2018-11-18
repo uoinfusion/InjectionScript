@@ -1,22 +1,40 @@
 ﻿using Antlr4.Runtime.Misc;
 using InjectionScript.Parsing.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InjectionScript.Analysis
 {
     public class SanityAnalyzer
     {
-        private class Visitor : injectionBaseVisitor<bool>
+        private class MisplacedStatementsVisitor : injectionBaseVisitor<bool>
         {
-            public List<Message> Messages { get; } = new List<Message>();
+            private readonly List<Message> messages;
 
-            public override bool VisitEndif([NotNull] injectionParser.EndifContext context)
+            public MisplacedStatementsVisitor(List<Message> messages)
             {
-                Messages.Add(new Message(context.Start.Line, context.Start.Column, "Cannot find any related 'if' to this 'end if'. Please, remove it, or pair it with an 'if'.", MessageSeverity.Warning));
+                this.messages = messages;
+            }
+
+            public override bool VisitMissplacedEndif([NotNull] injectionParser.MissplacedEndifContext context)
+            {
+                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, "STM001",
+                    "Cannot find any related 'if' to this 'end if'. Please, remove it, or pair it with an 'if'."));
+
+                return true;
+            }
+
+            public override bool VisitIncompleteWhile([NotNull] injectionParser.IncompleteWhileContext context)
+            {
+                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, "STM002",
+                    "Cannot find any related 'wend' to this 'while'. Please, close this 'while' with a 'wend' on the same nesting level."));
+
+                return true;
+            }
+
+            public override bool VisitWend([NotNull] injectionParser.WendContext context)
+            {
+                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, "STM003",
+                    "Cannot find any related 'while' to this 'wend'. Please, remove it, or pair it with an 'while'."));
 
                 return true;
             }
@@ -24,10 +42,12 @@ namespace InjectionScript.Analysis
 
         public MessageCollection Analyze(injectionParser.FileContext fileContext)
         {
-            var visitor = new Visitor();
-            visitor.Visit(fileContext);
+            var messages = new List<Message>();
 
-            return new MessageCollection(visitor.Messages);
+            var extraneousEndifVisitor = new MisplacedStatementsVisitor(messages);
+            extraneousEndifVisitor.Visit(fileContext);
+
+            return new MessageCollection(messages);
         }
     }
 }
