@@ -33,7 +33,6 @@ namespace InjectionScript.Interpretation
         {
             var forScopes = new Stack<ForScope>();
             var repeatIndexes = new Stack<int>();
-            var whileIndexes = new Stack<int>();
             var conditionalGotos = new Stack<ConditionalGoto>();
             var flattener = new StatementFlattener();
             flattener.Visit(subrutine);
@@ -125,30 +124,19 @@ namespace InjectionScript.Interpretation
                         else if (statement.@while() != null)
                         {
                             var condition = Visit(statement.@while().expression());
-                            if (condition == InjectionValue.False)
+                            int lastStatementIndex = statement.@while().codeBlock().statement().Any()
+                                ? statementsMap.GetIndex(statement.@while().codeBlock().statement().Last())
+                                : statementIndex;
+
+                            if (condition != InjectionValue.False)
                             {
-                                while (statementIndex < statementsMap.Count && statementsMap.GetStatement(statementIndex).wend() == null)
-                                {
-                                    statementIndex++;
-                                }
-                                if (statementsMap.GetStatement(statementIndex).wend() != null)
-                                {
-                                    statementIndex++;
-                                    if (whileIndexes.Any())
-                                        whileIndexes.Pop();
-                                }
-                                else
-                                    throw new NotImplementedException();
+                                conditionalGotos.Push(new ConditionalGoto(lastStatementIndex + 1, statementIndex));
+                                statementIndex++;
                             }
                             else
                             {
-                                whileIndexes.Push(statementIndex);
-                                statementIndex++;
+                                statementIndex = lastStatementIndex + 1;
                             }
-                        }
-                        else if (statement.wend() != null)
-                        {
-                            statementIndex = whileIndexes.Peek();
                         }
                         else if (statement.@goto() != null)
                         {

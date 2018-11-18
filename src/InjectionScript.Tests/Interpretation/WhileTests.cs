@@ -26,5 +26,20 @@ while 0
 wend
 return i");
         }
+
+        [TestMethod]
+        public void Nested_while_inner_always_false()
+        {
+            TestSubrutine(0, @"
+var i = 4
+var j = 0
+while i <> 0
+    while 0
+        j = j + 1
+    wend
+    i = i - 1
+wend
+return i");
+        }
     }
 }

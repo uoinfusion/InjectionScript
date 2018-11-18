@@ -71,28 +71,20 @@ sub for_out_of_range()
 end sub
 
 sub for_nested_loops()
-    var i, j, k
-    var num = 0
-    for i = 0 to 2
-        for j = 0 to 3 
-            for k = 0 to 4
-                num = num + 1
-            next
-        next
+   var i, j, k
+   var num = 0
+   for i = 0 to 2
+      for j = 0 to 3 
+         for k = 0 to 4
+            num = num + 1
+         next
+      next
    next
    tst_assert_num(60, num, "for_nested_loops")
 end sub
 
-sub for_ranges_empty_body_starting_non_zero()
-    var i
-    var num = 0
-    for i = 5 to 10
-      num = num + 1
-    next
-    tst_assert_num(6, num, "for_ranges_empty_body_starting_non_zero")
-end sub
 
-sub Number_of_cycles_is_range_minus_start_plus_one()
+sub For_number_of_iterations_is_range_minus_start_plus_one()
 	var i
 	var x = 0
 	for i = 0 to 10
@@ -146,7 +138,19 @@ until i <> 0
 tst_assert_num(0, i, "repeat_without_until")
 end sub
 
-sub false_while_with_two_wends()
+sub while_nested_inner_always_false()
+   var i = 4
+   var j = 0
+   while i <> 0
+      while 0
+         j = j + 1
+      wend
+      i = i - 1
+   wend
+   tst_assert_num(0, i, "nested_while_inner_always_false")
+end sub
+
+sub while_with_two_wends()
    var i = 0
    while 0
       if 1 then
