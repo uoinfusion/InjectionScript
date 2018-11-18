@@ -21,10 +21,28 @@ return 1");
         }
 
         [TestMethod]
+        public void If_trivial_true_condition_with_empty_then()
+        {
+            TestSubrutine(1, @"if 1 then
+endif
+
+return 1");
+        }
+
+        [TestMethod]
         public void If_trivial_false_condition()
         {
             TestSubrutine(1, @"if 0 then
     return 2
+endif
+
+return 1");
+        }
+
+        [TestMethod]
+        public void If_trivial_false_condition_with_empty_then()
+        {
+            TestSubrutine(1, @"if 0 then
 endif
 
 return 1");
@@ -38,6 +56,28 @@ if 1 then
     i = i + 1
 else
     i = i + 333
+endif
+
+return i");
+        }
+
+        [TestMethod]
+        public void If_trivial_true_condition_with_empty_else()
+        {
+            TestSubrutine(0, @"var i = 0
+if 1 then
+else
+endif
+
+return i");
+        }
+
+        [TestMethod]
+        public void If_trivial_false_condition_with_empty_else()
+        {
+            TestSubrutine(0, @"var i = 0
+if 0 then
+else
 endif
 
 return i");
