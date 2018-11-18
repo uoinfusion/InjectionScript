@@ -12,6 +12,7 @@ namespace InjectionScript.Interpretation
 
         public void SetGlobal(string name, string value) => globals[name] = value;
         public void SetGlobal(string name, int value) => SetGlobal(name, value.ToString());
+        public void SetGlobal(string name, double value) => SetGlobal(name, value.ToString());
 
         public string GetGlobal(string name)
         {

@@ -29,6 +29,7 @@ namespace InjectionScript.Interpretation
         {
             Metadata.Add(new NativeSubrutineDefinition("UO.SetGlobal", (Action<string, string>)Globals.SetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("UO.SetGlobal", (Action<string, int>)Globals.SetGlobal));
+            Metadata.Add(new NativeSubrutineDefinition("UO.SetGlobal", (Action<string, double>)Globals.SetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("UO.GetGlobal", (Func<string, string>)Globals.GetGlobal));
             Metadata.Add(new NativeSubrutineDefinition("str", (Func<int, string>)InternalSubrutines.Str));
             Metadata.Add(new NativeSubrutineDefinition("str", (Func<double, string>)InternalSubrutines.Str));

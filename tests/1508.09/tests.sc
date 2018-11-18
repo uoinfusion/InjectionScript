@@ -218,7 +218,17 @@ end sub
 
 sub globals()
     UO.SetGlobal("globname", "some text")
-    tst_assert_str("some text", UO.GetGlobal("globname"), "globals")
+    tst_assert_str("some text", UO.GetGlobal("globname"), "globals - string")
+    
+    UO.SetGlobal("globname2", 123)
+    tst_assert_str("123", UO.GetGlobal("globname2"), "globals - int converted to string")
+    
+    UO.SetGlobal("globname3", 4.99)
+    tst_assert_str("4", UO.GetGlobal("globname3"), "globals - dec floored and converted to string")
+
+    UO.SetGlobal("globname3", 4.99)
+    tst_assert_num(4, val(UO.GetGlobal("globname3")), "globals - dec floored and 'val' returns floored value")
+    
     tst_assert_str("N/A", UO.GetGlobal("nonexisting"), "globals - empty")
 end sub
 
