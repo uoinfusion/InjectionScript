@@ -1,4 +1,4 @@
-﻿using InjectionScript.Interpretation;
+﻿using InjectionScript.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -43,9 +43,9 @@ namespace InjectionScript.Tests.Interpretation
         [TestMethod]
         public void Intrinsic_variable_can_call_native_subrutine()
         {
-            TestSubrutine(123, @"return UO.Mana", intrinsicVariables: new[]
+            TestSubrutine(123, @"return UO.IntrinsicVar", intrinsicVariables: new[]
             {
-                new NativeSubrutineDefinition("UO.Mana", (Func<int>)(() => 123)),
+                new NativeSubrutineDefinition("UO.IntrinsicVar", (Func<int>)(() => 123)),
             });
         }
     }

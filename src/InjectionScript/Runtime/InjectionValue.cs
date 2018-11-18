@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     public struct InjectionValue
     {

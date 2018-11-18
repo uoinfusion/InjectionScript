@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     [Serializable]
     public class StatementFailedException : Exception

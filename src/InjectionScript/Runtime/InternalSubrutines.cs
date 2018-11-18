@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     public static class InternalSubrutines
     {

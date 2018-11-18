@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     public class Interpreter : injectionBaseVisitor<InjectionValue>
     {

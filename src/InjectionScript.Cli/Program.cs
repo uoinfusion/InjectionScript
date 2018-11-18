@@ -1,10 +1,11 @@
 ﻿using InjectionScript.Analysis;
-using InjectionScript.Interpretation;
+using InjectionScript.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using InjectionScript.Runtime;
 
 namespace InjectionScript.Cli
 {
@@ -39,7 +40,7 @@ namespace InjectionScript.Cli
         {
             Console.WriteLine($"Analysing {file}");
 
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
 
             var messages = runtime.Load(file);
             var originalCollor = Console.ForegroundColor;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     public class ForScope
     {

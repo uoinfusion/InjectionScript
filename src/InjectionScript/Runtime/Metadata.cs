@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InjectionScript.Interpretation
+namespace InjectionScript.Runtime
 {
     public class Metadata
     {

@@ -1,4 +1,4 @@
-﻿namespace InjectionScript.Interpretation
+﻿namespace InjectionScript.Runtime
 {
     public enum InjectionValueKind
     {

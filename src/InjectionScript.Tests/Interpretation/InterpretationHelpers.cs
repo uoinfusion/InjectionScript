@@ -1,4 +1,4 @@
-﻿using InjectionScript.Interpretation;
+﻿using InjectionScript.Runtime;
 using InjectionScript.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace InjectionScript.Tests.Interpretation
             var parser = new Parser();
             parser.AddErrorListener(new FailTestErrorListener());
             var expressionSyntax = parser.ParseExpression(expression);
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
 
             return runtime.Interpreter.VisitExpression(expressionSyntax);
         }
@@ -41,7 +41,7 @@ namespace InjectionScript.Tests.Interpretation
         public static void TestSubrutine(string codeBlock, NativeSubrutineDefinition[] natives = null, NativeSubrutineDefinition[] intrinsicVariables = null)
         {
             var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
             if (intrinsicVariables != null)
@@ -57,7 +57,7 @@ namespace InjectionScript.Tests.Interpretation
         public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null, NativeSubrutineDefinition[] intrinsicVariables = null)
         {
             var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
             if (intrinsicVariables != null)
@@ -76,7 +76,7 @@ namespace InjectionScript.Tests.Interpretation
         public static void TestSubrutine(string expected, string codeBlock, NativeSubrutineDefinition[] natives = null)
         {
             var subrutine = $"sub test()\r\n{codeBlock}\r\n end sub";
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
             if (natives != null)
                 runtime.Metadata.Add(natives);
 
@@ -92,7 +92,7 @@ namespace InjectionScript.Tests.Interpretation
 
         public static void TestSubrutine(int expected, string subrutineName, string file)
         {
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
             var parser = new Parser();
             parser.AddErrorListener(new FailTestErrorListener());
             runtime.Load(parser.ParseFile(file));
@@ -105,7 +105,7 @@ namespace InjectionScript.Tests.Interpretation
 
         public static MessageCollection Parse(string fileContent)
         {
-            var runtime = new Runtime();
+            var runtime = new InjectionRuntime();
             return runtime.Load(fileContent, "test.sc");
         }
 
