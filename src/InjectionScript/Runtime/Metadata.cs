@@ -19,7 +19,7 @@ namespace InjectionScript.Runtime
         public void Add(SubrutineDefinition subrutineDef)
         {
             subrutineNames.Add(subrutineDef.Name);
-            subrutines.Add(GetSubrutineKey(subrutineDef), subrutineDef);
+            subrutines[GetSubrutineKey(subrutineDef)] = subrutineDef;
         }
 
         public void Add(NativeSubrutineDefinition[] subrutineDefs)
