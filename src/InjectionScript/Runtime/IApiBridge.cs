@@ -46,8 +46,16 @@
         int IsTargeting();
         void SetReceivingContainer(int id);
         void Grab(int amount, int id);
+
+        void LClick(int x, int y);
         void KeyPress(int key);
         void Say(string message);
+
+        void PlayWav(string file);
+
+        void TextOpen();
+        void TextPrint(string text);
+
         void ServerPrint(string message);
         void Print(string msg);
         void ClientPrint(int id, int color, string msg);
@@ -71,5 +79,7 @@
         void Ignore(int id);
         void IgnoreReset();
         void Terminate(string subrutineName);
+        int GetGraphics(int id);
+        int GetDir(int id);
     }
 }

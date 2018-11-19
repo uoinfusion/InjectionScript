@@ -59,6 +59,13 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.getname", (Func<int, string>)GetName));
             metadata.Add(new NativeSubrutineDefinition("UO.getname", (Func<string, string>)GetName));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.getgraphic", (Func<string, int>)GetGraphics));
+            metadata.Add(new NativeSubrutineDefinition("UO.getgraphic", (Func<int, int>)GetGraphics));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.getdir", (Func<string, int>)GetDir));
+            metadata.Add(new NativeSubrutineDefinition("UO.getdir", (Func<int, int>)GetDir));
+            metadata.Add(new NativeSubrutineDefinition("UO.getdir", (Func<int>)GetDir));
+
             metadata.Add(new NativeSubrutineDefinition("UO.isnpc", (Func<int, int>)IsNpc));
             metadata.Add(new NativeSubrutineDefinition("UO.isnpc", (Func<string, int>)IsNpc));
 
@@ -79,6 +86,7 @@ namespace InjectionScript.Runtime
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.mana", (Func<int>)Mana));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.weight", (Func<int>)Weight));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.gold", (Func<int>)Gold));
+            metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.life", (Func<int>)Life));
 
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<int>)FindType));
@@ -117,8 +125,16 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<int>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<string>)SetReceivingContainer));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.lclick", (Action<int, int>)LClick));
             metadata.Add(new NativeSubrutineDefinition("UO.keypress", (Action<int>)KeyPress));
+            metadata.Add(new NativeSubrutineDefinition("UO.press", (Action<int>)Press));
             metadata.Add(new NativeSubrutineDefinition("UO.say", (Action<string>)Say));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.playwav", (Action<string>)PlayWav));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.textopen", (Action)TextOpen));
+            metadata.Add(new NativeSubrutineDefinition("UO.textprint", (Action<string>)TextPrint));
+
             metadata.Add(new NativeSubrutineDefinition("UO.msg", (Action<string>)Msg));
             metadata.Add(new NativeSubrutineDefinition("UO.serverprint", (Action<string>)ServerPrint));
             metadata.Add(new NativeSubrutineDefinition("UO.print", (Action<string>)Print));
@@ -197,6 +213,13 @@ namespace InjectionScript.Runtime
         public string GetName(string id) => GetName(GetObject(id));
         public string GetName(int id) => bridge.GetName(id);
 
+        public int GetGraphics(string id) => GetGraphics(GetObject(id));
+        public int GetGraphics(int id) => bridge.GetGraphics(id);
+
+        public int GetDir() => GetDir("self");
+        public int GetDir(string id) => GetDir(GetObject(id));
+        public int GetDir(int id) => bridge.GetDir(id);
+
         public int IsNpc(string id) => IsNpc(GetObject(id));
         public int IsNpc(int id) => bridge.IsNpc(id);
 
@@ -219,6 +242,7 @@ namespace InjectionScript.Runtime
         public int Mana() => bridge.Mana;
         public int Weight() => bridge.Weight;
         public int Gold() => bridge.Gold;
+        public int Life() => GetHP("self");
 
         public void Click(string id) => Click(GetObject(id));
         public void Click(int id) => bridge.Click(id);
@@ -263,8 +287,16 @@ namespace InjectionScript.Runtime
         public void Ignore(int id) => bridge.Ignore(id);
         public void IgnoreReset() => bridge.IgnoreReset();
 
+        public void LClick(int x, int y) => bridge.LClick(x, y);
+        public void Press(int key) => KeyPress(key);
         public void KeyPress(int key) => bridge.KeyPress(key);
         public void Say(string message) => bridge.Say(message);
+
+        public void PlayWav(string file) => bridge.PlayWav(file);
+
+        public void TextOpen() => bridge.TextOpen();
+        public void TextPrint(string text) => bridge.TextPrint(text);
+
         public void Msg(string message) => bridge.ServerPrint(message);
         public void ServerPrint(string message) => bridge.ServerPrint(message);
 
