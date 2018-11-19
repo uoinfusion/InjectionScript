@@ -150,6 +150,17 @@ end sub");
         }
 
         [TestMethod]
+        public void No_warning_when_reading_from_intrinsic_variable()
+        {
+            var messages = Parse(@"
+sub test()
+    var x = true
+end sub");
+
+            messages.AssertNoWarning(5, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
         public void No_warning_when_reading_from_dim_defined_with_different_casing()
         {
             var messages = Parse(@"

@@ -69,7 +69,7 @@ namespace InjectionScript.Analysis
             else
             {
                 name = context.lvalue()?.indexedSymbol()?.SYMBOL()?.GetText();
-                if (!string.IsNullOrEmpty(name) && !varNames.Contains(name))
+                if (!string.IsNullOrEmpty(name) && !varNames.Contains(name) && !metadata.TryGetIntrinsicVariable(name, out _))
                 {
                     messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                         $"Variable not found '{name}'."));
@@ -82,7 +82,8 @@ namespace InjectionScript.Analysis
         public override bool VisitOperand([NotNull] injectionParser.OperandContext context)
         {
             var varName = context.SYMBOL()?.GetText();
-            if (!string.IsNullOrEmpty(varName) && !varNames.Contains(varName))
+            if (!string.IsNullOrEmpty(varName) && !varNames.Contains(varName) && 
+                !metadata.TryGetIntrinsicVariable(varName, out _))
             {
                 messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                     $"Variable not found '{varName}'."));
@@ -93,7 +94,7 @@ namespace InjectionScript.Analysis
                 if (!string.IsNullOrEmpty(dimName) && !varNames.Contains(dimName))
                 {
                     messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
-                        $"Variable not found '{dimName}'."));
+                    $"Variable not found '{dimName}'."));
                 }
             }
 
