@@ -14,5 +14,7 @@ namespace InjectionScript
         public static string MisplacedWend => "SC004";
         public static string UndefinedSubrutine => "SC005";
         public static string UndefinedVariable => "SC006";
+        public static string SubrutineRedefinition => "SC007";
+        public static string SubrutineRedefined => "SC008";
     }
 }

@@ -16,6 +16,9 @@ namespace InjectionScript.Analysis
             var unknownSymbolVisitor = new UnknownSymbolVisitor(messages, metadata);
             unknownSymbolVisitor.Visit(fileContext);
 
+            var subrutineDefinitionsVisitor = new SubrutineDefinitionsVisitor(messages);
+            subrutineDefinitionsVisitor.Visit(fileContext);
+
             return new MessageCollection(messages);
         }
     }
