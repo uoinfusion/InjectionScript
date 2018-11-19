@@ -47,5 +47,30 @@ end sub
 ; comment 2
 ");
         }
+
+        [TestMethod]
+        public void File_can_contain_comment_between_subs()
+        {
+            TestSubrutine(123, "sub2", @"
+sub sub1()
+   sub2()
+end sub
+#
+sub sub2()
+    return 123
+end sub");
+        }
+
+        [TestMethod]
+        public void Sub_can_contain_multiple_comments()
+        {
+            TestSubrutine(123, "sub1", @"
+sub sub1()
+    #
+    ;
+    return 123
+end sub
+");
+        }
     }
 }

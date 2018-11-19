@@ -58,5 +58,19 @@ end sub
 end sub
 ");
         }
+
+        [TestMethod]
+        public void Can_call_empty_subrutine()
+        {
+            TestSubrutine(9, "sub1", @"
+sub sub1()
+    empty()
+    return 9
+end sub
+
+sub empty()
+end sub
+");
+        }
     }
 }

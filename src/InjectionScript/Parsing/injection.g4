@@ -1,32 +1,31 @@
 ﻿grammar injection;
 
-file: NEWLINE* subrutine*;
-subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock END_SUB (NEWLINE | EOF);
+file: subrutine*;
+subrutine: SUB name=SYMBOL '(' parameters? ')' codeBlock? END_SUB;
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+?;
-statement: label | if | while | wend | repeat | until | var | dim | assignStatement | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif | incompleteWhile;
+statement: label | if | while | wend | repeat | until | var | dim | assignStatement | callStatement | returnStatement | for | next | goto | missplacedEndif | incompleteWhile;
 
-if: IF expression THEN NEWLINE codeBlock? else? END_IF NEWLINE | EOF;
+if: IF expression THEN codeBlock? else? END_IF;
 missplacedEndif: END_IF;
-else: ELSE NEWLINE codeBlock?;
-while: WHILE expression NEWLINE codeBlock? WEND NEWLINE;
-incompleteWhile: WHILE expression NEWLINE;
-wend: WEND NEWLINE;
-repeat: REPEAT NEWLINE;
-until: UNTIL expression NEWLINE;
-for: FOR assignment TO expression NEWLINE;
-next: NEXT NEWLINE;
-assignStatement: assignment NEWLINE;
-callStatement: call NEWLINE;
-emptyStatement: NEWLINE;
-returnStatement: RETURN expression? NEWLINE;
-goto: GOTO SYMBOL NEWLINE;
-label: SYMBOL ':' NEWLINE;
+else: ELSE codeBlock?;
+while: WHILE expression codeBlock? WEND;
+incompleteWhile: WHILE expression;
+wend: WEND;
+repeat: REPEAT;
+until: UNTIL expression;
+for: FOR assignment TO expression;
+next: NEXT;
+assignStatement: assignment;
+callStatement: call;
+returnStatement: RETURN expression?;
+goto: GOTO SYMBOL;
+label: SYMBOL ':';
 
-var: VAR varDef (',' varDef)* NEWLINE;
+var: VAR varDef (',' varDef)*;
 varDef: SYMBOL | assignment;
-dim: DIM dimDef (',' dimDef)* NEWLINE;
+dim: DIM dimDef (',' dimDef)*;
 dimDef: SYMBOL '[' expression ']' dimDefAssignment?;
 dimDefAssignment: '=' expression;
 
@@ -101,8 +100,8 @@ SYMBOL: VALID_SYMBOL_START VALID_SYMBOL_CHAR*;
 INT_NUMBER: ('0'..'9')+;
 DEC_NUMBER: ('0'..'9')+ '.' ('0'..'9')+;
 HEX_NUMBER: '0x' HEX_DIGIT* ;
-NEWLINE: ('\r'? '\n')+;
-WS: (' '|'\r'|'\n'|'\t') -> channel(HIDDEN);
+NEWLINE: '\r'? '\n' -> channel(HIDDEN);
+WS: [ \t\f] -> channel(HIDDEN);
 DOUBLEQUOTED_LITERAL: '"' ~('"')*? '"';
 SINGLEQUOTED_LITERAL: '\'' ~('\'')*? '\'';
 

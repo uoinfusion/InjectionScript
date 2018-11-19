@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using InjectionScript.Runtime;
 
 namespace InjectionScript.Cli
 {
@@ -44,9 +42,8 @@ namespace InjectionScript.Cli
 
             var messages = runtime.Load(file);
             var originalCollor = Console.ForegroundColor;
-            foreach (var message in messages)
+            foreach (var message in messages.OrderBy(m => m.Line))
             {
-
                 switch (message.Severity)
                 {
                     case MessageSeverity.Error:
@@ -57,7 +54,6 @@ namespace InjectionScript.Cli
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine(message.ToString());
                         break;
-
                 }
             }
             Console.ForegroundColor = originalCollor;

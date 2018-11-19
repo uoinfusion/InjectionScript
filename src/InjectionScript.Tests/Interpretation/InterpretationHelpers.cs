@@ -130,5 +130,19 @@ namespace InjectionScript.Tests.Interpretation
             if (message != null)
                 Assert.Fail($"No warning expected on line {line}, but found:\n{message}");
         }
+
+        public static void AssertNoError(this MessageCollection collection)
+        {
+            var errorCount = collection.Count(m => m.Severity == MessageSeverity.Error);
+            if (errorCount > 0)
+                Assert.Fail($"{errorCount} error(s) found\n{collection}");
+        }
+
+        public static void AssertNoWarning(this MessageCollection collection)
+        {
+            var warningCount = collection.Count(m => m.Severity == MessageSeverity.Warning);
+            if (warningCount > 0)
+                Assert.Fail($"{warningCount} warning(s) found\n{collection}");
+        }
     }
 }

@@ -22,5 +22,10 @@ namespace InjectionScript
         {
             return messages.GetEnumerator();
         }
+
+        public override string ToString()
+        {
+            return messages.Select(m => m.ToString()).Aggregate((l, r) => l + "\n" + r);
+        }
     }
 }
