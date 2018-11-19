@@ -89,6 +89,30 @@ end sub");
         }
 
         [TestMethod]
+        public void Warning_for_undefined_var_in_var_def_assignment()
+        {
+            var messages = Parse(@"
+sub test()
+    var x = z
+end sub");
+
+            messages.AssertNoWarning(3, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
+        public void No_warning_for_parameters()
+        {
+            var messages = Parse(@"
+sub test(z)
+    var x = z + 2
+    x = z + 1
+end sub");
+
+            messages.AssertNoWarning(3, MessageCodes.UndefinedVariable);
+            messages.AssertNoWarning(4, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
         public void Warning_when_assigning_to_undefined_dim()
         {
             var messages = Parse(@"

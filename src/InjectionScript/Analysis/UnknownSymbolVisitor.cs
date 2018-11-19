@@ -42,6 +42,13 @@ namespace InjectionScript.Analysis
             return base.VisitSubrutine(context);
         }
 
+        public override bool VisitParameterName([NotNull] injectionParser.ParameterNameContext context)
+        {
+            varNames.Add(context.SYMBOL().GetText());
+
+            return true;
+        }
+
         public override bool VisitVarDef([NotNull] injectionParser.VarDefContext context)
         {
             var name = context.SYMBOL()?.GetText() ?? context.assignment()?.lvalue()?.SYMBOL()?.GetText();
