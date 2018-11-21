@@ -24,7 +24,7 @@ namespace InjectionScript.Debugging
         {
             if (server.TryGetBreakpoint(context.File, context.Line, out var breakpoint))
             {
-                server.OnBreak(this);
+                server.OnBreak(this, breakpoint);
                 currentContext = context;
                 continueEvent.WaitOne();
             }

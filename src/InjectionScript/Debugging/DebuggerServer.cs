@@ -18,6 +18,7 @@ namespace InjectionScript.Debugging
         private readonly Parser parser = new Parser();
 
         public ManualResetEvent BreakpointHitEvent { get; } = new ManualResetEvent(false);
+        public event EventHandler<Breakpoint> BreakpointHit;
 
         public void Continue()
         {
@@ -47,7 +48,7 @@ namespace InjectionScript.Debugging
             }
         }
 
-        internal void OnBreak(Debugger debugger)
+        internal void OnBreak(Debugger debugger, Breakpoint breakpoint)
         {
             lock (activeDebuggerLock)
             {
@@ -56,6 +57,8 @@ namespace InjectionScript.Debugging
                 activeDebugger = debugger;
                 BreakpointHitEvent.Set();
             }
+
+            BreakpointHit?.Invoke(this, breakpoint);
         }
 
         public void AddBreakpoint(string fileName, int line)
