@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,9 +9,16 @@ namespace InjectionScript
     {
         private readonly Message[] messages;
 
+        public static MessageCollection Empty { get; } = new MessageCollection(Array.Empty<Message>());
+
         public MessageCollection(IEnumerable<Message> messages)
         {
             this.messages = messages.ToArray();
+        }
+
+        public MessageCollection(Message message)
+        {
+            this.messages = new Message[] { message };
         }
 
         public IEnumerator<Message> GetEnumerator()

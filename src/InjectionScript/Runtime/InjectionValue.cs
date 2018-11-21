@@ -292,22 +292,23 @@ namespace InjectionScript.Runtime
 
         public override bool Equals(object obj)
         {
-            if (!(obj is InjectionValue))
+            if (obj is InjectionValue v2)
             {
-                return false;
+                var v1 = this;
+
+                if (v1.Kind == v2.Kind && v1.Integer == v2.Integer && v1.String == v2.String && v1.Decimal == v2.Decimal)
+                    return true;
+                else if (v1.Kind == InjectionValueKind.Decimal && v2.Kind == InjectionValueKind.Integer)
+                    return v1.Decimal == v2.Integer;
+                else if (v1.Kind == InjectionValueKind.Integer && v2.Kind == InjectionValueKind.Decimal)
+                    return v1.Integer == v2.Decimal;
+                else if (v1.Kind == InjectionValueKind.Decimal && v2.Kind == InjectionValueKind.Decimal)
+                    return v1.Decimal == v2.Decimal;
             }
-
-            var v1 = this;
-            var v2 = (InjectionValue)obj;
-
-            if (v1.Kind == v2.Kind && v1.Integer == v2.Integer && v1.String == v2.String && v1.Decimal == v2.Decimal)
-                return true;
-            else if (v1.Kind == InjectionValueKind.Decimal && v2.Kind == InjectionValueKind.Integer)
-                return v1.Decimal == v2.Integer;
-            else if (v1.Kind == InjectionValueKind.Integer && v2.Kind == InjectionValueKind.Decimal)
-                return v1.Integer == v2.Decimal;
-            else if (v1.Kind == InjectionValueKind.Decimal && v2.Kind == InjectionValueKind.Decimal)
-                return v1.Decimal == v2.Decimal;
+            else if (obj is int i)
+            {
+                return Kind == InjectionValueKind.Integer && Integer == i;
+            }
 
             return false;
         }

@@ -10,8 +10,7 @@ namespace InjectionScript.Tests.Interpretation
         public static InjectionValue EvalExpression(string expression)
         {
             var parser = new Parser();
-            parser.AddErrorListener(new FailTestErrorListener());
-            var expressionSyntax = parser.ParseExpression(expression);
+            var expressionSyntax = parser.ParseExpression(expression, new FailTestErrorListener());
             var runtime = new InjectionRuntime();
 
             return runtime.Interpreter.VisitExpression(expressionSyntax);
@@ -48,8 +47,7 @@ namespace InjectionScript.Tests.Interpretation
                 runtime.Metadata.AddIntrinsicVariables(intrinsicVariables);
 
             var parser = new Parser();
-            parser.AddErrorListener(new FailTestErrorListener());
-            runtime.Load(parser.ParseFile(subrutine));
+            runtime.Load(parser.ParseFile(subrutine, new FailTestErrorListener()));
 
             runtime.CallSubrutine("test");
         }
@@ -64,8 +62,7 @@ namespace InjectionScript.Tests.Interpretation
                 runtime.Metadata.AddIntrinsicVariables(intrinsicVariables);
 
             var parser = new Parser();
-            parser.AddErrorListener(new FailTestErrorListener());
-            runtime.Load(parser.ParseFile(subrutine));
+            runtime.Load(parser.ParseFile(subrutine, new FailTestErrorListener()));
 
             var actual = runtime.CallSubrutine("test");
 
@@ -81,8 +78,7 @@ namespace InjectionScript.Tests.Interpretation
                 runtime.Metadata.Add(natives);
 
             var parser = new Parser();
-            parser.AddErrorListener(new FailTestErrorListener());
-            runtime.Load(parser.ParseFile(subrutine));
+            runtime.Load(parser.ParseFile(subrutine, new FailTestErrorListener()));
 
             var actual = runtime.CallSubrutine("test");
 
@@ -94,8 +90,7 @@ namespace InjectionScript.Tests.Interpretation
         {
             var runtime = new InjectionRuntime();
             var parser = new Parser();
-            parser.AddErrorListener(new FailTestErrorListener());
-            runtime.Load(parser.ParseFile(file));
+            runtime.Load(parser.ParseFile(file, new FailTestErrorListener()));
 
             var actual = runtime.CallSubrutine(subrutineName);
 

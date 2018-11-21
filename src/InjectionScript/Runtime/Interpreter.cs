@@ -22,9 +22,16 @@ namespace InjectionScript.Runtime
         }
 
         private readonly Metadata metadata;
+        private readonly string currentFileName;
+        private readonly IDebugger debugger;
         private readonly SemanticScope semanticScope = new SemanticScope();
 
-        public Interpreter(Metadata metadata) => this.metadata = metadata;
+        public Interpreter(Metadata metadata, string currentFileName, IDebugger debugger = null)
+        {
+            this.metadata = metadata;
+            this.currentFileName = currentFileName;
+            this.debugger = debugger;
+        }
 
         public InjectionValue CallSubrutine(injectionParser.SubrutineContext subrutine)
             => CallSubrutine(subrutine, Array.Empty<InjectionValue>());
@@ -50,6 +57,11 @@ namespace InjectionScript.Runtime
                 while (statementIndex < statementsMap.Count)
                 {
                     var statement = statementsMap.GetStatement(statementIndex);
+                    if (debugger != null)
+                    {
+                        var context = new StatementExecutionContext(statementIndex, statement.Start.Line, currentFileName, this);
+                        debugger.BeforeStatement(context);
+                    }
 
                     try
                     {

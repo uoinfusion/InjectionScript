@@ -16,5 +16,7 @@ namespace InjectionScript
         public static string UndefinedVariable => "SC006";
         public static string SubrutineRedefinition => "SC007";
         public static string SubrutineRedefined => "SC008";
+
+        public static string DebuggerNotAttached => "DBG001";
     }
 }

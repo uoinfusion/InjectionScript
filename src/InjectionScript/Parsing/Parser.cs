@@ -11,32 +11,36 @@ namespace InjectionScript.Parsing
 {
     public class Parser
     {
-        private readonly List<BaseErrorListener> errorListeners = new List<BaseErrorListener>();
-
-        public injectionParser.FileContext ParseFile(string file)
+        private T Parse<T>(string sourceCode, BaseErrorListener errorListener, Func<injectionParser, T> parseFunc)
         {
-            var inputStream = new AntlrInputStream(file);
+            var inputStream = new AntlrInputStream(sourceCode);
             var lexer = new injectionLexer(inputStream);
             var tokenStream = new CommonTokenStream(lexer);
             var parser = new injectionParser(tokenStream);
-            foreach (var listener in errorListeners)
-                parser.AddErrorListener(listener);
+            if (errorListener != null)
+                parser.AddErrorListener(errorListener);
 
-            return parser.file();
+            return parseFunc(parser);
         }
 
-        public injectionParser.ExpressionContext ParseExpression(string expression)
+        private T Parse<T>(string sourceCode, Func<injectionParser, T> parseFunc, out MessageCollection messages)
         {
-            var inputStream = new AntlrInputStream(expression);
-            var lexer = new injectionLexer(inputStream);
-            var tokenStream = new CommonTokenStream(lexer);
-            var parser = new injectionParser(tokenStream);
-            foreach (var listener in errorListeners)
-                parser.AddErrorListener(listener);
+            var errorListener = new MemorySyntaxErrorListener();
+            var result = Parse(sourceCode, errorListener, parseFunc);
 
-            return parser.expression();
+            messages = new MessageCollection(errorListener.Errors);
+
+            return result;
         }
 
-        public void AddErrorListener(BaseErrorListener errorListener) => errorListeners.Add(errorListener);
+        public injectionParser.FileContext ParseFile(string sourceCode, BaseErrorListener errorListener = null) 
+            => Parse(sourceCode, errorListener, (parser) => parser.file());
+        public injectionParser.FileContext ParseFile(string sourceCode, out MessageCollection messages) 
+            => Parse(sourceCode, (parser) => parser.file(), out messages);
+
+        public injectionParser.ExpressionContext ParseExpression(string sourceCode, BaseErrorListener errorListener = null)
+            => Parse(sourceCode, errorListener, (parser) => parser.expression());
+        public injectionParser.ExpressionContext ParseExpression(string sourceCode, out MessageCollection messages)
+            => Parse(sourceCode, (parser) => parser.expression(), out messages);
     }
 }

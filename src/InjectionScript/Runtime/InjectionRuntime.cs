@@ -20,15 +20,14 @@ namespace InjectionScript.Runtime
         public injectionParser.FileContext CurrentFileSyntax { get; private set; }
         public InjectionApi Api { get; }
 
-        public InjectionRuntime() : this(null)
+        public InjectionRuntime() : this(null, new NullDebuggerServer())
         {
-
         }
 
-        public InjectionRuntime(IApiBridge bridge)
+        public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer)
         {
-            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata));
-            Api = new InjectionApi(bridge, Metadata, Globals);
+            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentFileName, debuggerServer.Create()));
+            Api = new InjectionApi(bridge, Metadata, Globals, debuggerServer);
             RegisterNatives();
         }
 
@@ -43,13 +42,11 @@ namespace InjectionScript.Runtime
         public MessageCollection Load(string content, string fileName)
         {
             var parser = new Parser();
-            var errorListener = new MemorySyntaxErrorListener();
-            parser.AddErrorListener(errorListener);
-            CurrentFileSyntax = parser.ParseFile(content);
+            CurrentFileSyntax = parser.ParseFile(content, out var errors);
             CurrentFileName = fileName;
 
-            if (errorListener.Errors.Any())
-                return new MessageCollection(errorListener.Errors);
+            if (errors.Any())
+                return errors;
 
             Metadata.ResetSubrutines();
             var collector = new DefinitionCollector(Metadata);
