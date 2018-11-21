@@ -58,7 +58,7 @@
 
         void ServerPrint(string message);
         void Print(string msg);
-        void ClientPrint(int id, int color, string msg);
+        void CharPrint(int id, int color, string msg);
         int InJournal(string pattern);
         void DeleteJournal();
         string GetJournalText(int index);

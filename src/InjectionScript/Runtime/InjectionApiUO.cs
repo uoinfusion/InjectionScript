@@ -304,7 +304,7 @@ namespace InjectionScript.Runtime
         public void CharPrint(int color, string msg) => CharPrint(bridge.Self, color, msg);
         public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.Str2Int(color), msg);
         public void CharPrint(string id, int color, string msg) => CharPrint(GetObject(id), color, msg);
-        public void CharPrint(int id, int color, string msg) => bridge.ClientPrint(id, color, msg);
+        public void CharPrint(int id, int color, string msg) => bridge.CharPrint(id, color, msg);
 
         public int InJournal(string pattern) => bridge.InJournal(pattern);
         public void DeleteJournal() => bridge.DeleteJournal();
