@@ -11,7 +11,7 @@ namespace InjectionScript.Runtime
         {
         }
 
-        public ScriptFailedException(string message, int line, StatementFailedException inner)
+        public ScriptFailedException(string message, int line, Exception inner)
             : base(message, inner)
         {
             Line = line;
