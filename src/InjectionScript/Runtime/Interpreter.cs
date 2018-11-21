@@ -184,6 +184,12 @@ namespace InjectionScript.Runtime
                     }
                 }
 
+                if (debugger != null)
+                {
+                    debugger.BeforeStatement(
+                        new StatementExecutionContext(statementIndex, subrutine.END_SUB().Symbol.Line, currentFileName, this));
+                }
+
                 return InjectionValue.Unit;
             }
             finally

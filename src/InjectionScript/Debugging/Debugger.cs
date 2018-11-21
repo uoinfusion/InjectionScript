@@ -41,7 +41,7 @@ namespace InjectionScript.Debugging
             if (currentContext == null)
                 return null;
 
-            return currentContext.Interpreter.VisitExpression(expression);
+            return currentContext.Eval(expression);
         }
     }
 }

@@ -2,61 +2,49 @@
 using InjectionScript.Debugging;
 using InjectionScript.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace InjectionScript.Tests.Debugging
 {
     [TestClass]
-    public class ExpressionEvaluationTests
+    public class BreakpointTests
     {
         [TestMethod]
-        public void Can_evaluate()
+        public void Can_break_at_end_sub()
         {
             var testDebugger = new TestDebuggerFacade();
 
             testDebugger.Load(@"
 sub sub1()
     var x = 33
-    x = x + 1
 end sub");
 
             testDebugger.AddBreakpoint(4);
             testDebugger.CallSubrutineAsync("sub1");
             testDebugger.WaitForBreakpointHit();
 
-            var result = testDebugger.EvaluateExpression("x");
-
-            result.Result.Value.Should().Be(33);
+            testDebugger.Continue();
+            testDebugger.AssertSubrutineFinished();
         }
 
         [TestMethod]
-        public void Can_evaluate_continue_and_evaluate_again()
+        public void Can_break_at_statement()
         {
             var testDebugger = new TestDebuggerFacade();
 
             testDebugger.Load(@"
 sub sub1()
     var x = 33
-    x = x + 1
-    x = x + 1
 end sub");
 
-            testDebugger.AddBreakpoint(4);
-            testDebugger.AddBreakpoint(5);
+            testDebugger.AddBreakpoint(3);
             testDebugger.CallSubrutineAsync("sub1");
             testDebugger.WaitForBreakpointHit();
 
-            var result = testDebugger.EvaluateExpression("x");
-            result.Result.Value.Should().Be(33);
-
             testDebugger.Continue();
-            testDebugger.WaitForBreakpointHit();
-
-            result = testDebugger.EvaluateExpression("x");
-            result.Result.Value.Should().Be(34);
-
-            testDebugger.Continue();
-
             testDebugger.AssertSubrutineFinished();
         }
     }
