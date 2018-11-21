@@ -1,5 +1,6 @@
 ﻿using InjectionScript;
 using InjectionScript.Runtime;
+using System.Linq;
 
 public class EvaluationResult
 {
@@ -21,5 +22,16 @@ public class EvaluationResult
     {
         Result = result;
         Messages = MessageCollection.Empty;
+    }
+
+    public override string ToString()
+    {
+        if (Messages.Any())
+            return Messages.ToString();
+
+        if (Result.HasValue)
+            return Result.Value.ToString();
+
+        return "no messages, no value";
     }
 }

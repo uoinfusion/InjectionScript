@@ -11,5 +11,6 @@ namespace InjectionScript.Runtime
         public void AddBreakpoint(string fileName, int line) { }
         public void Continue() { }
         public IDebugger Create() => null;
+        public EvaluationResult EvaluateExpression(string expressionText) => new EvaluationResult(InjectionValue.Unit);
     }
 }
