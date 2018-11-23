@@ -45,6 +45,7 @@
         void WaitTargetObject(int id1, int id2);
         int IsTargeting();
         void SetReceivingContainer(int id);
+        void UnsetReceivingContainer();
         void Grab(int amount, int id);
 
         void LClick(int x, int y);

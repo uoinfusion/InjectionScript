@@ -124,7 +124,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.grab", (Action<string, string>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<int>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<string>)SetReceivingContainer));
-
+            metadata.Add(new NativeSubrutineDefinition("UO.UnsetReceivingContainer", (Action)UnsetReceivingContainer));
+            
             metadata.Add(new NativeSubrutineDefinition("UO.lclick", (Action<int, int>)LClick));
             metadata.Add(new NativeSubrutineDefinition("UO.keypress", (Action<int>)KeyPress));
             metadata.Add(new NativeSubrutineDefinition("UO.press", (Action<int>)Press));
@@ -268,6 +269,7 @@ namespace InjectionScript.Runtime
 
         public void SetReceivingContainer(string id) => SetReceivingContainer(GetObject(id));
         public void SetReceivingContainer(int id) => bridge.SetReceivingContainer(id);
+        public void UnsetReceivingContainer() => bridge.UnsetReceivingContainer();
         public void Grab(int amount, string id) => Grab(amount, GetObject(id));
         public void Grab(string amount, string id) => Grab(NumberConversions.Str2Int(amount), GetObject(id));
         public void Grab(int amount, int id) => bridge.Grab(amount, id);
