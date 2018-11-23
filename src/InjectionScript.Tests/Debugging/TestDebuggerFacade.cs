@@ -11,12 +11,14 @@ namespace InjectionScript.Tests.Debugging
     internal sealed class TestDebuggerFacade
     {
         private readonly DebuggerServer debuggerServer = new DebuggerServer();
+        private readonly ITracer tracer;
         private readonly InjectionRuntime runtime;
         private Task subrutineTask;
 
         public TestDebuggerFacade()
         {
             runtime = new InjectionRuntime(null, debuggerServer);
+            tracer = debuggerServer;
         }
 
         public void Load(string sourceCode)
@@ -48,6 +50,8 @@ namespace InjectionScript.Tests.Debugging
             return subrutineTask;
         }
 
+        public void CallSubrutine(string name) => runtime.CallSubrutine(name);
+
         internal EvaluationResult EvaluateExpression(string expression)
         {
             var result = debuggerServer.EvaluateExpression(expression);
@@ -62,5 +66,9 @@ namespace InjectionScript.Tests.Debugging
             => debuggerServer.BreakpointHitEvent.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("breakpoint is expected to be hit");
 
         public void Continue() => debuggerServer.Continue();
+
+        public void EnabledTracing() => tracer.Enable();
+        public void DisableTracing() => tracer.Disable();
+        public string DumpTrace() => tracer.Dump();
     }
 }

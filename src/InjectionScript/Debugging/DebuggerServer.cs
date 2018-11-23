@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace InjectionScript.Debugging
 {
-    public class DebuggerServer : IDebuggerServer
+    public class DebuggerServer : IDebuggerServer, ITracer
     {
         private Debugger activeDebugger;
         private readonly object activeDebuggerLock = new object();
         private readonly object breakpointLock = new object();
         private readonly List<Breakpoint> breakpoints = new List<Breakpoint>();
         private readonly Parser parser = new Parser();
+        private readonly List<Debugger> debuggers = new List<Debugger>();
+        private bool tracingEnabled;
 
         public ManualResetEvent BreakpointHitEvent { get; } = new ManualResetEvent(false);
         public event EventHandler<Breakpoint> BreakpointHit;
@@ -78,6 +80,38 @@ namespace InjectionScript.Debugging
             }
         }
 
-        IDebugger IDebuggerServer.Create() => new Debugger(this);
+        IDebugger IDebuggerServer.Create()
+        {
+            var debugger = new Debugger(this);
+
+            debuggers.Add(debugger);
+            if (tracingEnabled)
+                debugger.EnableTracing();
+            return debugger;
+        }
+
+        void ITracer.Enable()
+        {
+            tracingEnabled = true;
+            foreach (var debugger in debuggers)
+                debugger.EnableTracing();
+        }
+
+        void ITracer.Disable()
+        {
+            tracingEnabled = false;
+            foreach (var debugger in debuggers)
+                debugger.DisableTracing();
+        }
+
+        string ITracer.Dump()
+        {
+            var output = new StringBuilder();
+
+            foreach (var debugger in debuggers)
+                debugger.DumpTrace(output);
+
+            return output.ToString();
+        }
     }
 }

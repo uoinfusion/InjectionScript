@@ -59,7 +59,7 @@ namespace InjectionScript.Runtime
                     var statement = statementsMap.GetStatement(statementIndex);
                     if (debugger != null)
                     {
-                        var context = new StatementExecutionContext(statementIndex, statement.Start.Line, currentFileName, this);
+                        var context = new StatementExecutionContext(statementIndex, statement.Start.Line, currentFileName, statement, this);
                         debugger.BeforeStatement(context);
                     }
 
@@ -187,7 +187,7 @@ namespace InjectionScript.Runtime
                 if (debugger != null)
                 {
                     debugger.BeforeStatement(
-                        new StatementExecutionContext(statementIndex, subrutine.END_SUB().Symbol.Line, currentFileName, this));
+                        new StatementExecutionContext(statementIndex, subrutine.END_SUB().Symbol.Line, currentFileName, null, this));
                 }
 
                 return InjectionValue.Unit;
@@ -243,11 +243,17 @@ namespace InjectionScript.Runtime
                 var name = context.lvalue().indexedSymbol().SYMBOL().GetText();
                 var index = (int)Visit(context.lvalue().indexedSymbol().expression());
 
+                if (debugger != null)
+                    debugger.BeforeVariableAssignment(new IndexedVariableAssignmentContex(context, currentFileName, name, value, index));
                 semanticScope.SetDim(name, index, value);
             }
             else
             {
                 var name = context.lvalue().SYMBOL().GetText();
+
+                if (debugger != null)
+                    debugger.BeforeVariableAssignment(new VariableAssignmentContext(context, currentFileName, name, value));
+
                 semanticScope.SetVar(name, value);
             }
 
@@ -432,6 +438,9 @@ namespace InjectionScript.Runtime
             if (context.expression() != null)
             {
                 var result = Visit(context.expression());
+                if (debugger != null)
+                    debugger.BeforeReturn(new ReturnContext(context, result));
+
                 if (result.Kind == InjectionValueKind.Array)
                     throw new StatementFailedException("Cannot return dim from a subrutine.");
 
@@ -448,6 +457,9 @@ namespace InjectionScript.Runtime
             var argumentValues = context.argumentList().arguments()?.argument()?
                 .Select(arg => VisitExpression(arg.expression()))
                 .ToArray() ?? Array.Empty<InjectionValue>();
+
+            if (debugger != null)
+                debugger.BeforeCall(new CallContext(context, name, argumentValues));
 
             if (metadata.TryGetNativeSubrutine(name, argumentValues, out var nativeSubrutine))
             {

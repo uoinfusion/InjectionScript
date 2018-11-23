@@ -27,7 +27,7 @@ namespace InjectionScript.Runtime
         public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer)
         {
             interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentFileName, debuggerServer.Create()));
-            Api = new InjectionApi(bridge, Metadata, Globals, debuggerServer);
+            Api = new InjectionApi(bridge, Metadata, Globals);
             RegisterNatives();
         }
 

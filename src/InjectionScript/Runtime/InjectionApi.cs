@@ -11,11 +11,9 @@ namespace InjectionScript.Runtime
         private readonly IApiBridge bridge;
         private readonly Objects objects = new Objects();
         public InjectionApiUO UO { get; }
-        public IDebuggerServer Debugger { get; }
 
-        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, IDebuggerServer debuggerServer)
+        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals)
         {
-            this.Debugger = debuggerServer;
             this.bridge = bridge;
             UO = new InjectionApiUO(bridge, this, metadata, globals);
             Register(metadata);
