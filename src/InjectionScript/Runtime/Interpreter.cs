@@ -430,7 +430,13 @@ namespace InjectionScript.Runtime
         public override InjectionValue VisitReturnStatement([NotNull] injectionParser.ReturnStatementContext context)
         {
             if (context.expression() != null)
-                return Visit(context.expression());
+            {
+                var result = Visit(context.expression());
+                if (result.Kind == InjectionValueKind.Array)
+                    throw new StatementFailedException("Cannot return dim from a subrutine.");
+
+                return result;
+            }
 
             return InjectionValue.Unit;
         }

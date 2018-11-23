@@ -124,7 +124,8 @@ end sub
         }
 
         [TestMethod]
-        public void Can_return_dim_from_subrutine()
+        [ExpectedException(typeof(ScriptFailedException))]
+        public void Exception_when_returning_dim_from_subrutine()
         {
             TestSubrutine(123, "sub1", @"
 sub sub1()
@@ -139,8 +140,6 @@ sub sub2(y)
     return y
 end sub
 ");
-
-            Assert.Inconclusive("Has to be tested on injection.");
         }
 
         [TestMethod]
@@ -151,10 +150,8 @@ end sub
     x[1] = 123
     x[2] = 'test'
 
-    return x[2] + str(x[1]);
+    return x[2] + str(x[1])
 ");
-
-            Assert.Inconclusive("Check it on injection.");
         }
     }
 }

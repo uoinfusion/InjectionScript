@@ -199,6 +199,27 @@ sub dim_assignment_without_index()
    tst_assert_num(123, x, "dim_assignment_without_index - x")    
 end sub
 
+sub dim_can_be_passed_as_argument()
+   dim x[10]
+   dim_can_be_passed_as_argument_sub1(x)
+   
+   tst_assert_num(123, x[5], "dim_can_be_passed_as_argument")        
+end sub
+
+sub dim_can_be_passed_as_argument_sub1(y)
+   y[5] = 123
+end sub
+
+sub dim_can_contain_different_types_on_different_indexes()
+    dim x[10]
+    x[1] = 123
+    x[2] = 'test'
+
+    var result = x[2] + str(x[1])
+    
+    tst_assert_str("test123", result, "dim_can_contain_different_types_on_different_indexes")
+end sub
+
 sub dim_name_can_contain_dot()
     dim x.y.z...[10]
     
