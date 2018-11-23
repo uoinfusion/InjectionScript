@@ -104,5 +104,57 @@ y = x[5]
 
             Assert.Fail("Exception expected.");
         }
+
+        [TestMethod]
+        public void Can_pass_dim_as_a_parameter()
+        {
+            TestSubrutine(123, "sub1", @"
+sub sub1()
+    dim x[10]
+
+    sub2(x)
+
+    return x[5]
+end sub
+
+sub sub2(y)
+    y[5] = 123
+end sub
+");
+        }
+
+        [TestMethod]
+        public void Can_return_dim_from_subrutine()
+        {
+            TestSubrutine(123, "sub1", @"
+sub sub1()
+    var x
+    x = sub2(x)
+    return x[5]
+end sub
+
+sub sub2(y)
+    dim y[10]
+    y[5] = 123
+    return y
+end sub
+");
+
+            Assert.Inconclusive("Has to be tested on injection.");
+        }
+
+        [TestMethod]
+        public void Dim_can_contain_different_type_on_different_indexes()
+        {
+            TestSubrutine("test123", @"
+    dim x[10]
+    x[1] = 123
+    x[2] = 'test'
+
+    return x[2] + str(x[1]);
+");
+
+            Assert.Inconclusive("Check it on injection.");
+        }
     }
 }

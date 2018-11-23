@@ -11,7 +11,6 @@ namespace InjectionScript.Runtime
         private class Scope
         {
             public readonly Dictionary<string, InjectionValue> vars = new Dictionary<string, InjectionValue>();
-            public readonly Dictionary<string, InjectionValue?[]> dims = new Dictionary<string, InjectionValue?[]>();
 
             public Scope()
             {
@@ -28,16 +27,25 @@ namespace InjectionScript.Runtime
         public void Start() => scopes.Push(new Scope());
         public void End() => scopes.Pop();
 
+        public void SetDim(string name, int index, InjectionValue value)
+        {
+            var vars = scopes.Peek().vars;
+            if (vars.TryGetValue(name, out var dim))
+            {
+                if (dim.Kind == InjectionValueKind.Array)
+                    dim.Array[index] = value;
+                else
+                    throw new NotImplementedException();
+            }
+            else
+                throw new NotImplementedException();
+        }
+
         public void SetVar(string name, InjectionValue value)
         {
             var vars = scopes.Peek().vars;
             if (vars.ContainsKey(name))
                 vars[name] = value;
-            else if (scopes.Peek().dims.ContainsKey(name))
-            {
-                scopes.Peek().dims.Remove(name);
-                vars[name] = value;
-            }
             else
                 throw new NotImplementedException();
         }
@@ -45,46 +53,47 @@ namespace InjectionScript.Runtime
         public bool TryGetVar(string name, out InjectionValue value)
             => scopes.Peek().vars.TryGetValue(name, out value);
 
+        public InjectionValue GetDim(string name, int index)
+        {
+            var vars = scopes.Peek().vars;
+            if (vars.TryGetValue(name, out var dim))
+            {
+                if (dim.Kind == InjectionValueKind.Array)
+                {
+                    if (dim.Array[index] == InjectionValue.Unit)
+                        throw new StatementFailedException($"Accessing not initialized array index {index} of dim '{name}'.");
+
+                    return dim.Array[index];
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+                throw new NotImplementedException();
+
+        }
+
         internal void DefineVar(string name)
         {
             var vars = scopes.Peek().vars;
             vars[name] = InjectionValue.Unit;
         }
 
+        internal void DefineDim(string name, int limit)
+        {
+            var vars = scopes.Peek().vars;
+
+            var dim = new InjectionValue[limit + 1];
+            for (int i = 0; i < limit + 1; i++)
+                dim[i] = InjectionValue.Unit;
+
+            vars[name] = new InjectionValue(dim);
+        }
+
         internal void DefineVar(string name, InjectionValue value)
         {
             var vars = scopes.Peek().vars;
             vars[name] = value;
-        }
-
-        public void SetDim(string name, int index, InjectionValue value)
-        {
-            var dims = scopes.Peek().dims;
-            if (dims.ContainsKey(name))
-                dims[name][index] = value;
-            else
-                throw new NotImplementedException();
-        }
-
-        public InjectionValue GetDim(string name, int index)
-        {
-            var scope = scopes.Peek();
-            if (!scope.dims.TryGetValue(name, out var dim))
-                throw new StatementFailedException($"Variable '{name}' is not defined.");
-
-            if (index < 0 && index > dim.Length)
-                throw new StatementFailedException($"Index {index} is out of range for variable '{name}' (maximum size of this array is {dim.Length})");
-
-            if (!dim[index].HasValue)
-                throw new StatementFailedException($"Reading value from variable '{name}' at  index {index} that is not initialized. Assign some value to '{name}[{index}]' first.");
-
-            return dim[index].Value;
-        }
-
-        internal void DefineDim(string name, int limit)
-        {
-            var dims = scopes.Peek().dims;
-            dims[name] = new InjectionValue?[limit + 1];
         }
     }
 }

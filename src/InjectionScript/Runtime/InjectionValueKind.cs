@@ -5,6 +5,7 @@
         Unit,
         Integer,
         Decimal,
-        String
+        String,
+        Array
     }
 }
