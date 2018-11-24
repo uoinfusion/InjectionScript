@@ -1,7 +1,7 @@
 ﻿using System;
 using InjectionScript.Parsing.Syntax;
 
-namespace InjectionScript.Runtime
+namespace InjectionScript.Runtime.Contexts
 {
     public sealed class StatementExecutionContext
     {

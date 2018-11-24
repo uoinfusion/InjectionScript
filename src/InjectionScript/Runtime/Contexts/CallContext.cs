@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InjectionScript.Runtime
+namespace InjectionScript.Runtime.Contexts
 {
     public sealed class CallContext
     {

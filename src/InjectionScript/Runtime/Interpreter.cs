@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
 using InjectionScript.Parsing.Syntax;
+using InjectionScript.Runtime.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -136,7 +137,7 @@ namespace InjectionScript.Runtime
                         else if (statement.@while() != null)
                         {
                             var condition = Visit(statement.@while().expression());
-                            int lastStatementIndex = statement.@while().codeBlock().statement().Any()
+                            var lastStatementIndex = statement.@while().codeBlock().statement().Any()
                                 ? statementsMap.GetIndex(statement.@while().codeBlock().statement().Last())
                                 : statementIndex;
 

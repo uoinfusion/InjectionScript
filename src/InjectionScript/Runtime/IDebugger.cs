@@ -1,4 +1,6 @@
-﻿namespace InjectionScript.Runtime
+﻿using InjectionScript.Runtime.Contexts;
+
+namespace InjectionScript.Runtime
 {
     public interface IDebugger
     {
