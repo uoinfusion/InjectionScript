@@ -105,7 +105,26 @@ return i");
         }
 
         [TestMethod]
-        public void Nested_false_conditions_with_else()
+        public void Nested_false_conditions()
+        {
+            TestSubrutine(0, @"var i = 0
+if 0 then
+    if 0 then
+        i = i + 334
+    else
+        if 0 then
+            i = i + 335
+        else
+            i = i + 1
+        end if
+    end if
+endif
+
+return i");
+        }
+
+        [TestMethod]
+        public void Nested_false_condition_within_else()
         {
             TestSubrutine(1, @"var i = 0
 if 0 then

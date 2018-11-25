@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using InjectionScript.Parsing.Syntax;
 using InjectionScript.Runtime.Contexts;
+using InjectionScript.Runtime.Instructions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,18 +11,6 @@ namespace InjectionScript.Runtime
 {
     public class Interpreter : injectionBaseVisitor<InjectionValue>
     {
-        private struct ConditionalGoto
-        {
-            public int TriggerIndex { get; }
-            public int TargetIndex { get; }
-
-            public ConditionalGoto(int trigger, int target)
-            {
-                TriggerIndex = trigger;
-                TargetIndex = target;
-            }
-        }
-
         private readonly Metadata metadata;
         private readonly string currentFileName;
         private readonly IDebugger debugger;
@@ -41,10 +30,6 @@ namespace InjectionScript.Runtime
         {
             var forScopes = new Stack<ForScope>();
             var repeatIndexes = new Stack<int>();
-            var conditionalGotos = new Stack<ConditionalGoto>();
-            var flattener = new StatementFlattener();
-            flattener.Visit(subrutine);
-            var statementsMap = flattener.Statements;
 
             semanticScope.Start();
             var parameters = subrutine.parameters()?.parameterName()?.Select(x => x.SYMBOL().GetText()).ToArray()
@@ -52,15 +37,32 @@ namespace InjectionScript.Runtime
             for (int i = 0; i < parameters.Length; i++)
                 semanticScope.DefineVar(parameters[i], argumentValues[i]);
 
+            var name = subrutine.SYMBOL().GetText();
+            var subrutineDefinition = metadata.GetSubrutine(name, parameters.Length);
+
             try
             {
-                var statementIndex = 0;
-                while (statementIndex < statementsMap.Count)
+                var instructionAddress = 0;
+                while (instructionAddress < subrutineDefinition.Instructions.Length)
                 {
-                    var statement = statementsMap.GetStatement(statementIndex);
+                    var currentInstruction = subrutineDefinition.Instructions[instructionAddress];
+                    var statement = currentInstruction.Statement;
+
+                    if (statement == null)
+                    {
+                        switch (currentInstruction)
+                        {
+                            case JumpInstruction jump:
+                                instructionAddress = jump.TargetAddress;
+                                break;
+                        }
+
+                        continue;
+                    }
+
                     if (debugger != null)
                     {
-                        var context = new StatementExecutionContext(statementIndex, statement.Start.Line, currentFileName, statement, this);
+                        var context = new StatementExecutionContext(instructionAddress, statement.Start.Line, currentFileName, statement, this);
                         debugger.BeforeStatement(context);
                     }
 
@@ -72,99 +74,73 @@ namespace InjectionScript.Runtime
                         }
                         else if (statement.@if() != null)
                         {
-                            injectionParser.StatementContext nextStatement;
-
                             var condition = Visit(statement.@if().expression());
-                            if (condition != InjectionValue.False)
+                            if (condition == InjectionValue.False)
                             {
-                                nextStatement = (injectionParser.StatementContext)statement.@if().Parent;
-                                var triggerStatement = statement.@if().@else()?.codeBlock()?.statement()?.FirstOrDefault();
-                                var targetStatement = statement.@if().@else()?.codeBlock()?.statement()?.LastOrDefault();
-                                if (triggerStatement != null && targetStatement != null)
-                                {
-                                    var conditionalGoto = new ConditionalGoto(statementsMap.GetIndex(triggerStatement),
-                                        statementsMap.GetIndex(targetStatement) + 1);
-                                    conditionalGotos.Push(conditionalGoto);
-                                }
+                                var ifInstruction = (IfInstruction)currentInstruction;
+                                instructionAddress = ifInstruction.ElseAddress ?? ifInstruction.EndIfAddress;
                             }
                             else
-                                nextStatement = statement.@if().codeBlock()?.statement()?.LastOrDefault();
-
-                            if (nextStatement != null)
-                                statementIndex = statementsMap.GetIndex(nextStatement) + 1;
-                            else
-                                statementIndex++;
+                                instructionAddress++;
                         }
                         else if (statement.@for() != null)
                         {
-                            statementIndex++;
-                            forScopes.Push(InterpretFor(statementIndex, statement.@for()));
+                            instructionAddress++;
+                            forScopes.Push(InterpretFor(instructionAddress, statement.@for()));
                         }
                         else if (statement.next() != null)
                         {
                             var forScope = forScopes.Peek();
                             if (!semanticScope.TryGetVar(forScope.VariableName, out var variable))
-                                throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", statementsMap.GetStatement(statementIndex).Start.Line);
+                                throw new ScriptFailedException($"Variable undefined - {forScope.VariableName}", subrutineDefinition.Instructions[instructionAddress].Statement.Start.Line);
 
                             if (variable < forScope.Range)
                             {
-                                statementIndex = forScope.StatementIndex;
+                                instructionAddress = forScope.StatementIndex;
                                 variable = variable + new InjectionValue(1);
                                 semanticScope.SetVar(forScope.VariableName, variable);
                             }
                             else
                             {
-                                statementIndex++;
+                                instructionAddress++;
                                 forScopes.Pop();
                             }
                         }
                         else if (statement.repeat() != null)
                         {
-                            statementIndex++;
-                            repeatIndexes.Push(statementIndex);
+                            instructionAddress++;
+                            repeatIndexes.Push(instructionAddress);
                         }
                         else if (statement.until() != null)
                         {
                             var condition = Visit(statement.until().expression());
                             if (condition != InjectionValue.False)
                             {
-                                statementIndex++;
+                                instructionAddress++;
                                 repeatIndexes.Pop();
                             }
                             else
-                                statementIndex = repeatIndexes.Peek();
+                                instructionAddress = repeatIndexes.Peek();
                         }
                         else if (statement.@while() != null)
                         {
+                            var whileInstruction = (WhileInstruction)currentInstruction;
                             var condition = Visit(statement.@while().expression());
-                            var lastStatementIndex = statement.@while().codeBlock().statement().Any()
-                                ? statementsMap.GetIndex(statement.@while().codeBlock().statement().Last())
-                                : statementIndex;
 
                             if (condition != InjectionValue.False)
-                            {
-                                conditionalGotos.Push(new ConditionalGoto(lastStatementIndex + 1, statementIndex));
-                                statementIndex++;
-                            }
+                                instructionAddress++;
                             else
-                            {
-                                statementIndex = lastStatementIndex + 1;
-                            }
+                                instructionAddress = whileInstruction.WendAddress;
                         }
                         else if (statement.@goto() != null)
                         {
-                            statementIndex = statementsMap.GetIndex(statement.@goto().SYMBOL().GetText());
+                            var gotoInstruction = (GotoInstruction)currentInstruction;
+                            instructionAddress = gotoInstruction.TargetAddress;
                         }
                         else
                         {
                             Visit(statement);
-                            statementIndex++;
-                        }
-
-                        while (conditionalGotos.Count > 0 && conditionalGotos.Peek().TriggerIndex == statementIndex)
-                        {
-                            var conditionalGoto = conditionalGotos.Pop();
-                            statementIndex = conditionalGoto.TargetIndex;
+                            instructionAddress++;
                         }
                     }
                     catch (StatementFailedException ex)
@@ -188,7 +164,7 @@ namespace InjectionScript.Runtime
                 if (debugger != null)
                 {
                     debugger.BeforeStatement(
-                        new StatementExecutionContext(statementIndex, subrutine.END_SUB().Symbol.Line, currentFileName, null, this));
+                        new StatementExecutionContext(instructionAddress, subrutine.END_SUB().Symbol.Line, currentFileName, null, this));
                 }
 
                 return InjectionValue.Unit;

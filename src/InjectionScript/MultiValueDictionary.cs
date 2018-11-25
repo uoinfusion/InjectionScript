@@ -12,6 +12,7 @@ namespace InjectionScript
         private readonly Dictionary<TKey, List<TValue>> dictionary = new Dictionary<TKey, List<TValue>>();
 
         public IEnumerable<IEnumerable<TValue>> Values => dictionary.Values;
+        public IEnumerable<TKey> Keys => dictionary.Keys;
 
         public void Add(TKey key, TValue value)
         {

@@ -1,11 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using InjectionScript.Parsing.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using InjectionScript.Runtime.Instructions;
 
 namespace InjectionScript.Runtime
 {
@@ -20,7 +15,10 @@ namespace InjectionScript.Runtime
 
         public override Metadata VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
         {
-            metadata.Add(new SubrutineDefinition(context.name.Text, context));
+            var generator = new Generator();
+            generator.Visit(context);
+
+            metadata.Add(new SubrutineDefinition(context.name.Text, context, generator.Instructions));
 
             return metadata;
         }

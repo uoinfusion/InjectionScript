@@ -1,4 +1,5 @@
 ﻿using InjectionScript.Parsing.Syntax;
+using InjectionScript.Runtime.Instructions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,13 @@ namespace InjectionScript.Runtime
     {
         public string Name { get; }
         internal injectionParser.SubrutineContext Syntax { get; }
+        internal Instruction[] Instructions { get; }
 
-        internal SubrutineDefinition(string name, injectionParser.SubrutineContext subrutine)
+        internal SubrutineDefinition(string name, injectionParser.SubrutineContext subrutine, Instruction[] instructions)
         {
             Name = name;
             Syntax = subrutine;
+            Instructions = instructions;
         }
     }
 }
