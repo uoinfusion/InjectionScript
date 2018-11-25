@@ -13,11 +13,15 @@ namespace InjectionScript.Tests.Interpretation
         [TestMethod]
         public void If_trivial_true_condition()
         {
-            TestSubrutine(2, @"if 1 then
-    return 2
+            TestSubrutine(2, @"
+var x = 0
+if 1 then
+    x = x + 1
 endif
 
-return 1");
+x = x + 1
+
+return x");
         }
 
         [TestMethod]
@@ -51,12 +55,14 @@ return 1");
         [TestMethod]
         public void If_trivial_true_condition_with_else()
         {
-            TestSubrutine(1, @"var i = 0
+            TestSubrutine(3, @"var i = 0
 if 1 then
     i = i + 1
 else
     i = i + 333
 endif
+
+i = i + 2
 
 return i");
         }
@@ -86,7 +92,7 @@ return i");
         [TestMethod]
         public void Nested_true_conditions_with_else()
         {
-            TestSubrutine(1, @"var i = 0
+            TestSubrutine(3, @"var i = 0
 if 1 then
     if 1 then
         if 1 then
@@ -97,9 +103,12 @@ if 1 then
     else
         i = i + 334
     end if
+    i = i + 1
 else
     i = i + 333
 endif
+
+i = i + 1
 
 return i");
         }
@@ -107,7 +116,7 @@ return i");
         [TestMethod]
         public void Nested_false_conditions()
         {
-            TestSubrutine(0, @"var i = 0
+            TestSubrutine(2, @"var i = 0
 if 0 then
     if 0 then
         i = i + 334
@@ -115,10 +124,15 @@ if 0 then
         if 0 then
             i = i + 335
         else
-            i = i + 1
+            i = i + 347
         end if
+        i = i + 358
     end if
+    i = i + 369
+else
+    i = i + 1
 endif
+i = i + 1
 
 return i");
         }
