@@ -24,6 +24,13 @@ namespace InjectionScript.Runtime.Contexts
         internal InjectionValue Eval(injectionParser.ExpressionContext expression)
             => interpreter.VisitExpression(expression);
 
-        internal string GetStatementText() => statement?.GetText() ?? "<no statement>";
+        internal string GetStatementText()
+        {
+            if (statement == null)
+                return "<no statement>";
+
+            var text = statement.GetText();
+            return text.Substring(0, text.Length > 40 ? 40 : text.Length);
+        }
     }
 }

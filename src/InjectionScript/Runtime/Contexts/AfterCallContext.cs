@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace InjectionScript.Runtime.Contexts
 {
-    public sealed class CallContext
+    public sealed class AfterCallContext
     {
         private readonly injectionParser.CallContext context;
         private readonly string name;
@@ -15,11 +15,14 @@ namespace InjectionScript.Runtime.Contexts
 
         public int Line => context.Start.Line;
 
-        internal CallContext(injectionParser.CallContext context, string name, InjectionValue[] argumentValues)
+        public InjectionValue ReturnValue { get; }
+
+        internal AfterCallContext(injectionParser.CallContext context, string name, InjectionValue[] argumentValues, InjectionValue returnValue)
         {
             this.context = context;
             this.name = name;
             this.argumentValues = argumentValues;
+            ReturnValue = returnValue;
         }
 
         public override string ToString()
@@ -28,7 +31,7 @@ namespace InjectionScript.Runtime.Contexts
                 ? argumentValues.Select(x => x.ToString()).Aggregate((l, r) => l + "," + r)
                 : string.Empty;
 
-            return $"calling {name}({args})";
+            return $"Line {Line}: called {name}({args}) -> {ReturnValue}";
         }
     }
 }

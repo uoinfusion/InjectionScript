@@ -44,7 +44,7 @@ namespace InjectionScript.Debugging
                 traceBuffer.AppendLine(context.ToString());
         }
 
-        public void BeforeCall(CallContext context)
+        public void AfterCall(AfterCallContext context)
         {
             if (traceEnabled)
                 traceBuffer.AppendLine(context.ToString());

@@ -6,7 +6,7 @@ namespace InjectionScript.Runtime
     {
         void BeforeStatement(StatementExecutionContext context);
         void BeforeVariableAssignment(VariableAssignmentContext context);
-        void BeforeCall(CallContext context);
+        void AfterCall(AfterCallContext context);
         void BeforeReturn(ReturnContext context);
     }
 }

@@ -435,17 +435,16 @@ namespace InjectionScript.Runtime
                 .Select(arg => VisitExpression(arg.expression()))
                 .ToArray() ?? Array.Empty<InjectionValue>();
 
-            if (debugger != null)
-                debugger.BeforeCall(new CallContext(context, name, argumentValues));
+            var result = InjectionValue.Unit;
 
             if (metadata.TryGetNativeSubrutine(name, argumentValues, out var nativeSubrutine))
             {
-                return nativeSubrutine.Call(argumentValues);
+                result = nativeSubrutine.Call(argumentValues);
             }
             else
             {
                 if (metadata.TryGetSubrutine(name, argumentValues.Length, out var customSubrutine))
-                    return CallSubrutine(customSubrutine.Syntax, argumentValues);
+                    result = CallSubrutine(customSubrutine.Syntax, argumentValues);
                 else
                 {
                     var argumentKinds = argumentValues.Any()
@@ -454,6 +453,11 @@ namespace InjectionScript.Runtime
                     throw new ScriptFailedException($"Function not found {name} ({argumentKinds})", context.Start.Line);
                 }
             }
+
+            if (debugger != null)
+                debugger.AfterCall(new AfterCallContext(context, name, argumentValues, result));
+
+            return result;
         }
     }
 }
