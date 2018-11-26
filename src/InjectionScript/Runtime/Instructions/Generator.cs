@@ -15,7 +15,7 @@ namespace InjectionScript.Runtime.Instructions
         private int currentAddress;
         private readonly MultiValueDictionary<string, GotoInstruction> gotos
             = new MultiValueDictionary<string, GotoInstruction>();
-        private readonly Dictionary<string, int> labels = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> labels = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         internal Instruction[] Instructions => instructions.ToArray();
 

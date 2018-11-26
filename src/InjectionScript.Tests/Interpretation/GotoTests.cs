@@ -18,8 +18,9 @@ x = x + 1
 return x
 
 end sub
-");[TestMethod]
+");
 
+        [TestMethod]
         public void Label_can_contain_dot() => TestSubrutine(2, "sub1", @"sub sub1()
 var x = 1
 goto label.1.
@@ -47,5 +48,22 @@ goto label1
 return 111
 end sub
 ");
+
+        [TestMethod]
+        public void Labels_are_case_insensitive()
+        {
+            TestSubrutine(2, "sub1", @"sub sub1()
+var x = 1
+goto LaBeL
+x = x + 1
+
+lAbEl:
+x = x + 1
+
+return x
+end sub
+");
+        }
     }
+
 }
