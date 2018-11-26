@@ -43,9 +43,10 @@ namespace InjectionScript.Debugging
                 return newBuilder;
             }
 
-            var recycledBuffer = buffer.Dequeue();
-            recycledBuffer.Clear();
-            return recycledBuffer;
+            var recycledBuilder = buffer.Dequeue();
+            recycledBuilder.Clear();
+            buffer.Enqueue(recycledBuilder);
+            return recycledBuilder;
         }
 
         public void AppendLine()
