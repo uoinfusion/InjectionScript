@@ -43,6 +43,7 @@
         void UseType(int type, int color);
         void WaitTargetObject(int id);
         void WaitTargetObject(int id1, int id2);
+        void WaitTargetTile(int type, int x, int y, int z);
         int IsTargeting();
         void SetReceivingContainer(int id);
         void UnsetReceivingContainer();
