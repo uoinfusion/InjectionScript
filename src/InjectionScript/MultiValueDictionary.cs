@@ -9,10 +9,20 @@ namespace InjectionScript
 {
     public sealed class MultiValueDictionary<TKey, TValue>
     {
-        private readonly Dictionary<TKey, List<TValue>> dictionary = new Dictionary<TKey, List<TValue>>();
+        private readonly Dictionary<TKey, List<TValue>> dictionary;
 
         public IEnumerable<IEnumerable<TValue>> Values => dictionary.Values;
         public IEnumerable<TKey> Keys => dictionary.Keys;
+
+        public MultiValueDictionary()
+        {
+            dictionary = new Dictionary<TKey, List<TValue>>();
+        }
+
+        public MultiValueDictionary(IEqualityComparer<TKey> comparer)
+        {
+            dictionary = new Dictionary<TKey, List<TValue>>(comparer);
+        }
 
         public void Add(TKey key, TValue value)
         {
@@ -29,7 +39,7 @@ namespace InjectionScript
         public IEnumerable<TValue> this[TKey key] => dictionary[key];
         public bool TryGet(TKey key, out IEnumerable<TValue> values)
         {
-            if (!dictionary.TryGetValue(key, out var list))
+            if (dictionary.TryGetValue(key, out var list))
             {
                 values = list;
                 return true;
