@@ -19,6 +19,9 @@ namespace InjectionScript.Analysis
             var subrutineDefinitionsVisitor = new SubrutineDefinitionsVisitor(messages);
             subrutineDefinitionsVisitor.Visit(fileContext);
 
+            var nativeSubrutineIncorrectArgumentsVisitor = new NativeSubrutineIncorrectArgumentsVisitor(messages);
+            nativeSubrutineIncorrectArgumentsVisitor.Visit(fileContext);
+
             return new MessageCollection(messages);
         }
     }
