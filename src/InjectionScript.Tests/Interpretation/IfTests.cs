@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static InjectionScript.Tests.Interpretation.InterpretationHelpers;
+using static InjectionScript.Tests.TestHelpers;
 
 namespace InjectionScript.Tests.Interpretation
 {

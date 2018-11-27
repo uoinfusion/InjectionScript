@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static InjectionScript.Tests.Interpretation.InterpretationHelpers;
+using static InjectionScript.Tests.TestHelpers;
 
 namespace InjectionScript.Tests.Interpretation
 {

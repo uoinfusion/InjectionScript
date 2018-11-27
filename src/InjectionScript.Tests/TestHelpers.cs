@@ -3,9 +3,9 @@ using InjectionScript.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace InjectionScript.Tests.Interpretation
+namespace InjectionScript.Tests
 {
-    public static class InterpretationHelpers
+    public static class TestHelpers
     {
         public static InjectionValue EvalExpression(string expression)
         {
@@ -50,6 +50,16 @@ namespace InjectionScript.Tests.Interpretation
             runtime.Load(parser.ParseFile(subrutine, new FailTestErrorListener()));
 
             runtime.CallSubrutine("test");
+        }
+
+        public static InjectionValue Execute(string subName, string codeBlock)
+        {
+            var runtime = new InjectionRuntime();
+
+            var parser = new Parser();
+            runtime.Load(parser.ParseFile(codeBlock, new FailTestErrorListener()));
+
+            return runtime.CallSubrutine(subName); 
         }
 
         public static void TestSubrutine(int expected, string codeBlock, NativeSubrutineDefinition[] natives = null, NativeSubrutineDefinition[] intrinsicVariables = null)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using static InjectionScript.Tests.Interpretation.InterpretationHelpers;
+using static InjectionScript.Tests.TestHelpers;
 
 
 namespace InjectionScript.Tests.Interpretation
