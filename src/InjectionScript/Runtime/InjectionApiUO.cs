@@ -11,6 +11,8 @@ namespace InjectionScript.Runtime
         private readonly IApiBridge bridge;
         private readonly InjectionApi injectionApi;
         private readonly Globals globals;
+        private readonly DateTime timerStart;
+        private readonly Random random;
 
         internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals)
         {
@@ -18,6 +20,8 @@ namespace InjectionScript.Runtime
             this.injectionApi = injectionApi;
             this.globals = globals;
             Register(metadata);
+            timerStart = DateTime.UtcNow;
+            random = new Random();
         }
 
         internal void Register(Metadata metadata)
@@ -90,15 +94,23 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<int>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<int, int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<int, int, int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<string, string, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findtype", (Action<int, int, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<int>)FindCount));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<string, int>)((ignoredParam1) => FindCount())));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<string, string, int>)((ignoredParam1, ignoredParam2) => FindCount())));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<string, string, string, int>)((ignoredParam1, ignoredParam2, ignoredParam3) => FindCount())));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<int, int>)((ignoredParam1) => FindCount())));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<int, int, int>)((ignoredParam1, ignoredParam2) => FindCount())));
+            metadata.Add(new NativeSubrutineDefinition("UO.findcount", (Func<int, int, int, int>)((ignoredParam1, ignoredParam2, ignoredParam3) => FindCount())));
             metadata.Add(new NativeSubrutineDefinition("UO.ignore", (Action<int>)Ignore));
             metadata.Add(new NativeSubrutineDefinition("UO.ignore", (Action<string>)Ignore));
             metadata.Add(new NativeSubrutineDefinition("UO.ignorereset", (Action)IgnoreReset));
             metadata.Add(new NativeSubrutineDefinition("UO.count", (Func<string, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.count", (Func<int, int>)Count));
+            metadata.Add(new NativeSubrutineDefinition("UO.count", (Func<int, int, int>)Count));
 
             metadata.Add(new NativeSubrutineDefinition("UO.click", (Action<string>)Click));
             metadata.Add(new NativeSubrutineDefinition("UO.click", (Action<int>)Click));
@@ -110,6 +122,10 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.getstatus", (Action<int>)GetStatus));
             metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<int>)UseType));
             metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<string>)UseType));
+            metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<int, int>)UseType));
+            metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<string, string>)UseType));
+            metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<int, string>)UseType));
+            metadata.Add(new NativeSubrutineDefinition("UO.usetype", (Action<string, int>)UseType));
 
             metadata.Add(new NativeSubrutineDefinition("UO.waittargetobject", (Action<string>)WaitTargetObject));
             metadata.Add(new NativeSubrutineDefinition("UO.waittargetobject", (Action<string, string>)WaitTargetObject));
@@ -122,6 +138,13 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.grab", (Action<int, int>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.grab", (Action<int, string>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.grab", (Action<string, string>)Grab));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, string>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, int>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<int, int>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, string, string>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<int, int, int>)MoveItem));
+
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<int>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.setreceivingcontainer", (Action<string>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.UnsetReceivingContainer", (Action)UnsetReceivingContainer));
@@ -165,6 +188,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.morph", (Action<int>)Morph));
 
             metadata.Add(new NativeSubrutineDefinition("UO.terminate", (Action<string>)Terminate));
+            metadata.Add(new NativeSubrutineDefinition("UO.timer", (Func<int>)Timer));
+            metadata.Add(new NativeSubrutineDefinition("UO.random", (Func<int, int>)Random));
         }
 
         public void Set(string name, int value)
@@ -183,7 +208,14 @@ namespace InjectionScript.Runtime
             }
         }
 
-        private int GetObject(string name) => injectionApi.GetObject(name);
+        private int GetObject(string name)
+        {
+            var id = injectionApi.GetObject(name);
+            if (id == 0)
+                bridge.Error($"Unknown object {name}");
+
+            return id;
+        }
 
         public int GetX() => GetX("self");
         public int GetX(string id) => GetX(GetObject(id));
@@ -255,7 +287,11 @@ namespace InjectionScript.Runtime
         public void GetStatus(int id) => bridge.GetStatus(id);
 
         public void UseType(string type) => UseType(NumberConversions.Str2Int(type));
-        public void UseType(int type) => bridge.UseType(type);
+        public void UseType(string type, string color) => UseType(NumberConversions.Str2Int(type), NumberConversions.Str2Int(color));
+        public void UseType(int type, string color) => UseType(type, NumberConversions.Str2Int(color));
+        public void UseType(string type, int color) => UseType(NumberConversions.Str2Int(type), color);
+        public void UseType(int type) => UseType(type, -1);
+        public void UseType(int type, int color) => bridge.UseType(type, color);
 
         public void WaitTargetObject(string id) => WaitTargetObject(GetObject(id));
         public void WaitTargetObject(int id) => bridge.WaitTargetObject(id);
@@ -274,8 +310,16 @@ namespace InjectionScript.Runtime
         public void Grab(string amount, string id) => Grab(NumberConversions.Str2Int(amount), GetObject(id));
         public void Grab(int amount, int id) => bridge.Grab(amount, id);
 
+        public void MoveItem(int id, int amount) => MoveItem(id, amount, 0);
+        public void MoveItem(string id, int amount) => MoveItem(GetObject(id), amount, 0);
+        public void MoveItem(string id, string amount) => MoveItem(GetObject(id), NumberConversions.Str2Int(amount), 0);
+        public void MoveItem(string id, string amount, string targetContainerId)
+            => MoveItem(GetObject(id), NumberConversions.Str2Int(amount), GetObject(targetContainerId));
+        public void MoveItem(int id, int amount, int targetContainerId) => bridge.MoveItem(id, amount, targetContainerId);
+
         public void FindType(string typeStr) => FindType(NumberConversions.Str2Int(typeStr));
         public void FindType(int type) => FindType(type, -1, -1);
+        public void FindType(int type, int color) => FindType(type, color, -1);
         public void FindType(string type, string color, string container)
             => FindType(NumberConversions.Str2Int(type), NumberConversions.Str2Int(color), ConvertContainer(container));
         public void FindType(int type, int color, string container)
@@ -283,7 +327,8 @@ namespace InjectionScript.Runtime
         public void FindType(int type, int color, int containerId) => bridge.FindType(type, color, containerId);
         public int FindCount() => bridge.FindCount();
         public int Count(string type) => Count(NumberConversions.Str2Int(type));
-        public int Count(int type) => bridge.Count(type);
+        public int Count(int type) => Count(type, -1);
+        public int Count(int type, int color) => bridge.Count(type, color);
 
         public void Ignore(string id) => Ignore(GetObject(id));
         public void Ignore(int id) => bridge.Ignore(id);
@@ -329,6 +374,15 @@ namespace InjectionScript.Runtime
         public void Morph(string type) => Morph(NumberConversions.Str2Int(type));
         public void Morph(int type) => bridge.Morph(type);
         public void Terminate(string subrutineName) => bridge.Terminate(subrutineName);
+
+        public int Timer()
+        {
+            var duration = DateTime.UtcNow - timerStart;
+
+            return (int)duration.TotalMilliseconds / 100;
+        }
+
+        public int Random(int max) => random.Next(max);
 
         private int ConvertContainer(string id)
         {

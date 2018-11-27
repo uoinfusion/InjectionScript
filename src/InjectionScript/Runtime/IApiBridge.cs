@@ -40,13 +40,14 @@
         void UseObject(int id);
         void Attack(int id);
         void GetStatus(int id);
-        void UseType(int type);
+        void UseType(int type, int color);
         void WaitTargetObject(int id);
         void WaitTargetObject(int id1, int id2);
         int IsTargeting();
         void SetReceivingContainer(int id);
         void UnsetReceivingContainer();
         void Grab(int amount, int id);
+        void MoveItem(int id, int amount, int targetContainerId);
 
         void LClick(int x, int y);
         void KeyPress(int key);
@@ -76,11 +77,13 @@
 
         int FindCount();
         void FindType(int type, int color, int containerId);
-        int Count(int type);
+        int Count(int type, int color);
         void Ignore(int id);
         void IgnoreReset();
         void Terminate(string subrutineName);
         int GetGraphics(int id);
         int GetDir(int id);
+
+        void Error(string message);
     }
 }
