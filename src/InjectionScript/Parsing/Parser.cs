@@ -42,5 +42,8 @@ namespace InjectionScript.Parsing
             => Parse(sourceCode, errorListener, (parser) => parser.expression());
         public injectionParser.ExpressionContext ParseExpression(string sourceCode, out MessageCollection messages)
             => Parse(sourceCode, (parser) => parser.expression(), out messages);
+
+        public injectionParser.StatementContext ParseStatement(string sourceCode, BaseErrorListener errorListener = null)
+            => Parse(sourceCode, errorListener, (parser) => parser.statement());
     }
 }

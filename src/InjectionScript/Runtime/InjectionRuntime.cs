@@ -45,12 +45,12 @@ namespace InjectionScript.Runtime
             CurrentFileSyntax = parser.ParseFile(content, out var errors);
             CurrentFileName = fileName;
 
-            if (errors.Any())
-                return errors;
-
             Metadata.ResetSubrutines();
             var collector = new DefinitionCollector(Metadata);
             collector.Visit(CurrentFileSyntax);
+
+            if (errors.Any())
+                return errors;
 
             var sanityAnalyzer = new SanityAnalyzer();
             return sanityAnalyzer.Analyze(CurrentFileSyntax, Metadata);

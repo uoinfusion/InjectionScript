@@ -15,6 +15,7 @@ namespace InjectionScript.Runtime
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
 
         public IEnumerable<SubrutineDefinition> Subrutines => subrutines.Values;
+        public IEnumerable<NativeSubrutineDefinition> NativeSubrutines => nativeSubrutines.Values;
 
         public void Add(SubrutineDefinition subrutineDef)
         {

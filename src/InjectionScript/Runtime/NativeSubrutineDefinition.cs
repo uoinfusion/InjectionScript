@@ -72,5 +72,7 @@ namespace InjectionScript.Runtime
 
             return $"{name}`{parametersSignature}";
         }
+
+        public override string ToString() => $"Subrutine {Name}";
     }
 }
