@@ -1,4 +1,4 @@
-﻿using Antlr4.Runtime;
+﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using InjectionScript.Parsing.Syntax;
 using InjectionScript.Runtime;
@@ -28,91 +28,73 @@ namespace InjectionScript.Lsp
             new CompletionItem() { Label = "var", InsertText = "var", Kind = CompletionItemKind.Keyword },
         };
 
-        private bool IsEmpty(ParserRuleContext syntax)
-        {
-            if (syntax == null)
-                return true;
-
-            if (syntax is injectionParser.ArgumentListContext argumentList && argumentList.ChildCount <= 1)
-                return true;
-            
-
-            return false;
-        }
-
-        private bool CanContainStatementKeyword(ParserRuleContext syntax)
-            => syntax == null || (!(syntax is injectionParser.OperandContext) && !(syntax is injectionParser.ArgumentListContext));
-
         public CompletionList GetCompletions(injectionParser.FileContext fileSyntax, Metadata metadata, int line, int column)
         {
-            var lineSyntax = FindLine(fileSyntax, line, column);
+            var subrutineSyntax = GetSubrutine(fileSyntax, line, column);
+            if (subrutineSyntax == null)
+                return new CompletionList(new[]
+                {
+                    new CompletionItem() { Label = "sub", InsertText = "sub", Kind = CompletionItemKind.Keyword },
+                    new CompletionItem() { Label = "end sub", InsertText = "end sub", Kind = CompletionItemKind.Keyword },
+                });
 
-            var subrutineSuggestions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var result = GetContext(fileSyntax, line, column);
+            if (!result.HasValue)
+                return new CompletionList(true);
+
+            var context = result.Value;
+
             var namespaceSuggestions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            if (IsEmpty(lineSyntax))
-            {
-                foreach (var subrutine in metadata.Subrutines)
-                {
-                    subrutineSuggestions.Add(subrutine.Name);
-                }
+            var completions = Enumerable.Empty<CompletionItem>();
 
-                foreach (var subrutine in metadata.NativeSubrutines)
-                {
-                    if (!subrutine.Name.StartsWith("UO.", StringComparison.OrdinalIgnoreCase))
-                        subrutineSuggestions.Add(subrutine.Name);
-                }
-
-                namespaceSuggestions.Add("UO");
-
-                var suggestions = subrutineSuggestions.Select(x => CreateSubrutineCompletion(x))
-                    .Concat(namespaceSuggestions.Select(x => CreateNamespaceCompletion(x)));
-
-                if (CanContainStatementKeyword(lineSyntax))
-                    suggestions = suggestions.Concat(statementKeywords);
-
-                return new CompletionList(suggestions);
-            }
-
-            var prefix = lineSyntax.GetText().Trim();
-            bool isUONamespace = prefix.StartsWith("UO.", StringComparison.OrdinalIgnoreCase);
-
-            foreach (var subrutine in metadata.NativeSubrutines)
-            {
-                if (!isUONamespace && subrutine.Name.StartsWith("UO."))
-                    continue;
-
-                if (subrutine.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (isUONamespace)
-                        subrutineSuggestions.Add(subrutine.Name.Substring(3));
-                    else
-                        subrutineSuggestions.Add(subrutine.Name);
-                }
-            }
-
-            if ("UO".StartsWith(prefix))
-                namespaceSuggestions.Add("UO");
-
-            foreach (var subrutine in metadata.Subrutines)
-            {
-                if (subrutine.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    subrutineSuggestions.Add(subrutine.Name);
-                }
-            }
-
-            var completions = subrutineSuggestions.Select(x => CreateSubrutineCompletion(x))
-                    .Concat(namespaceSuggestions.Select(x => CreateNamespaceCompletion(x)));
-
-            if (!prefix.StartsWith("UO.", StringComparison.OrdinalIgnoreCase) && CanContainStatementKeyword(lineSyntax))
+            if (context.AllowedSuggestions.HasFlag(SuggestionKind.Keywords) && !context.StartsWith("UO."))
                 completions = completions.Concat(statementKeywords);
 
-            return new CompletionList(completions);
+            if (context.AllowedSuggestions.HasFlag(SuggestionKind.Variables) && !context.StartsWith("UO."))
+            {
+                var collector = new VariableDefinitionCollector(line, context.Prefix);
+                collector.Visit(subrutineSyntax);
+
+                completions = completions.Concat(collector.VariableNames.Select(CreateVariableCompletion));
+            }
+
+            if (context.AllowedSuggestions.HasFlag(SuggestionKind.Namespace) && !context.StartsWith("UO."))
+                namespaceSuggestions.Add("UO");
+
+            if (context.AllowedSuggestions.HasFlag(SuggestionKind.Namespace))
+            {
+                var subrutineCompletions = metadata.NativeSubrutines.Where(subrutine => context.IsSameNamespace(subrutine.Name))
+                    .GroupBy(subrutine => subrutine.Name)
+                    .Select(group => CreateSubrutineCompletion(group.First().Name));
+                completions = completions.Concat(subrutineCompletions);
+
+                if (!context.HasNamespace)
+                {
+                    subrutineCompletions = metadata.Subrutines.GroupBy(subrutine => subrutine.Name)
+                        .Select(group => CreateSubrutineCompletion(group.First().Name));
+                    completions = completions.Concat(subrutineCompletions);
+                }
+            }
+
+            completions = completions
+                .Concat(namespaceSuggestions.Select(x => CreateNamespaceCompletion(x)));
+
+            return new CompletionList(completions.ToArray());
         }
 
+        private CompletionItem CreateVariableCompletion(string variableName) =>
+            new CompletionItem() { Label = variableName, InsertText = variableName, Kind = CompletionItemKind.Variable };
+
+
         private CompletionItem CreateSubrutineCompletion(string subrutineName)
-            => new CompletionItem() { Label = subrutineName, InsertText = subrutineName, Kind = CompletionItemKind.Function };
+        {
+            if (subrutineName.StartsWith("UO."))
+                subrutineName = subrutineName.Substring(3);
+
+            return new CompletionItem() { Label = subrutineName, InsertText = subrutineName, Kind = CompletionItemKind.Function };
+        }
+
         private CompletionItem CreateNamespaceCompletion(string ns)
             => new CompletionItem() { Label = ns, InsertText = ns, Kind = CompletionItemKind.Class };
 
@@ -124,35 +106,159 @@ namespace InjectionScript.Lsp
             return GetCompletions(runtime.CurrentFileSyntax, runtime.Metadata, line, column);
         }
 
-        private ParserRuleContext FindLine(IParseTree syntax, int line, int column)
+        private injectionParser.SubrutineContext GetSubrutine(injectionParser.FileContext fileSyntax, int line, int column)
+        {
+            for (var i = 0; i < fileSyntax.ChildCount; i++)
+            {
+                var child = fileSyntax.GetChild(i) as injectionParser.SubrutineContext;
+                if (child != null && line >= child.Start.Line && line <= child.Stop.Line)
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+
+        private SuggestionContext? GetContext(IParseTree syntax, int line, int column)
         {
             for (var i = 0; i < syntax.ChildCount; i++)
             {
                 var child = syntax.GetChild(i);
-                var foundChild = FindLine(child, line, column);
+                var foundChild = GetContext(child, line, column);
                 if (foundChild != null)
                     return foundChild;
 
                 switch (child)
                 {
+                    case injectionParser.AdditiveOperandContext additiveOperand:
+                        if (additiveOperand.Start.Line > additiveOperand.Stop.Line && additiveOperand.Stop.Line == line)
+                        {
+                            return new SuggestionContext(SuggestionKind.Namespace | SuggestionKind.Subrutines | SuggestionKind.Variables, null);
+                        }
+                        break;
+                    case injectionParser.OperandContext operand:
+                        if (operand.Start.Line == line && operand.Start.Column <= column)
+                        {
+                            var text = operand.GetText();
+                            if (operand.Start.Column + text.Length >= column - 1)
+                                return new SuggestionContext(SuggestionKind.Namespace | SuggestionKind.Subrutines | SuggestionKind.Variables, text);
+                        }
+                        break;
+                    case injectionParser.ArgumentContext argument:
+                        if (argument.Start.Line == line && argument.Start.Column <= column)
+                        {
+                            var text = argument.GetText();
+                            if (argument.Start.Column + text.Length >= column - 1)
+                                return new SuggestionContext(SuggestionKind.Namespace | SuggestionKind.Subrutines | SuggestionKind.Variables, text);
+                        }
+                        break;
                     case injectionParser.ArgumentListContext argumentList:
                         if (line == argumentList.Start.Line && line == argumentList.Stop.Line)
-                            return argumentList;
+                        {
+                            if (argumentList.Stop.Column < column)
+                                return new SuggestionContext(SuggestionKind.Namespace | SuggestionKind.Subrutines | SuggestionKind.Variables, null);
+                        }
                         break;
                     case injectionParser.StatementContext statement:
                         if (line == statement.Start.Line && line == statement.Stop.Line)
-                            return statement;
+                            return new SuggestionContext(SuggestionKind.All, statement.GetText());
                         break;
-                    case Antlr4.Runtime.ParserRuleContext rule:
-                        if (line == rule.Start.Line && line == rule.Stop.Line && column >= rule.Start.Column && column <= rule.Stop.Column)
-                        {
-                            return rule;
-                        }
+                    case injectionParser.SubrutineContext subrutine:
+                        if (line > subrutine.Start.Line && line < subrutine.Stop.Line)
+                            return new SuggestionContext(SuggestionKind.All, null);
                         break;
                 }
             }
 
             return null;
+        }
+
+        private struct SuggestionContext
+        {
+            public SuggestionContext(SuggestionKind allowedSuggestions, string prefix)
+            {
+                AllowedSuggestions = allowedSuggestions;
+                Prefix = prefix;
+            }
+
+            public SuggestionKind AllowedSuggestions { get; }
+            public string Prefix { get; }
+            public bool HasNamespace => !string.IsNullOrEmpty(Prefix) && Prefix.Contains('.');
+
+            internal bool IsSameNamespace(string str)
+            {
+                var dotIndex = str.IndexOf('.');
+                var prefixDotIndex = Prefix?.IndexOf('.') ?? -1;
+
+                if (dotIndex < 0 && prefixDotIndex < 0)
+                    return true;
+
+                if (prefixDotIndex < 0 && dotIndex > 0)
+                    return false;
+
+                if (prefixDotIndex > 0 && dotIndex < 0)
+                    return false;
+
+                return str.Substring(0, dotIndex).Equals(Prefix.Substring(0, prefixDotIndex), StringComparison.OrdinalIgnoreCase);
+            }
+
+            internal bool StartsWith(string str)
+            {
+                if (string.IsNullOrEmpty(Prefix))
+                    return false;
+
+                return Prefix.StartsWith(str);
+            }
+        }
+
+        [Flags]
+        private enum SuggestionKind
+        {
+            None = 0,
+            Keywords = 1,
+            Subrutines = 2,
+            Namespace = 4,
+            Variables = 8,
+            All=15
+        }
+
+        private class VariableDefinitionCollector : injectionBaseVisitor<bool>
+        {
+            private readonly int referenceLine;
+            private readonly string prefix;
+            private HashSet<string> variableNames = new HashSet<string>();
+
+            public IEnumerable<string> VariableNames => variableNames;
+
+            public VariableDefinitionCollector(int referenceLine, string prefix)
+            {
+                this.referenceLine = referenceLine;
+                this.prefix = prefix;
+            }
+
+            public override bool VisitVarDef([NotNull] injectionParser.VarDefContext context)
+            {
+                if (context.Start.Line < referenceLine)
+                    Process(context.SYMBOL() ?? context.assignment().lvalue().SYMBOL());
+
+                return true;
+            }
+
+            public override bool VisitDimDef([NotNull] injectionParser.DimDefContext context)
+            {
+                if (context.Start.Line < referenceLine)
+                    Process(context.SYMBOL());
+
+                return true;
+            }
+
+            private void Process(ITerminalNode symbol)
+            {
+                var name = symbol.GetText();
+                if (string.IsNullOrEmpty(prefix) || name.StartsWith(prefix))
+                    variableNames.Add(name);
+            }
         }
     }
 }

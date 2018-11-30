@@ -36,7 +36,7 @@ namespace InjectionScript.Lsp.Server
             var completer = new Completer();
 
             var completions = completer.GetCompletions(fileContent,
-                (int)request.Position.Line + 1, (int)request.Position.Character);
+                (int)request.Position.Line + 1, (int)request.Position.Character + 1);
 
             return Task.FromResult(completions);
         }
