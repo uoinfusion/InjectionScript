@@ -119,18 +119,18 @@ namespace InjectionScript.Tests
             if (!collection.Any(x => x.Severity == MessageSeverity.Warning))
                 Assert.Fail("No warning found.");
 
-            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.Line == line))
+            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.StartLine == line))
                 Assert.Fail($"No warning found on line {line}.");
 
-            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.Line == line && x.IsCode(code)))
+            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.StartLine == line && x.IsCode(code)))
                 Assert.Fail($"No warning found on line {line} with code {code}.");
 
-            Assert.IsTrue(collection.Any(m => m.Severity == MessageSeverity.Warning && m.Line == line && m.IsCode(code)));
+            Assert.IsTrue(collection.Any(m => m.Severity == MessageSeverity.Warning && m.StartLine == line && m.IsCode(code)));
         }
 
         public static void AssertNoWarning(this MessageCollection collection, int line, string code)
         {
-            var message = collection.FirstOrDefault(x => x.Severity == MessageSeverity.Warning && x.Line == line && x.IsCode(code));
+            var message = collection.FirstOrDefault(x => x.Severity == MessageSeverity.Warning && x.StartLine == line && x.IsCode(code));
 
             if (message != null)
                 Assert.Fail($"No warning expected on line {line}, but found:\n{message}");

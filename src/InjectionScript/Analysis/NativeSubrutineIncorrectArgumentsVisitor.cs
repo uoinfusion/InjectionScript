@@ -31,7 +31,8 @@ namespace InjectionScript.Analysis
 
             if (argumentsCount.TryGet(name, out var values) && !values.Contains(argumentCount))
             {
-                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
+                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                    MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
                     $"Invalid arguments count for '{name}'."));
             }
 

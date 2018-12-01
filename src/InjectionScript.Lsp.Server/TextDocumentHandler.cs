@@ -35,15 +35,12 @@ namespace InjectionScript.Lsp.Server
 
         public Task<Unit> Handle(DidChangeTextDocumentParams notification, CancellationToken token)
         {
-            _router.Window.LogMessage(new LogMessageParams()
+            return Task.Run(() =>
             {
-                Type = MessageType.Log,
-                Message = "Hello World!!!!"
+                injectionWorkspace.UpdateDocument(notification.TextDocument.Uri, notification.ContentChanges.Single().Text);
+
+                return Unit.Value;
             });
-
-            injectionWorkspace.UpdateDocument(notification.TextDocument.Uri, notification.ContentChanges.Single().Text);
-
-            return Unit.Task;
         }
 
         TextDocumentChangeRegistrationOptions IRegistration<TextDocumentChangeRegistrationOptions>.GetRegistrationOptions() => new TextDocumentChangeRegistrationOptions()
@@ -54,19 +51,14 @@ namespace InjectionScript.Lsp.Server
 
         public void SetCapability(SynchronizationCapability capability) => _capability = capability;
 
-        public async Task<Unit> Handle(DidOpenTextDocumentParams notification, CancellationToken token)
+        public Task<Unit> Handle(DidOpenTextDocumentParams notification, CancellationToken token)
         {
-            await Task.Yield();
-            _router.Window.LogMessage(new LogMessageParams()
+            return Task.Run(() =>
             {
-                Type = MessageType.Log,
-                Message = "Hello World!!!!"
+                injectionWorkspace.UpdateDocument(notification.TextDocument.Uri, notification.TextDocument.Text);
+
+                return Unit.Value;
             });
-
-            injectionWorkspace.UpdateDocument(notification.TextDocument.Uri, notification.TextDocument.Text);
-
-
-            return Unit.Value;
         }
 
         TextDocumentRegistrationOptions IRegistration<TextDocumentRegistrationOptions>.GetRegistrationOptions() => new TextDocumentRegistrationOptions()

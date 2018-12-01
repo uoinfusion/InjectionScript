@@ -25,7 +25,8 @@ namespace InjectionScript.Lsp.Server
                     .WithHandler<TextDocumentHandler>()
                     .WithServices(serviceCollection =>
                     {
-                        serviceCollection.AddSingleton<IInjectionWorkspace>(new InjectionWorkspace());
+                        serviceCollection.AddSingleton(typeof(IDiagnosticReporter), typeof(DiagnosticReporter));
+                        serviceCollection.AddSingleton(typeof(IInjectionWorkspace), typeof(InjectionWorkspace));
                     })
                 );
 

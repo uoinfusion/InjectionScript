@@ -28,7 +28,8 @@ namespace InjectionScript.Analysis
             if (!metadata.NativeSubrutineExists(name, argumentCount)
                 && !metadata.TryGetSubrutine(name, argumentCount, out var customSubrutine))
             {
-                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
+                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                    MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
                     $"Subrutine {name} with {argumentCount} arguments not found."));
             }
 
@@ -70,7 +71,8 @@ namespace InjectionScript.Analysis
             var name = context.lvalue()?.SYMBOL()?.GetText();
             if (!string.IsNullOrEmpty(name) && !varNames.Contains(name))
             {
-                messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, context.lvalue().Stop.Line, context.lvalue().Stop.Column,
+                    MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                     $"Variable not found '{name}'."));
             }
             else
@@ -78,7 +80,8 @@ namespace InjectionScript.Analysis
                 name = context.lvalue()?.indexedSymbol()?.SYMBOL()?.GetText();
                 if (!string.IsNullOrEmpty(name) && !varNames.Contains(name) && !metadata.TryGetIntrinsicVariable(name, out _))
                 {
-                    messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                    messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, context.lvalue().Stop.Line, context.lvalue().Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                         $"Variable not found '{name}'."));
                 }
             }
@@ -92,7 +95,8 @@ namespace InjectionScript.Analysis
             if (!string.IsNullOrEmpty(varName) && !varNames.Contains(varName) && 
                 !metadata.TryGetIntrinsicVariable(varName, out _))
             {
-                messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                    MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                     $"Variable not found '{varName}'."));
             }
             else
@@ -100,7 +104,8 @@ namespace InjectionScript.Analysis
                 var dimName = context.indexedSymbol()?.SYMBOL()?.GetText();
                 if (!string.IsNullOrEmpty(dimName) && !varNames.Contains(dimName))
                 {
-                    messages.Add(new Message(context.Start.Line, context.Start.Column, MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                    messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedVariable,
                     $"Variable not found '{dimName}'."));
                 }
             }

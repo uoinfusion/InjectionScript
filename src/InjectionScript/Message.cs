@@ -8,24 +8,33 @@ namespace InjectionScript
 {
     public class Message
     {
-        public int Line { get; }
-        public int CharPos { get; }
+        public int StartLine { get; }
+        public int StartColumn { get; }
+        public int EndLine { get; }
+        public int EndColumn { get; }
         public string Text { get; }
         public string Code { get; }
         public MessageSeverity Severity { get; }
 
-        public Message(int line, int charPos, MessageSeverity severity, string code, string text)
+        public Message(int startLine, int startColumn, int endLine, int endColumn, MessageSeverity severity, string code, string text)
         {
-            Line = line;
-            CharPos = charPos;
+            StartLine = startLine;
+            StartColumn = startColumn;
+            EndLine = endLine;
+            EndColumn = endColumn;
             Text = text;
             Code = code;
             Severity = severity;
         }
 
+        public Message(int startLine, int startColumn, MessageSeverity severity, string code, string text)
+            : this(startLine, startColumn, startLine, startColumn + 1, severity, code, text)
+        {
+        }
+
         public bool IsCode(string code) 
             => Code.Equals(code, StringComparison.OrdinalIgnoreCase);
 
-        public override string ToString() => $"{Severity} {Code}: {Line}, {CharPos} - {Text}";
+        public override string ToString() => $"{Severity} {Code}: {StartLine}, {StartColumn} - {Text}";
     }
 }

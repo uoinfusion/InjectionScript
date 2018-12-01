@@ -42,7 +42,7 @@ namespace InjectionScript.Cli
 
             var messages = runtime.Load(file);
             var originalCollor = Console.ForegroundColor;
-            foreach (var message in messages.OrderBy(m => m.Line))
+            foreach (var message in messages.OrderBy(m => m.StartLine))
             {
                 switch (message.Severity)
                 {

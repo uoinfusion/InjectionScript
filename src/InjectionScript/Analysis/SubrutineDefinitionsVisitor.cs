@@ -30,12 +30,14 @@ namespace InjectionScript.Analysis
                     var collection = valueCollection.OrderBy(v => v.Start.Line);
                     var firstValue = collection.First();
 
-                    messages.Add(new Message(firstValue.Start.Line, firstValue.Start.Column, MessageSeverity.Warning, MessageCodes.SubrutineRedefined,
+                    messages.Add(new Message(firstValue.Start.Line, firstValue.Start.Column, firstValue.Stop.Line, firstValue.Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.SubrutineRedefined,
                         $"Subrutine '{firstValue.SYMBOL().GetText()}' was redefined by later subrutine definitions with the same name."));
 
                     foreach (var value in collection.Skip(1))
                     {
-                        messages.Add(new Message(value.Start.Line, value.Start.Column, MessageSeverity.Warning, MessageCodes.SubrutineRedefinition,
+                        messages.Add(new Message(value.Start.Line, value.Start.Column, value.Stop.Line, value.Stop.Column,
+                            MessageSeverity.Warning, MessageCodes.SubrutineRedefinition,
                             $"Subrutine '{value.SYMBOL().GetText()}' redefines a subrutine with the same name."));
                     }
                 }
