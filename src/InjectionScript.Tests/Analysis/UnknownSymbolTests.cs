@@ -21,6 +21,29 @@ end sub");
         }
 
         [TestMethod]
+        public void Warning_when_a_subrutine_not_defined_in_vardef()
+        {
+            var messages = Parse(@"
+sub test()
+    var x = unknown()
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.UndefinedSubrutine);
+        }
+
+        [TestMethod]
+        public void Warning_when_a_subrutine_not_defined_in_assignment()
+        {
+            var messages = Parse(@"
+sub test()
+    var x
+    x = unknown()
+end sub");
+
+            messages.AssertWarning(4, MessageCodes.UndefinedSubrutine);
+        }
+
+        [TestMethod]
         public void No_warning_when_a_subrutine_defined()
         {
             var messages = Parse(@"
@@ -96,7 +119,7 @@ sub test()
     var x = z
 end sub");
 
-            messages.AssertNoWarning(3, MessageCodes.UndefinedVariable);
+            messages.AssertWarning(3, MessageCodes.UndefinedVariable);
         }
 
         [TestMethod]
@@ -145,7 +168,17 @@ sub test()
 end sub");
 
             messages.AssertWarning(4, MessageCodes.UndefinedVariable);
+        }
 
+        [TestMethod]
+        public void Warning_when_reading_from_undefined_variable_as_argument()
+        {
+            var messages = Parse(@"
+sub test(param1)
+    test(undefined)
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.UndefinedVariable);
         }
 
         [TestMethod]
@@ -158,6 +191,17 @@ sub test()
 end sub");
 
             messages.AssertWarning(4, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
+        public void Warning_when_reading_from_undefined_dim_as_argument()
+        {
+            var messages = Parse(@"
+sub test(param1)
+    test(y[5])
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.UndefinedVariable);
         }
 
         [TestMethod]
@@ -195,6 +239,56 @@ sub test()
 end sub");
 
             messages.AssertNoWarning(5, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
+        public void Warning_for_undefined_label()
+        {
+            var messages = Parse(@"
+sub test()
+    goto undefinedlabel
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.UndefinedLabel);
+        }
+
+        [TestMethod]
+        public void Warning_for_mutliple_gotos_to_same_undefined_label()
+        {
+            var messages = Parse(@"
+sub test()
+    goto undefinedlabel
+    goto undefinedlabel
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.UndefinedLabel);
+            messages.AssertWarning(4, MessageCodes.UndefinedLabel);
+        }
+
+        [TestMethod]
+        public void No_warning_for_forward_defined_label()
+        {
+            var messages = Parse(@"
+sub test()
+    goto undefinedlabel
+undefinedlabel:
+    return
+end sub");
+
+            messages.AssertNoWarning(3, MessageCodes.UndefinedLabel);
+        }
+
+        [TestMethod]
+        public void No_warning_for_backward_defined_label()
+        {
+            var messages = Parse(@"
+sub test()
+undefinedlabel:
+    goto undefinedlabel
+    return
+end sub");
+
+            messages.AssertNoWarning(4, MessageCodes.UndefinedLabel);
         }
     }
 }

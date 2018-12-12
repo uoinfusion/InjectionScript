@@ -4,6 +4,7 @@ using InjectionScript.Parsing.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Antlr4.Runtime;
 
 namespace InjectionScript.Analysis
 {
@@ -12,6 +13,9 @@ namespace InjectionScript.Analysis
         private readonly List<Message> messages;
         private readonly Metadata metadata;
         private readonly HashSet<string> varNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> declaredLabels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<injectionParser.GotoContext> referencedLabels 
+            = new List<injectionParser.GotoContext>();
 
         public UnknownSymbolVisitor(List<Message> messages, Metadata metadata)
         {
@@ -33,14 +37,29 @@ namespace InjectionScript.Analysis
                     $"Subrutine {name} with {argumentCount} arguments not found."));
             }
 
-            return true;
+            return base.VisitCall(context);
         }
 
         public override bool VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
         {
             varNames.Clear();
+            declaredLabels.Clear();
+            referencedLabels.Clear();
 
-            return base.VisitSubrutine(context);
+            var result = base.VisitSubrutine(context);
+
+            foreach (var gotoContext in referencedLabels)
+            {
+                var labelName = gotoContext.SYMBOL().GetText();
+                if (!declaredLabels.Contains(labelName))
+                {
+                    messages.Add(new Message(gotoContext.Start.Line, gotoContext.Start.Column, gotoContext.Stop.Line, gotoContext.Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedLabel,
+                        $"Label not found '{labelName}'."));
+                }
+            }
+
+            return result;
         }
 
         public override bool VisitParameterName([NotNull] injectionParser.ParameterNameContext context)
@@ -55,7 +74,7 @@ namespace InjectionScript.Analysis
             var name = context.SYMBOL()?.GetText() ?? context.assignment()?.lvalue()?.SYMBOL()?.GetText();
             varNames.Add(name);
 
-            return true;
+            return base.VisitVarDef(context);
         }
 
         public override bool VisitDimDef([NotNull] injectionParser.DimDefContext context)
@@ -87,6 +106,20 @@ namespace InjectionScript.Analysis
             }
 
             return base.VisitAssignment(context);
+        }
+
+        public override bool VisitGoto([NotNull] injectionParser.GotoContext context)
+        {
+            referencedLabels.Add(context);
+
+            return base.VisitGoto(context);
+        }
+
+        public override bool VisitLabel([NotNull] injectionParser.LabelContext context)
+        {
+            declaredLabels.Add(context.SYMBOL().GetText());
+
+            return base.VisitLabel(context);
         }
 
         public override bool VisitOperand([NotNull] injectionParser.OperandContext context)

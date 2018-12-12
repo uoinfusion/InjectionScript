@@ -25,9 +25,11 @@ namespace InjectionScript.Runtime.Instructions
 
             foreach (var key in gotos.Keys)
             {
-                var labelIndex = labels[key];
-                foreach (var g in gotos[key])
-                    g.TargetAddress = labelIndex;
+                if (labels.TryGetValue(key, out var labelIndex))
+                {
+                    foreach (var g in gotos[key])
+                        g.TargetAddress = labelIndex;
+                }
             }
 
             return true;
