@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
 using OmniSharp.Extensions.LanguageServer.Server;
 using System;
 using System.Diagnostics;
@@ -15,7 +16,12 @@ namespace InjectionScript.Lsp.Server
 
         static async Task MainAsync(string[] args)
         {
-            Debugger.Launch();
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(o =>
+                {
+                    if (o.Debug)
+                        Debugger.Launch();
+                });
 
             var server = await LanguageServer.From(options =>
                 options
@@ -31,6 +37,12 @@ namespace InjectionScript.Lsp.Server
                 );
 
             await server.WaitForExit;
+        }
+
+        private class Options
+        {
+            [Option('d', "debug", Required = false)]
+            public bool Debug { get; set; }
         }
 
     }
