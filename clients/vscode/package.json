@@ -15,7 +15,7 @@
         "onLanguage:injection"
     ],
     "repository": {
-        "url": "https://github.com/uoinfusion/InjectionScript"
+        "url": "https://github.com/uoinfusion/InjectionScript/tree/master/clients/vscode"
     },
     "license": "Apache License 2.0",
     "main": "./out/extension",
