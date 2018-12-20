@@ -1,0 +1,45 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "injection",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.injection",
+				"match": "\\b(if|else|then|while|for|return|repeat|until|wend|sub|end sub|endsub|end if|endif|next|dim|var|return)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.injection",
+			"begin": "(\"|')",
+			"end": "(\"|')",
+			"patterns": [
+				{
+					"name": "constant.character.escape.injection",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"patterns": [{
+				"name": "comment.line.sharp.injection",
+				"match": "#.*"
+			},
+			{
+				"name": "comment.line.semicolon.injection",
+				"match": ";.*"
+			}]
+		}
+	},
+	"scopeName": "source.injection"
+}
