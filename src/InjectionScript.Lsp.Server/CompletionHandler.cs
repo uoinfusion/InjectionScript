@@ -21,7 +21,7 @@ namespace InjectionScript.Lsp.Server
         };
         private readonly IInjectionWorkspace injectionWorkspace;
 
-        public CompletionHandler(IInjectionWorkspace injectionWorkspace)
+        public CompletionHandler(IInjectionWorkspace injectionWorkspace, ErrorReporter errorReporter)
         {
             this.injectionWorkspace = injectionWorkspace;
         }

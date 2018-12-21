@@ -11,9 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InjectionScript.Tests", "In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InjectionScript.Lsp", "InjectionScript.Lsp\InjectionScript.Lsp.csproj", "{E0AE8DF5-3372-451A-9040-D8E57F8665A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InjectionScript.Lsp.Server", "InjectionScript.Lsp.Server\InjectionScript.Lsp.Server.csproj", "{6E1F5F87-FBA3-45FE-8791-C53DDBA13400}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InjectionScript.Lsp.Server", "InjectionScript.Lsp.Server\InjectionScript.Lsp.Server.csproj", "{6E1F5F87-FBA3-45FE-8791-C53DDBA13400}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InjectionScript.Lsp.Tests", "InjectionScript.Lsp.Tests\InjectionScript.Lsp.Tests.csproj", "{6AB7137E-A9DD-46B0-AF9A-C223FFB62ED5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InjectionScript.Lsp.Tests", "InjectionScript.Lsp.Tests\InjectionScript.Lsp.Tests.csproj", "{6AB7137E-A9DD-46B0-AF9A-C223FFB62ED5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB6C0CB8-F673-4DA0-A0B0-DCF956D59DE9}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

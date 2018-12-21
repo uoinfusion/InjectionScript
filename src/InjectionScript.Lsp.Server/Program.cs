@@ -9,6 +9,8 @@ namespace InjectionScript.Lsp.Server
 {
     class Program
     {
+        private static ErrorReporter errorReporter;
+
         static void Main(string[] args)
         {
             MainAsync(args).Wait();
@@ -16,6 +18,7 @@ namespace InjectionScript.Lsp.Server
 
         static async Task MainAsync(string[] args)
         {
+            errorReporter = new ErrorReporter("cefebb45-6e15-473f-a7c1-facaaaabb958");
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
@@ -33,6 +36,7 @@ namespace InjectionScript.Lsp.Server
                     {
                         serviceCollection.AddSingleton(typeof(IDiagnosticReporter), typeof(DiagnosticReporter));
                         serviceCollection.AddSingleton(typeof(IInjectionWorkspace), typeof(InjectionWorkspace));
+                        serviceCollection.AddSingleton(typeof(ErrorReporter), errorReporter);
                     })
                 );
 
