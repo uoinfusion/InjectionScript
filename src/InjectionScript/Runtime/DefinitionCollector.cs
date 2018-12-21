@@ -15,10 +15,13 @@ namespace InjectionScript.Runtime
 
         public override Metadata VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
         {
-            var generator = new Generator();
-            generator.Visit(context);
+            if (!string.IsNullOrEmpty(context.name?.Text))
+            {
+                var generator = new Generator();
+                generator.Visit(context);
 
-            metadata.Add(new SubrutineDefinition(context.name.Text, context, generator.Instructions));
+                metadata.Add(new SubrutineDefinition(context.name.Text, context, generator.Instructions));
+            }
 
             return metadata;
         }

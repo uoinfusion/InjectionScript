@@ -237,6 +237,14 @@ namespace InjectionScript.Lsp
                 this.prefix = prefix;
             }
 
+            public override bool VisitParameterName([NotNull] injectionParser.ParameterNameContext context)
+            {
+                if (context.Start.Line < referenceLine)
+                    Process(context.SYMBOL());
+
+                return true;
+            }
+
             public override bool VisitVarDef([NotNull] injectionParser.VarDefContext context)
             {
                 if (context.Start.Line < referenceLine)

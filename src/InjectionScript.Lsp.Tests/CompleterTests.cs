@@ -600,6 +600,20 @@ end sub";
         }
 
         [TestMethod]
+        public void Argument_empty_operand_Then_suggests_arguments()
+        {
+            string file = @"
+sub test1(myParam, yourParam)
+    UO.Print('x' + )
+end sub";
+
+            var completer = new Completer();
+            var completions = completer.GetCompletions(file, 3, 20);
+
+            completions.ShouldContainLabel("myParam", "yourParam");
+        }
+
+        [TestMethod]
         public void Assignment_operand_with_UO_namespace_Then_suggests_UO_namespace_subrutines()
         {
             string file = @"
@@ -650,6 +664,21 @@ end sub";
 
             completions.ShouldContainLabel("myVariableBefore", "myDimBefore");
             completions.ShouldNotContainLabel("myVariableAfter", "myDimAfter");
+        }
+
+        [TestMethod]
+        public void Assignment_empty_operand_Then_suggests_arguments()
+        {
+            string file = @"
+sub test1(myParam, yourParam)
+     var x = 123 + my
+end sub";
+
+            var completer = new Completer();
+            var completions = completer.GetCompletions(file, 3, 22);
+
+            completions.ShouldContainLabel("myParam");
+            completions.ShouldNotContainLabel("yourParam");
         }
 
 
