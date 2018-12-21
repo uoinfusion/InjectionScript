@@ -16,11 +16,11 @@ and unimplemented features. If you are interested in this project, please file a
 - Editing Yoko Injection scripts in an amazing text editor on Windows, Linux or MacOS.
 - Code completion
 
-![Code completion example](images/code-completion.gif)
+![Code completion example](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/code-completion.gif)
 
 - Source code analysis reports usage of unknown variable, subrutine or keyword
 
-![Code error and warning example](images/code-analysis.gif)
+![Code error and warning example](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/code-analysis.gif)
 
 ## Known Issues
 
