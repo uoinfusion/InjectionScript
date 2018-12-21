@@ -1,29 +1,29 @@
-# Visual Studio Code extension for Yoko Injection
+# Injection.VsCode
 
-This project is in very early development phase.
+Yoko Injection support for Visual Studio Code.
 
-Discord: <https://discord.gg/Ng3RDke>
+You have to install [.NET Core 2.1](https://dotnet.microsoft.com/download/dotnet-core/2.1) to use this extension.
+
+This extension is in very early development stage so there are many bugs
+and unimplemented features. If you are interested in this project, please file a bug on [Github](https://github.com/uoinfusion/InjectionScript/issues) or on [Discord](https://discord.gg/Ng3RDke).
 
 ## Features
 
-Code completion.
+- Editing Yoko Injection scripts in an amazing text editor.
+- Code completion
 
-Errors, warnings.
+![Code completion example](images/code-completion.gif)
 
-## Requirements
+- Source code analysis reports usage of unknown variable, subrutine or keyword
 
-Requires .NET Core 2.0.
-
-## Extension Settings
-
-No settings.
+![Code error and warning example](images/code-analysis.gif)
 
 ## Known Issues
 
-Implementation is slow and incomplete.
+Implementation is very slow inefficient and incomplete.
 
 ## Release Notes
 
 ### 0.0.1
 
-Initial release of ...
+Initial release.
