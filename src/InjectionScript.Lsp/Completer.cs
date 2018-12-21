@@ -26,6 +26,7 @@ namespace InjectionScript.Lsp
             new CompletionItem() { Label = "goto", InsertText = "goto", Kind = CompletionItemKind.Keyword },
             new CompletionItem() { Label = "dim", InsertText = "dim", Kind = CompletionItemKind.Keyword },
             new CompletionItem() { Label = "var", InsertText = "var", Kind = CompletionItemKind.Keyword },
+            new CompletionItem() { Label = "end sub", InsertText = "var", Kind = CompletionItemKind.Keyword },
         };
 
         public CompletionList GetCompletions(injectionParser.FileContext fileSyntax, Metadata metadata, int line, int column)
@@ -110,10 +111,13 @@ namespace InjectionScript.Lsp
         {
             for (var i = 0; i < fileSyntax.ChildCount; i++)
             {
-                var child = fileSyntax.GetChild(i) as injectionParser.SubrutineContext;
-                if (child != null && line >= child.Start.Line && line <= child.Stop.Line)
+                if (fileSyntax.GetChild(i) is injectionParser.FileSectionContext fileSection)
                 {
-                    return child;
+                    var subrutine = fileSection.subrutine();
+                    if (subrutine != null && line >= subrutine.Start.Line && line <= subrutine.Stop.Line)
+                    {
+                        return subrutine;
+                    }
                 }
             }
 
@@ -132,7 +136,8 @@ namespace InjectionScript.Lsp
                 switch (child)
                 {
                     case injectionParser.AdditiveOperandContext additiveOperand:
-                        if (additiveOperand.Start.Line > additiveOperand.Stop.Line && additiveOperand.Stop.Line == line)
+                        if ((additiveOperand.Start.Line > additiveOperand.Stop.Line | string.IsNullOrEmpty(additiveOperand.GetText())) 
+                            && additiveOperand.Stop.Line == line)
                         {
                             return new SuggestionContext(SuggestionKind.Namespace | SuggestionKind.Subrutines | SuggestionKind.Variables, null);
                         }

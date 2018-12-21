@@ -18,7 +18,7 @@ and unimplemented features. If you are interested in this project, please file a
 
 ![Code completion example](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/code-completion.gif)
 
-- Source code analysis reports usage of unknown variable, subrutine or keyword
+- Source code analysis reports usage of unknown variable, subrutine or keyword.
 
 ![Code error and warning example](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/code-analysis.gif)
 

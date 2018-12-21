@@ -11,7 +11,7 @@ namespace InjectionScript.Cli
     {
         private static void Main(string[] args)
         {
-            if (args[0].Equals("analyse"))
+            if (args[0].Equals("analyze"))
             {
                 AnalyseDirectory(args[1]);
 
@@ -27,16 +27,16 @@ namespace InjectionScript.Cli
             var files = Directory.GetFiles(path, "*.sc");
 
             foreach (var file in files)
-                AnalyseFile(file);
+                AnalyzeFile(file);
 
             var subDirectories = Directory.GetDirectories(path);
             foreach (var subDirectory in subDirectories)
                 AnalyseDirectory(subDirectory);
         }
 
-        private static void AnalyseFile(string file)
+        private static void AnalyzeFile(string file)
         {
-            Console.WriteLine($"Analysing {file}");
+            Console.WriteLine($"Analyzing {file}");
 
             var runtime = new InjectionRuntime();
 
