@@ -26,7 +26,7 @@ namespace InjectionScript.Lsp
             new CompletionItem() { Label = "goto", InsertText = "goto", Kind = CompletionItemKind.Keyword },
             new CompletionItem() { Label = "dim", InsertText = "dim", Kind = CompletionItemKind.Keyword },
             new CompletionItem() { Label = "var", InsertText = "var", Kind = CompletionItemKind.Keyword },
-            new CompletionItem() { Label = "end sub", InsertText = "var", Kind = CompletionItemKind.Keyword },
+            new CompletionItem() { Label = "end sub", InsertText = "end sub", Kind = CompletionItemKind.Keyword },
         };
 
         public CompletionList GetCompletions(injectionParser.FileContext fileSyntax, Metadata metadata, int line, int column)
