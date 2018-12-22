@@ -16,7 +16,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.injection",
-				"match": "\\b(if|else|then|while|for|return|repeat|until|wend|sub|end sub|endsub|end if|endif|next|dim|var|return)\\b"
+				"match": "\\b(if|else|then|while|for|return|repeat|until|wend|sub|end sub|endsub|end if|endif|next|dim|var|return|goto)\\b"
 			}]
 		},
 		"strings": {
