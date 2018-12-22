@@ -173,8 +173,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.Journal", (Func<int, string>)GetJournalText));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalSerial", (Func<int, string>)JournalSerial));
-            metadata.Add(new NativeSubrutineDefinition("UO.SetJournalline", (Action<int>)SetJournalLine));
-            metadata.Add(new NativeSubrutineDefinition("UO.SetJournalline", (Action<int, string>)SetJournalLine));
+            metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int>)SetJournalLine));
+            metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int, string>)SetJournalLine));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Arm", (Action<string>)Arm));
             metadata.Add(new NativeSubrutineDefinition("UO.SetArm", (Action<string>)SetArm));
