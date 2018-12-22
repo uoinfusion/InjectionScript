@@ -57,7 +57,9 @@ namespace InjectionScript.Runtime.Instructions
             int whileAddress = currentAddress;
             AddInstruction(whileInstruction);
 
-            foreach (var statement in whileContext.codeBlock().statement())
+            var statements = whileContext.codeBlock()?.statement()
+                ?? Enumerable.Empty<injectionParser.StatementContext>();
+            foreach (var statement in statements)
                 VisitStatement(statement);
 
             AddInstruction(new JumpInstruction(whileAddress));

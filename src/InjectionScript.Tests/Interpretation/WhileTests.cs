@@ -42,5 +42,14 @@ while i <> 0
 wend
 return i");
         }
+
+        [TestMethod]
+        public void Empty_while()
+        {
+            TestSubrutine(1, @"
+while 0
+wend
+return 1");
+        }
     }
 }
