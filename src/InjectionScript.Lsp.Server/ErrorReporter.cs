@@ -1,16 +1,20 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace InjectionScript.Lsp.Server
 {
-    internal sealed class ErrorReporter
+    internal sealed class ErrorReporter : IDisposable
     {
+#pragma warning disable S3459 // Unassigned members should be removed
         private readonly TelemetryClient client;
+#pragma warning restore S3459 // Unassigned members should be removed
 
         public ErrorReporter(string apiKey)
         {
+#if !DEBUG
             client = new TelemetryClient(new TelemetryConfiguration(apiKey));
             var version = GetType().Assembly?.GetName()?.Version?.ToString(3);
             if (version != null)
@@ -20,6 +24,7 @@ namespace InjectionScript.Lsp.Server
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
 
             client.TrackPageView("started");
+#endif
         }
 
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs args)
@@ -27,6 +32,9 @@ namespace InjectionScript.Lsp.Server
 
         internal void Report(object exceptionObject)
         {
+            if (client == null)
+                return;
+
             if (exceptionObject is Exception exception)
             {
                 client.TrackException(exception);
@@ -37,6 +45,13 @@ namespace InjectionScript.Lsp.Server
             }
 
             client.Flush();
+        }
+
+        public void Dispose()
+        {
+            if (client != null)
+                client.Flush();
+            Console.WriteLine("dispose");
         }
     }
 }
