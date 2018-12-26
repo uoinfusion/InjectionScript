@@ -37,7 +37,7 @@ namespace InjectionScript.Runtime
             for (int i = 0; i < parameters.Length; i++)
                 semanticScope.DefineVar(parameters[i], argumentValues[i]);
 
-            var name = subrutine.SYMBOL().GetText();
+            var name = subrutine.subrutineName().GetText();
             var subrutineDefinition = metadata.GetSubrutine(name, parameters.Length);
 
             try

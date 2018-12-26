@@ -4,7 +4,8 @@ file: fileSection*?;
 fileSection: emptyLine | subrutine;
 
 emptyLine: NEWLINE;
-subrutine: SUB name=SYMBOL '(' parameters? ')' NEWLINE codeBlock? END_SUB (NEWLINE | EOF);
+subrutine: SUB subrutineName '(' parameters? ')' NEWLINE codeBlock? END_SUB (NEWLINE | EOF);
+subrutineName: SYMBOL;
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+?;

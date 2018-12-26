@@ -16,7 +16,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.injection",
-				"match": "\\b(if|else|then|while|for|return|repeat|until|wend|sub|end sub|endsub|end if|endif|next|dim|var|return|goto)\\b"
+				"match": "\\b([iI][fF]|[eE][lL][sS][eE]|[tT][hH][eE][nN]|[wW][hH][iI][lL][eE]|[fF][oO][rR]|[rR][eE][tT][uU][rR][nN]|[rR][eE][pP][eE][aA][tT]|[uU][nN][tT][iI][lL]|[wW][eE][nN][dD]|[sS][uU][bB]|[eE][nN][dD] [sS][uU][bB]|[eE][nN][dD][sS][uU][bB]|[eE][nN][dD] [iI][fF]|[eE][nN][dD][iI][fF]|[nN][eE][xX][tT]|[dD][iI][mM]|[vV][aA][rR]|[rR][eE][tT][uU][rR][nN]|[gG][oO][tT][oO])\\b"
 			}]
 		},
 		"strings": {

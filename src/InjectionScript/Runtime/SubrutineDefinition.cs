@@ -11,7 +11,7 @@ namespace InjectionScript.Runtime
     public class SubrutineDefinition
     {
         public string Name { get; }
-        internal injectionParser.SubrutineContext Syntax { get; }
+        public injectionParser.SubrutineContext Syntax { get; }
         internal Instruction[] Instructions { get; }
 
         internal SubrutineDefinition(string name, injectionParser.SubrutineContext subrutine, Instruction[] instructions)

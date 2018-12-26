@@ -1,6 +1,7 @@
 ﻿using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -43,7 +44,6 @@ namespace InjectionScript.Lsp.Server
 
         public void SetCapability(CompletionCapability capability)
         {
-
         }
     }
 }

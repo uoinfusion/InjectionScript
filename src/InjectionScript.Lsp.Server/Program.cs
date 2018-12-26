@@ -34,6 +34,7 @@ namespace InjectionScript.Lsp.Server
                         .WithOutput(Console.OpenStandardOutput())
                         .WithHandler<CompletionHandler>()
                         .WithHandler<TextDocumentHandler>()
+                        .WithHandler<NavigationHandler>()
                         .WithServices(serviceCollection =>
                         {
                             serviceCollection.AddSingleton(typeof(IDiagnosticReporter), typeof(DiagnosticReporter));

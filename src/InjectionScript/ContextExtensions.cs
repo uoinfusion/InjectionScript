@@ -12,7 +12,7 @@ namespace InjectionScript
         public static string GetSubrutineKey(this injectionParser.SubrutineContext context)
         {
             var parameterCount = context.parameters()?.parameterName()?.Length ?? 0;
-            var name = context.SYMBOL().GetText();
+            var name = context.subrutineName().GetText();
 
             return $"{name}`{parameterCount}";
         }
