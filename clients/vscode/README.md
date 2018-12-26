@@ -22,12 +22,20 @@ and unimplemented features. If you are interested in this project, please file a
 
 ![Code error and warning example](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/code-analysis.gif)
 
+- Go to Definition (F12)
+
+![Go to Definition](https://raw.githubusercontent.com/uoinfusion/InjectionScript/master/clients/vscode/images/goto-definition.gif)
+
 ## Known Issues
 
 Implementation is very slow inefficient and incomplete.
 
 ## Release Notes
 
+### 0.0.6
+
+- F12 navigates to symbol definition (subrutine, variable, label).
+
 ### 0.0.1
 
-Initial release.
+- Initial release.
