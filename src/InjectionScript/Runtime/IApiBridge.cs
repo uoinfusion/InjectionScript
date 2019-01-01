@@ -32,6 +32,8 @@
 
         int GetQuantity(int id);
 
+        int Exists(int id);
+        int IsOnline();
         int Dead();
         int Hidden(int id);
 
@@ -66,9 +68,13 @@
         void DeleteJournal();
         string GetJournalText(int index);
         string JournalSerial(int index);
+        string JournalColor(int index);
         void SetJournalLine(int index);
         void Arm(string name);
         void SetArm(string name);
+        void Equip(string layer, int id);
+        void Unequip(string layer);
+        int ObjAtLayer(string layer);
         void WarMode(int mode);
         int WarMode();
         void UseSkill(string skillName);

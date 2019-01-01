@@ -48,5 +48,15 @@ namespace InjectionScript.Tests.Interpretation
                 new NativeSubrutineDefinition("UO.IntrinsicVar", (Func<int>)(() => 123)),
             });
         }
+
+        [TestMethod]
+        public void Native_subrutine_can_return_InjectionValue()
+        {
+            TestSubrutine("can return string", @"return UO.Subrutine()", natives: new[]
+            {
+                new NativeSubrutineDefinition("UO.Subrutine", (Func<InjectionValue>)(() => new InjectionValue("can return string")))
+            });
+
+        }
     }
 }

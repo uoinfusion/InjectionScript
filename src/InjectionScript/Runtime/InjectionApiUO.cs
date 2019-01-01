@@ -71,12 +71,16 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.IsNpc", (Func<int, int>)IsNpc));
             metadata.Add(new NativeSubrutineDefinition("UO.IsNpc", (Func<string, int>)IsNpc));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.Exists", (Func<int, int>)Exists));
+            metadata.Add(new NativeSubrutineDefinition("UO.Exists", (Func<string, int>)Exists));
+
             metadata.Add(new NativeSubrutineDefinition("UO.Getserial", (Func<string, string>)GetSerial));
             metadata.Add(new NativeSubrutineDefinition("UO.GetQuantity", (Func<string, int>)GetQuantity));
             metadata.Add(new NativeSubrutineDefinition("UO.GetQuantity", (Func<int, int>)GetQuantity));
-            metadata.Add(new NativeSubrutineDefinition("UO.dead", (Func<int>)Dead));
-            metadata.Add(new NativeSubrutineDefinition("UO.hidden", (Func<int>)Hidden));
-            metadata.Add(new NativeSubrutineDefinition("UO.hidden", (Func<string, int>)Hidden));
+            metadata.Add(new NativeSubrutineDefinition("UO.IsOnline", (Func<int>)IsOnline));
+            metadata.Add(new NativeSubrutineDefinition("UO.Dead", (Func<int>)Dead));
+            metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<int>)Hidden));
+            metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<string, int>)Hidden));
 
             metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string, int>)AddObject));
             metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string>)AddObject));
@@ -171,11 +175,16 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.Journal", (Func<int, string>)GetJournalText));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalSerial", (Func<int, string>)JournalSerial));
+            metadata.Add(new NativeSubrutineDefinition("UO.JournalColor", (Func<int, string>)JournalColor));
             metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int>)SetJournalLine));
             metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int, string>)SetJournalLine));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Arm", (Action<string>)Arm));
             metadata.Add(new NativeSubrutineDefinition("UO.SetArm", (Action<string>)SetArm));
+            metadata.Add(new NativeSubrutineDefinition("UO.Unequip", (Action<string>)Unequip));
+            metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, int>)Equip));
+            metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, string>)Equip));
+            metadata.Add(new NativeSubrutineDefinition("UO.ObjAtLayer", (Func<string, InjectionValue>)ObjAtLayer));
 
             metadata.Add(new NativeSubrutineDefinition("UO.WarMode", (Action<int>)WarMode));
             metadata.Add(new NativeSubrutineDefinition("UO.WarMode", (Func<int>)WarMode));
@@ -259,7 +268,10 @@ namespace InjectionScript.Runtime
         public int GetQuantity(string id) => GetQuantity(GetObject(id));
         public int GetQuantity(int id) => bridge.GetQuantity(id);
 
+        public int Exists(string id) => Exists(GetObject(id));
+        public int Exists(int id) => bridge.Exists(id);
         public string GetSerial(string id) => NumberConversions.Int2Hex(GetObject(id));
+        public int IsOnline() => bridge.IsOnline();
         public int Dead() => bridge.Dead();
         public int Hidden() => Hidden("self");
         public int Hidden(string idText) => Hidden(GetObject(idText));
@@ -360,11 +372,23 @@ namespace InjectionScript.Runtime
         public void DeleteJournal() => bridge.DeleteJournal();
         public string GetJournalText(int index) => bridge.GetJournalText(index);
         public string JournalSerial(int index) => bridge.JournalSerial(index);
+        public string JournalColor(int index) => bridge.JournalColor(index);
         public void SetJournalLine(int index) => bridge.SetJournalLine(index);
         public void SetJournalLine(int index, string text) => bridge.SetJournalLine(index);
 
         public void Arm(string name) => bridge.Arm(name);
         public void SetArm(string name) => bridge.SetArm(name);
+        public void Unequip(string layer) => bridge.Unequip(layer);
+        public void Equip(string layer, int id) => bridge.Equip(layer, id);
+        public void Equip(string layer, string id) => Equip(layer, GetObject(id));
+        public InjectionValue ObjAtLayer(string layer)
+        {
+            var id = bridge.ObjAtLayer(layer);
+            if (id == 0)
+                return InjectionValue.Zero;
+
+            return new InjectionValue("0x" + id.ToString("X8"));
+        }
 
         public void WarMode(int mode) => bridge.WarMode(mode);
         public int WarMode() => bridge.WarMode();
