@@ -65,6 +65,13 @@ namespace InjectionScript.Runtime
                 return true;
             }
 
+            key = NativeSubrutineDefinition.GetAnySignature(name, argumentValues);
+            if (nativeSubrutines.TryGetValue(key, out value))
+            {
+                subrutineDefinition = value;
+                return true;
+            }
+
             subrutineDefinition = null;
             return false;
         }

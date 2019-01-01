@@ -73,6 +73,38 @@ return x.y...[5]
         }
 
         [TestMethod]
+        public void GetArrayLength_returns_array_length()
+        {
+            TestSubrutine(11, @"   dim x[10]
+   return GetArrayLength(x)
+");
+        }
+
+        [TestMethod]
+        public void GetArrayLength_returns_0_for_int()
+        {
+            TestSubrutine(0, @"   dim x[10]
+   return GetArrayLength(1)
+");
+        }
+
+        [TestMethod]
+        public void GetArrayLength_returns_0_for_string()
+        {
+            TestSubrutine(0, @"   dim x[10]
+   return GetArrayLength('str')
+");
+        }
+
+        [TestMethod]
+        public void GetArrayLength_returns_0_for_decimal()
+        {
+            TestSubrutine(0, @"   dim x[10]
+   return GetArrayLength(1.1)
+");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ScriptFailedException))]
         public void Exception_when_reading_from_uninitialized_index()
         {

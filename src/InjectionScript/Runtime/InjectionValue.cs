@@ -73,6 +73,25 @@ namespace InjectionScript.Runtime
             Kind = InjectionValueKind.Integer;
         }
 
+        internal object ConvertTo(InjectionValueKind targetKind)
+        {
+            switch (targetKind)
+            {
+                case InjectionValueKind.Any:
+                    return this;
+                case InjectionValueKind.Integer:
+                    return (int)this;
+                case InjectionValueKind.Decimal:
+                    return (double)this;
+                case InjectionValueKind.String:
+                    return (string)this;
+                case InjectionValueKind.Array:
+                    return (InjectionValue[])this;
+                default:
+                    throw new NotImplementedException($"Conversion from {this.Kind} to {targetKind}.");
+            }
+        }
+
         public InjectionValue(string str)
         {
             String = str;
@@ -111,7 +130,7 @@ namespace InjectionScript.Runtime
                 return InjectionValueKind.Unit;
             else if (type.Equals(typeof(double)))
                 return InjectionValueKind.Decimal;
-            else if (type.Equals(typeof(IEnumerable<InjectionValue>)))
+            else if (typeof(Array).IsAssignableFrom(type))
                 return InjectionValueKind.Array;
 
             throw new NotSupportedException($"Unsupported type {type.Name}.");
@@ -285,6 +304,22 @@ namespace InjectionScript.Runtime
                 throw new NotImplementedException();
 
             return v1.Decimal;
+        }
+
+        public static explicit operator string(InjectionValue v1)
+        {
+            if (v1.Kind != InjectionValueKind.String)
+                throw new NotImplementedException();
+
+            return v1.String;
+        }
+
+        public static explicit operator InjectionValue[](InjectionValue v1)
+        {
+            if (v1.Kind != InjectionValueKind.Array)
+                throw new NotImplementedException();
+
+            return v1.Array;
         }
 
         public object ToValue()

@@ -354,6 +354,11 @@ sub value_change_of_shortcut_variable_is_inherited_in_call_chain.sub()
     self = "qwer"
 end sub
 
+sub tst_GetArrayLength()
+   dim array[10]
+   tst_assert_num(11, GetArrayLength(array), "tst_GetArrayLength")
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))

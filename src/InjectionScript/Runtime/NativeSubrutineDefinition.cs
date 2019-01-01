@@ -9,7 +9,25 @@ namespace InjectionScript.Runtime
     {
         private readonly Delegate subrutine;
         public string Name { get; }
-        internal int ArgumentCount { get; }
+        internal int ArgumentCount => parameterKinds.Length;
+        private readonly InjectionValueKind[] parameterKinds;
+
+        public NativeSubrutineDefinition(string name, Func<InjectionValue, InjectionValue> subrutine)
+            : this(name, subrutine, new[] { InjectionValueKind.Any })
+        {
+        }
+
+        public NativeSubrutineDefinition(string name, Func<InjectionValue, InjectionValue, InjectionValueKind> subrutine)
+            : this(name, subrutine, new[] { InjectionValueKind.Any, InjectionValueKind.Any })
+        {
+        }
+
+        private NativeSubrutineDefinition(string name, Delegate subrutine, InjectionValueKind[] parameterKinds)
+        {
+            Name = name;
+            this.subrutine = subrutine;
+            this.parameterKinds = parameterKinds;
+        }
 
         public NativeSubrutineDefinition(string name, Delegate subrutine)
         {
@@ -20,21 +38,26 @@ namespace InjectionScript.Runtime
             if (!InjectionValue.IsSupported(subrutine.Method.ReturnType))
                 throw new ArgumentException($"The retrun type {subrutine.Method.ReturnType} of {subrutine} is not compatible with native subrutine.");
 
-            int argumentCount = 0;
-            foreach (var param in subrutine.Method.GetParameters())
+            var parameterTypes = this.subrutine.Method
+                .GetParameters();
+
+            foreach (var param in parameterTypes)
             {
                 if (!InjectionValue.IsSupported(param.ParameterType))
                     throw new ArgumentException($"The type {param.ParameterType} of {param.Name} ({subrutine}) is not compatible with native subrutine.");
-
-                argumentCount++;
             }
 
-            ArgumentCount = argumentCount;
+            parameterKinds = parameterTypes.Select(x => InjectionValue.GetKind(x.ParameterType)).ToArray();
         }
 
         internal InjectionValue Call(InjectionValue[] argumentValues)
         {
-            var args = argumentValues.Select(x => x.ToValue()).ToArray();
+            if (argumentValues.Length != parameterKinds.Length)
+                throw new NativeSubrutineException($"Mismatch of argument ({argumentValues.Length}) and parameters ({parameterKinds.Length}) count and parameters for {Name}.");
+
+            object[] args = new object[argumentValues.Length];
+            for (int i = 0; i < argumentValues.Length; i++)
+                args[i] = argumentValues[i].ConvertTo(parameterKinds[i]);
 
             try
             {
@@ -55,11 +78,7 @@ namespace InjectionScript.Runtime
 
         internal string GetSignature()
         {
-            var parametersSignature = this.subrutine.Method
-                .GetParameters()
-                .Select(x => InjectionValue.GetKind(x.ParameterType));
-
-            return GetSignature(Name, parametersSignature);
+            return GetSignature(Name, parameterKinds);
         }
 
         internal static string GetSignature(string name, IEnumerable<InjectionValue> parameters)
@@ -68,6 +87,14 @@ namespace InjectionScript.Runtime
         internal static string GetSignature(string name, IEnumerable<InjectionValueKind> parameterTypes)
         {
             var parametersSignature = parameterTypes.Select(x => x.ToString())
+                .Aggregate(string.Empty, (l, r) => l + "," + r);
+
+            return $"{name}`{parametersSignature}";
+        }
+
+        internal static string GetAnySignature(string name, IEnumerable<InjectionValue> argumentValues)
+        {
+            var parametersSignature = argumentValues.Select(x => "Any")
                 .Aggregate(string.Empty, (l, r) => l + "," + r);
 
             return $"{name}`{parametersSignature}";

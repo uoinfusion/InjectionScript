@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace InjectionScript.Runtime
 {
@@ -21,5 +22,13 @@ namespace InjectionScript.Runtime
         public static int Len(string value) => value.Length;
         public static int Len(int value) => 0;
         public static int Len(double value) => 0;
+
+        public static InjectionValue GetArrayLength(InjectionValue arg)
+        {
+            if (arg.Kind == InjectionValueKind.Array)
+                return new InjectionValue(arg.Array.Length);
+
+            return InjectionValue.Zero;
+        }
     }
 }
