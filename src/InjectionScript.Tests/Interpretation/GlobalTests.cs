@@ -23,5 +23,12 @@ return UO.GetGlobal(""globname"")");
 UO.SetGlobal('globname', 'some text')
 return UO.GetGlobal('globname')");
         }
+
+        [TestMethod]
+        public void Name_is_case_sensitive()
+        {
+            TestSubrutine("N/A", @"UO.SetGlobal('globname', 'some text')
+return UO.GetGlobal('GlObName')");
+        }
     }
 }

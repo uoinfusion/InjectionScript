@@ -249,6 +249,9 @@ sub globals()
 
     UO.SetGlobal("globname3", 4.99)
     tst_assert_num(4, val(UO.GetGlobal("globname3")), "globals - dec floored and 'val' returns floored value")
+
+    UO.SetGlobal("globname4", "value")
+    tst_assert_str("N/A", UO.GetGlobal("GloBnAmE4"), "globals - global name case sensitive")
     
     tst_assert_str("N/A", UO.GetGlobal("nonexisting"), "globals - empty")
 end sub
