@@ -11,7 +11,6 @@ namespace InjectionScript.Runtime
         private readonly IApiBridge bridge;
         private readonly InjectionApi injectionApi;
         private readonly Globals globals;
-        private readonly DateTime timerStart;
         private readonly Random random;
 
         internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals)
@@ -20,7 +19,6 @@ namespace InjectionScript.Runtime
             this.injectionApi = injectionApi;
             this.globals = globals;
             Register(metadata);
-            timerStart = DateTime.UtcNow;
             random = new Random();
         }
 
@@ -380,12 +378,7 @@ namespace InjectionScript.Runtime
         public void Morph(int type) => bridge.Morph(type);
         public void Terminate(string subrutineName) => bridge.Terminate(subrutineName);
 
-        public int Timer()
-        {
-            var duration = DateTime.UtcNow - timerStart;
-
-            return (int)duration.TotalMilliseconds / 100;
-        }
+        public int Timer() => injectionApi.Now() / 100;
 
         public int Random(int max) => random.Next(max);
 
