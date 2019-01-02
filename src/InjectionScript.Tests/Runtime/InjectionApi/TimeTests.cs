@@ -7,15 +7,6 @@ using System.Text;
 
 namespace InjectionScript.Tests.Runtime.InjectionApi
 {
-    internal class TestTimeSource : ITimeSource
-    {
-        public DateTime StartTime { get; set; }
-
-        public TimeSpan SinceStart => Now - StartTime;
-
-        public DateTime Now { get; set; }
-    }
-
     [TestClass]
     public class TimeTests
     {

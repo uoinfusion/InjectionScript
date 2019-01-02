@@ -6,21 +6,6 @@ using System.Threading.Tasks;
 
 namespace InjectionScript.Runtime
 {
-    public interface ITimeSource
-    {
-        TimeSpan SinceStart { get; }
-        DateTime Now { get; }
-    }
-
-    public class RealTimeSource : ITimeSource
-    {
-        private readonly DateTime startTime = DateTime.Now;
-
-        public TimeSpan SinceStart => DateTime.Now - startTime;
-
-        public DateTime Now => DateTime.Now;
-    }
-
     public class InjectionApiUO
     {
         private readonly IApiBridge bridge;
@@ -190,6 +175,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<string, int, string>)CharPrint));
 
             metadata.Add(new NativeSubrutineDefinition("UO.InJournal", (Func<string, int>)InJournal));
+            metadata.Add(new NativeSubrutineDefinition("UO.InJournalBetweenTimes", (Func<string, int, int, int>)InJournalBetweenTimes));
+            metadata.Add(new NativeSubrutineDefinition("UO.InJournalBetweenTimes", (Func<string, int, int, int, int>)InJournalBetweenTimes));
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action<string>)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.Journal", (Func<int, string>)GetJournalText));
@@ -399,6 +386,8 @@ namespace InjectionScript.Runtime
         public void CharPrint(int id, int color, string msg) => bridge.CharPrint(id, color, msg);
 
         public int InJournal(string pattern) => bridge.InJournal(pattern);
+        public int InJournalBetweenTimes(string pattern, int startTime, int endTime) => InJournalBetweenTimes(pattern, startTime, endTime, -1);
+        public int InJournalBetweenTimes(string pattern, int startTime, int endTime, int limit) => bridge.InJournalBetweenTimes(pattern, startTime, endTime, limit);
         public void DeleteJournal() => bridge.DeleteJournal();
         public void DeleteJournal(string text) => bridge.DeleteJournal(text);
         public string GetJournalText(int index) => bridge.GetJournalText(index);

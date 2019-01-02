@@ -68,6 +68,7 @@
         void CharPrint(int id, int color, string msg);
 
         int InJournal(string pattern);
+        int InJournalBetweenTimes(string pattern, int startTime, int endTime, int limit);
         void DeleteJournal();
         void DeleteJournal(string text);
         string GetJournalText(int index);
