@@ -357,9 +357,25 @@ sub value_change_of_shortcut_variable_is_inherited_in_call_chain.sub()
     self = "qwer"
 end sub
 
-sub tst_GetArrayLength()
+sub GetArrayLength_function()
    dim array[10]
    tst_assert_num(11, GetArrayLength(array), "tst_GetArrayLength")
+end sub
+
+sub String_functions()
+    tst_assert_str("abcd", Left("abcdefgh", 4), "left")
+    tst_assert_str("", Left("abcdefgh", 0), "left - zero length")
+    tst_assert_str("abcd", Left("abcd", 6), "left - length more than string length")
+
+    tst_assert_str("efgh", Right("abcdefgh", 4), "right")
+    tst_assert_str("", Right("abcdefgh", 0), "right - zero length")
+    tst_assert_str("abcd", Right("abcd", 6), "right - length more than string length")
+    
+    tst_assert_str("cdef", Mid("abcdefgh", 2, 4), "mid")
+    tst_assert_str("cdef", Mid("abcdefgh", 2, 0), "mid - zero length")
+    tst_assert_str("abcd", Mid("abcdefgh", 0, 4), "mid - starting at zero index")
+    tst_assert_str("cd", Mid("abcd", 2, 6), "mid - index + length more thant string length")
+    tst_assert_str("", Mid("abcd", 6, 6), "mid - index more than string length")
 end sub
 
 sub tst_assert_num(expected, actual, description)

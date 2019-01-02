@@ -53,5 +53,31 @@ namespace InjectionScript.Tests.Interpretation
             TestExpression("len(123)", 0);
             TestExpression("len(4.99)", 0);
         }
+
+        [TestMethod]
+        public void Left()
+        {
+            TestExpression("left('abcdefgh', 4)", "abcd");
+            TestExpression("left('abcdefgh', 0)", "");
+            TestExpression("left('abcd', 6)", "abcd");
+        }
+
+        [TestMethod]
+        public void Right()
+        {
+            TestExpression("right('abcdefgh', 4)", "efgh");
+            TestExpression("right('abcdefgh', 0)", "");
+            TestExpression("right('abcd', 6)", "abcd");
+        }
+
+        [TestMethod]
+        public void Mid()
+        {
+            //TestExpression("mid('abcdefgh', 2, 4)", "cdef");
+            //TestExpression("mid('abcdefgh', 2, 0)", "");
+            //TestExpression("mid('abcdefgh', 0, 4)", "abcd");
+            //TestExpression("Mid('abcd', 2, 6)", "cd");
+            TestExpression("Mid('abcd', 6, 6)", "");
+        }
     }
 }

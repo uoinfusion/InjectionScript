@@ -30,5 +30,34 @@ namespace InjectionScript.Runtime
 
             return InjectionValue.Zero;
         }
+
+        public static string Left(string str, int length)
+        {
+            length = str.Length < length ? str.Length : length;
+
+            return str.Substring(0, length);
+        }
+
+        public static string Right(string str, int length)
+        {
+            length = str.Length < length ? str.Length : length;
+
+            return str.Substring(str.Length - length, length);
+        }
+
+        public static string Mid(string str, int start, int length)
+        {
+            if (start > str.Length)
+                return "";
+
+            if (start < 0)
+                return "";
+
+            var end = start + length;
+            if (end > str.Length)
+                length = str.Length - start;
+
+            return str.Substring(start, length);
+        }
     }
 }
