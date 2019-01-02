@@ -7,6 +7,8 @@
         int LastCorpse { get; }
         int LastStatus { get; }
         int LastTarget { get; }
+        int Backpack { get; }
+
         int Strength { get; }
         int Intelligence { get; }
         int Dexterity { get; }

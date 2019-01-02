@@ -15,6 +15,7 @@ namespace InjectionScript.Tests.Interpretation
             TestSubrutine("self", "return self");
             TestSubrutine("lastcorpse", "return lastcorpse");
             TestSubrutine("finditem", "return finditem");
+            TestSubrutine("backpack", "return backpack");
         }
 
         [TestMethod]

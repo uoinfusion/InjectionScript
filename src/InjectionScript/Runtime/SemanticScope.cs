@@ -16,6 +16,7 @@ namespace InjectionScript.Runtime
             {
                 vars["lastcorpse"] = new InjectionValue("lastcorpse");
                 vars["self"] = new InjectionValue("self");
+                vars["backpack"] = new InjectionValue("backpack");
                 vars["finditem"] = new InjectionValue("finditem");
                 vars["laststatus"] = new InjectionValue("laststatus");
                 vars["lasttarget"] = new InjectionValue("lasttarget");

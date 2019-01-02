@@ -53,6 +53,8 @@ namespace InjectionScript.Runtime
                 return bridge.LastTarget;
             if (id.Equals("laststatus", StringComparison.OrdinalIgnoreCase))
                 return bridge.LastStatus;
+            if (id.Equals("backpack", StringComparison.OrdinalIgnoreCase))
+                return bridge.Backpack;
 
             if (objects.TryGet(id, out var value))
                 return value;
