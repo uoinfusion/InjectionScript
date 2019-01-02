@@ -173,6 +173,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.InJournal", (Func<string, int>)InJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action)DeleteJournal));
+            metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action<string>)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.Journal", (Func<int, string>)GetJournalText));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalSerial", (Func<int, string>)JournalSerial));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalColor", (Func<int, string>)JournalColor));
@@ -370,6 +371,7 @@ namespace InjectionScript.Runtime
 
         public int InJournal(string pattern) => bridge.InJournal(pattern);
         public void DeleteJournal() => bridge.DeleteJournal();
+        public void DeleteJournal(string text) => bridge.DeleteJournal(text);
         public string GetJournalText(int index) => bridge.GetJournalText(index);
         public string JournalSerial(int index) => bridge.JournalSerial(index);
         public string JournalColor(int index) => bridge.JournalColor(index);
