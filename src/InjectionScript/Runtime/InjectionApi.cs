@@ -8,17 +8,17 @@ namespace InjectionScript.Runtime
 {
     public class InjectionApi
     {
-        private readonly DateTime timerStart;
         private readonly IApiBridge bridge;
+        private readonly ITimeSource timeSource;
         private readonly Objects objects = new Objects();
         public InjectionApiUO UO { get; }
 
-        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals)
+        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource)
         {
             this.bridge = bridge;
-            UO = new InjectionApiUO(bridge, this, metadata, globals);
+            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource);
             Register(metadata);
-            timerStart = DateTime.UtcNow;
+            this.timeSource = timeSource;
         }
 
         private void Register(Metadata metadata)
@@ -40,6 +40,8 @@ namespace InjectionScript.Runtime
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("true", (Func<int>)(() => 1)));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("false", (Func<int>)(() => 0)));
         }
+
+        public int Now() => (int)timeSource.SinceStart.TotalMilliseconds;
 
         public int GetObject(string id)
         {
@@ -71,12 +73,5 @@ namespace InjectionScript.Runtime
         }
 
         public void Wait(int ms) => bridge.Wait(ms);
-
-        public int Now()
-        {
-            var duration = DateTime.UtcNow - timerStart;
-
-            return (int)duration.TotalMilliseconds;
-        }
     }
 }

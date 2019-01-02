@@ -16,8 +16,13 @@ namespace InjectionScript.Tests.Debugging
         private Task subrutineTask;
 
         public TestDebuggerFacade()
+            : this(new RealTimeSource())
         {
-            runtime = new InjectionRuntime(null, debuggerServer);
+        }
+
+        public TestDebuggerFacade(ITimeSource timeSource)
+        {
+            runtime = new InjectionRuntime(null, debuggerServer, timeSource);
             tracer = debuggerServer;
         }
 

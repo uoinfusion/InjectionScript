@@ -6,20 +6,37 @@ using System.Threading.Tasks;
 
 namespace InjectionScript.Runtime
 {
+    public interface ITimeSource
+    {
+        TimeSpan SinceStart { get; }
+        DateTime Now { get; }
+    }
+
+    public class RealTimeSource : ITimeSource
+    {
+        private readonly DateTime startTime = DateTime.Now;
+
+        public TimeSpan SinceStart => DateTime.Now - startTime;
+
+        public DateTime Now => DateTime.Now;
+    }
+
     public class InjectionApiUO
     {
         private readonly IApiBridge bridge;
         private readonly InjectionApi injectionApi;
         private readonly Globals globals;
         private readonly Random random;
+        private readonly ITimeSource timeSource;
 
-        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals)
+        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource)
         {
             this.bridge = bridge;
             this.injectionApi = injectionApi;
             this.globals = globals;
             Register(metadata);
             random = new Random();
+            this.timeSource = timeSource;
         }
 
         internal void Register(Metadata metadata)
@@ -198,8 +215,11 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Morph", (Action<string>)Morph));
             metadata.Add(new NativeSubrutineDefinition("UO.Morph", (Action<int>)Morph));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.Terminate", (Action<string>)Terminate));
             metadata.Add(new NativeSubrutineDefinition("UO.Timer", (Func<int>)Timer));
+            metadata.Add(new NativeSubrutineDefinition("UO.Time", (Func<int>)Time));
+            metadata.Add(new NativeSubrutineDefinition("UO.Date", (Func<int>)Date));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.Terminate", (Action<string>)Terminate));
             metadata.Add(new NativeSubrutineDefinition("UO.Random", (Func<int, int>)Random));
         }
 
@@ -413,7 +433,18 @@ namespace InjectionScript.Runtime
         public void Morph(int type) => bridge.Morph(type);
         public void Terminate(string subrutineName) => bridge.Terminate(subrutineName);
 
-        public int Timer() => injectionApi.Now() / 100;
+        public int Timer() => (int)timeSource.SinceStart.TotalMilliseconds / 100;
+        public int Date()
+        {
+            var now = timeSource.Now;
+            return (now.Year % 100) * 10000 + now.Month * 100 + now.Day;
+        }
+
+        public int Time()
+        {
+            var now = timeSource.Now;
+            return now.Hour * 10000 + now.Minute * 100 + now.Second;
+        }
 
         public int Random(int max) => random.Next(max);
 

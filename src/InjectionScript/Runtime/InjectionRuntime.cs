@@ -20,14 +20,14 @@ namespace InjectionScript.Runtime
         public injectionParser.FileContext CurrentFileSyntax { get; private set; }
         public InjectionApi Api { get; }
 
-        public InjectionRuntime() : this(null, new NullDebuggerServer())
+        public InjectionRuntime() : this(null, new NullDebuggerServer(), new RealTimeSource())
         {
         }
 
-        public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer)
+        public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer, ITimeSource timeSource)
         {
             interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentFileName, debuggerServer.Create()));
-            Api = new InjectionApi(bridge, Metadata, Globals);
+            Api = new InjectionApi(bridge, Metadata, Globals, timeSource);
             RegisterNatives();
         }
 
