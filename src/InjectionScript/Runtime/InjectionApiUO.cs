@@ -58,6 +58,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.GetNotoriety", (Func<int, int>)GetNotoriety));
             metadata.Add(new NativeSubrutineDefinition("UO.GetNotoriety", (Func<string, int>)GetNotoriety));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.GetInfo", (Func<string, string>)GetInfo));
             metadata.Add(new NativeSubrutineDefinition("UO.GetName", (Func<int, string>)GetName));
             metadata.Add(new NativeSubrutineDefinition("UO.GetName", (Func<string, string>)GetName));
 
@@ -252,6 +253,14 @@ namespace InjectionScript.Runtime
 
         public int GetNotoriety(string id) => GetNotoriety(GetObject(id));
         public int GetNotoriety(int id) => bridge.GetNotoriety(id);
+
+        private string GetInfo(string arg)
+        {
+            if (arg.Equals("character", StringComparison.Ordinal))
+                return GetName("self");
+
+            return "UNKNOWN";
+        }
 
         public string GetName(string id) => GetName(GetObject(id));
         public string GetName(int id) => bridge.GetName(id);
