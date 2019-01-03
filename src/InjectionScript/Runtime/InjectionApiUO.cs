@@ -187,6 +187,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.Arm", (Action<string>)Arm));
             metadata.Add(new NativeSubrutineDefinition("UO.SetArm", (Action<string>)SetArm));
+            metadata.Add(new NativeSubrutineDefinition("UO.Disarm", (Action)Disarm));
             metadata.Add(new NativeSubrutineDefinition("UO.Unequip", (Action<string>)Unequip));
             metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, int>)Equip));
             metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, string>)Equip));
@@ -398,6 +399,12 @@ namespace InjectionScript.Runtime
 
         public void Arm(string name) => bridge.Arm(name);
         public void SetArm(string name) => bridge.SetArm(name);
+        public void Disarm()
+        {
+            Unequip("Lhand");
+            Unequip("Rhand");
+        }
+
         public void Unequip(string layer) => bridge.Unequip(layer);
         public void Equip(string layer, int id) => bridge.Equip(layer, id);
         public void Equip(string layer, string id) => Equip(layer, GetObject(id));
