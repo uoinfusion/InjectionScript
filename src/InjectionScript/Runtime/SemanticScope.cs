@@ -40,8 +40,7 @@ namespace InjectionScript.Runtime
                 DefineShortcut("lasttarget");
             }
 
-            private void DefineShortcut(string name) 
-                => vars.Add(name, new Var { Value = new InjectionValue(name), IsGlobal = false });
+            private void DefineShortcut(string name) => DefineVar(name);
 
             internal void SetVar(string name, InjectionValue value)
             {

@@ -378,6 +378,33 @@ sub String_functions()
     tst_assert_str("", Mid("abcd", 6, 6), "mid - index more than string length")
 end sub
 
+sub get_initial_value()
+    UO.SetGlobal("globalVariableOutput", "get_initial_value")
+   return 123
+end sub
+
+var globalVariableWithInitialValue = get_initial_value()
+var globalVariable
+var aliasedGlobalVariable = 111
+
+sub global_variable()
+   UO.SetGlobal("globalVariableOutput", UO.GetGlobal("globalVariableOutput") + ";global_variable")
+   tst_assert_num(123, globalVariableWithInitialValue, "global variables - initial value")
+   globalVariable = 321
+
+   var aliasedGlobalVariable = 765
+   tst_assert_num(765, aliasedGlobalVariable, "global variables - aliasing local variables has priority over global variables")   
+   
+   global_variable_sub()
+   tst_assert_num(321, globalVariable, "global variables - callee changes in global variable are not visible to caller")
+   tst_assert_str("get_initial_value;global_variable", UO.GetGlobal("globalVariableOutput"), "global variables - variable initializers runs before any subrutine code")   
+end sub 
+
+sub global_variable_sub()
+   tst_assert_num(321, globalVariable, "global variables - inherits global variable value from caller")
+   tst_assert_num(111, aliasedGlobalVariable, "global variables - aliasing local variable values from caller are not visible to callee")
+end sub
+
 sub tst_assert_num(expected, actual, description)
    if (expected <> actual) then
       UO.Print("FAILURE " + description + " - " + "expected: " + str(expected) + ", actual: " + str(actual))
