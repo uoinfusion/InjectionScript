@@ -10,6 +10,20 @@ namespace InjectionScript.Tests.Interpretation
     public class ForTests
     {
         [TestMethod]
+        public void Step()
+        {
+            TestSubrutine(6, @"
+var i, j = 0
+for i = 0 to 10 step 2
+    j = j + 1
+next
+
+return j
+");
+
+        }
+
+        [TestMethod]
         public void For_variable_is_equal_to_range_when_loop_finishes()
         {
             TestSubrutine(10, @"var i

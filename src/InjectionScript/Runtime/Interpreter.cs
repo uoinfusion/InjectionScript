@@ -99,7 +99,7 @@ namespace InjectionScript.Runtime
                             if (variable < forScope.Range)
                             {
                                 instructionAddress = forScope.StatementIndex;
-                                variable = variable + new InjectionValue(1);
+                                variable = variable + forScope.Step;
                                 semanticScope.SetVar(forScope.VariableName, variable);
                             }
                             else
@@ -182,8 +182,13 @@ namespace InjectionScript.Runtime
             var variableName = forContext.assignment().lvalue().SYMBOL().GetText();
             Visit(forContext.assignment());
             var range = Visit(forContext.expression());
+            InjectionValue step;
+            if (forContext.step()?.expression() != null)
+                step = Visit(forContext.step().expression());
+            else
+                step = new InjectionValue(1);
 
-            return new ForScope(variableName, range, statementIndex);
+            return new ForScope(variableName, range, statementIndex, step);
         }
 
         public override InjectionValue VisitVarDef([NotNull] injectionParser.VarDefContext context)

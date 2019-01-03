@@ -30,17 +30,22 @@ namespace InjectionScript.Runtime
                 }
             }
 
+            private static readonly InjectionValue lastcorpseShortcutValue = new InjectionValue("lastcorpse");
+            private static readonly InjectionValue selfShortcutValue = new InjectionValue("self");
+            private static readonly InjectionValue backpackShortcutValue = new InjectionValue("backpack");
+            private static readonly InjectionValue finditemShortcutValue = new InjectionValue("finditem");
+            private static readonly InjectionValue laststatusShortcutValue = new InjectionValue("laststatus");
+            private static readonly InjectionValue lasttargetShortcutValue = new InjectionValue("lasttarget");
+
             public Scope()
             {
-                DefineShortcut("lastcorpse");
-                DefineShortcut("self");
-                DefineShortcut("backpack");
-                DefineShortcut("finditem");
-                DefineShortcut("laststatus");
-                DefineShortcut("lasttarget");
+                DefineVar(lastcorpseShortcutValue.String, lastcorpseShortcutValue);
+                DefineVar(selfShortcutValue.String, selfShortcutValue);
+                DefineVar(backpackShortcutValue.String, backpackShortcutValue);
+                DefineVar(finditemShortcutValue.String, finditemShortcutValue);
+                DefineVar(laststatusShortcutValue.String, laststatusShortcutValue);
+                DefineVar(lasttargetShortcutValue.String, lasttargetShortcutValue);
             }
-
-            private void DefineShortcut(string name) => DefineVar(name);
 
             internal void SetVar(string name, InjectionValue value)
             {

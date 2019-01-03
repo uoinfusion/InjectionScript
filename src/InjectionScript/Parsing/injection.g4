@@ -21,7 +21,8 @@ incompleteWhile: WHILE expression NEWLINE;
 wend: WEND NEWLINE;
 repeat: REPEAT NEWLINE;
 until: UNTIL expression NEWLINE;
-for: FOR assignment TO expression NEWLINE;
+for: FOR assignment TO expression step? NEWLINE;
+step: STEP expression;
 next: NEXT NEWLINE;
 assignStatement: assignment NEWLINE;
 callStatement: call NEWLINE;
@@ -88,6 +89,7 @@ FOR: [fF][oO][rR];
 GOTO: [gG][oO][tT][oO];
 TO: [tT][oO];
 NEXT: [nN][eE][xX][tT];
+STEP: [sS][tT][eE][pP];
 
 PLUS: '+' ;
 MINUS: '-' ;

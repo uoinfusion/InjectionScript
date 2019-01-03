@@ -11,12 +11,14 @@ namespace InjectionScript.Runtime
         public string VariableName { get; }
         public InjectionValue Range { get; }
         public int StatementIndex { get; }
+        public InjectionValue Step { get; set; }
 
-        public ForScope(string variableName, InjectionValue range, int statementIndex)
+        public ForScope(string variableName, InjectionValue range, int statementIndex, InjectionValue step)
         {
             VariableName = variableName;
             Range = range;
             StatementIndex = statementIndex;
+            Step = step;
         }
     }
 }
