@@ -89,7 +89,7 @@
 
         int FindCount();
         void FindType(int type, int color, int containerId, int range);
-        int Count(int type, int color);
+        int Count(int type, int color, int containerId);
         void Ignore(int id);
         void IgnoreReset();
         void Terminate(string subrutineName);

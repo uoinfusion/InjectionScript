@@ -116,8 +116,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.IgnoreReset", (Action)IgnoreReset));
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<string, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<int, int>)Count));
-            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<int, int, int>)Count));
-
+            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, InjectionValue, InjectionValue, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<string>)Click));
             metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<int>)Click));
             metadata.Add(new NativeSubrutineDefinition("UO.UseObject", (Action<string>)UseObject));
@@ -366,9 +365,11 @@ namespace InjectionScript.Runtime
                 ConvertContainer(containerId),
                 NumberConversions.ToInt(range));
         public int FindCount() => bridge.FindCount();
-        public int Count(string type) => Count(NumberConversions.ToInt(type));
-        public int Count(int type) => Count(type, -1);
-        public int Count(int type, int color) => bridge.Count(type, color);
+        public int Count(string type) => bridge.Count(NumberConversions.ToInt(type), -1, -1);
+        public int Count(int type) => bridge.Count(type, -1, -1);
+        public int Count(int type, int color) => bridge.Count(type, color, 01);
+        public int Count(InjectionValue type, InjectionValue color, InjectionValue container) => 
+            bridge.Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
 
         public void Ignore(string id) => Ignore(GetObject(id));
         public void Ignore(int id) => bridge.Ignore(id);
