@@ -48,6 +48,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<string, int>)GetDistance));
             metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<int, int>)GetDistance));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<int, int, int, int, int>)GetDistance));
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetHP", (Func<int>)GetHP));
             metadata.Add(new NativeSubrutineDefinition("UO.GetHP", (Func<int, int>)GetHP));
@@ -250,6 +251,13 @@ namespace InjectionScript.Runtime
 
         public int GetDistance(string id) => GetDistance(GetObject(id));
         public int GetDistance(int id) => bridge.GetDistance(id);
+        public int GetDistance(int x1, int y1, int x2, int y2)
+        {
+            int dx = Math.Abs(x1 - x2);
+            int dy = Math.Abs(y1 - y2);
+
+            return Math.Max(dx, dy);
+        }
 
         public int GetHP() => GetHP("self");
         public int GetHP(string id) => GetHP(GetObject(id));
