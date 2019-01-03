@@ -88,7 +88,7 @@
         void Cast(string spellName);
 
         int FindCount();
-        void FindType(int type, int color, int containerId);
+        void FindType(int type, int color, int containerId, int range);
         int Count(int type, int color);
         void Ignore(int id);
         void IgnoreReset();

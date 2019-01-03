@@ -103,6 +103,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string, string, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindCount", (Func<int>)FindCount));
             metadata.Add(new NativeSubrutineDefinition("UO.FindCount", (Func<string, int>)((ignoredParam1) => FindCount())));
             metadata.Add(new NativeSubrutineDefinition("UO.FindCount", (Func<string, string, int>)((ignoredParam1, ignoredParam2) => FindCount())));
@@ -316,10 +317,10 @@ namespace InjectionScript.Runtime
         public void GetStatus(string id) => GetStatus(GetObject(id));
         public void GetStatus(int id) => bridge.GetStatus(id);
 
-        public void UseType(string type) => UseType(NumberConversions.Str2Int(type));
-        public void UseType(string type, string color) => UseType(NumberConversions.Str2Int(type), NumberConversions.Str2Int(color));
-        public void UseType(int type, string color) => UseType(type, NumberConversions.Str2Int(color));
-        public void UseType(string type, int color) => UseType(NumberConversions.Str2Int(type), color);
+        public void UseType(string type) => UseType(NumberConversions.ToInt(type));
+        public void UseType(string type, string color) => UseType(NumberConversions.ToInt(type), NumberConversions.ToInt(color));
+        public void UseType(int type, string color) => UseType(type, NumberConversions.ToInt(color));
+        public void UseType(string type, int color) => UseType(NumberConversions.ToInt(type), color);
         public void UseType(int type) => UseType(type, -1);
         public void UseType(int type, int color) => bridge.UseType(type, color);
 
@@ -333,33 +334,39 @@ namespace InjectionScript.Runtime
         public void WaitTargetLast() => WaitTargetObject("lasttarget");
         public void WaitTargetTile(int type, int x, int y, int z) => bridge.WaitTargetTile(type, x, y, z);
         public void WaitTargetTile(string type, string x, string y, string z) 
-            => WaitTargetTile(NumberConversions.Str2Int(type), NumberConversions.Str2Int(x), NumberConversions.Str2Int(y), NumberConversions.Str2Int(z));
+            => WaitTargetTile(NumberConversions.ToInt(type), NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
         public int IsTargeting() => bridge.IsTargeting();
 
         public void SetReceivingContainer(string id) => SetReceivingContainer(GetObject(id));
         public void SetReceivingContainer(int id) => bridge.SetReceivingContainer(id);
         public void UnsetReceivingContainer() => bridge.UnsetReceivingContainer();
         public void Grab(int amount, string id) => Grab(amount, GetObject(id));
-        public void Grab(string amount, string id) => Grab(NumberConversions.Str2Int(amount), GetObject(id));
+        public void Grab(string amount, string id) => Grab(NumberConversions.ToInt(amount), GetObject(id));
         public void Grab(int amount, int id) => bridge.Grab(amount, id);
 
         public void MoveItem(int id, int amount) => MoveItem(id, amount, 0);
         public void MoveItem(string id, int amount) => MoveItem(GetObject(id), amount, 0);
-        public void MoveItem(string id, string amount) => MoveItem(GetObject(id), NumberConversions.Str2Int(amount), 0);
+        public void MoveItem(string id, string amount) => MoveItem(GetObject(id), NumberConversions.ToInt(amount), 0);
         public void MoveItem(string id, string amount, string targetContainerId)
-            => MoveItem(GetObject(id), NumberConversions.Str2Int(amount), GetObject(targetContainerId));
+            => MoveItem(GetObject(id), NumberConversions.ToInt(amount), GetObject(targetContainerId));
         public void MoveItem(int id, int amount, int targetContainerId) => bridge.MoveItem(id, amount, targetContainerId);
 
-        public void FindType(string typeStr) => FindType(NumberConversions.Str2Int(typeStr));
+        public void FindType(string typeStr) => FindType(NumberConversions.ToInt(typeStr));
         public void FindType(int type) => FindType(type, -1, -1);
         public void FindType(int type, int color) => FindType(type, color, -1);
         public void FindType(string type, string color, string container)
-            => FindType(NumberConversions.Str2Int(type), NumberConversions.Str2Int(color), ConvertContainer(container));
+            => FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
         public void FindType(int type, int color, string container)
             => FindType(type, color, ConvertContainer(container));
-        public void FindType(int type, int color, int containerId) => bridge.FindType(type, color, containerId);
+        public void FindType(int type, int color, int containerId) => bridge.FindType(type, color, containerId, -1);
+
+        public void FindType(InjectionValue type, InjectionValue color, InjectionValue containerId, InjectionValue range)
+            => bridge.FindType(NumberConversions.ToInt(type),
+                NumberConversions.ToInt(color),
+                ConvertContainer(containerId),
+                NumberConversions.ToInt(range));
         public int FindCount() => bridge.FindCount();
-        public int Count(string type) => Count(NumberConversions.Str2Int(type));
+        public int Count(string type) => Count(NumberConversions.ToInt(type));
         public int Count(int type) => Count(type, -1);
         public int Count(int type, int color) => bridge.Count(type, color);
 
@@ -382,7 +389,7 @@ namespace InjectionScript.Runtime
 
         public void Print(string msg) => bridge.Print(msg);
         public void CharPrint(int color, string msg) => CharPrint(bridge.Self, color, msg);
-        public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.Str2Int(color), msg);
+        public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.ToInt(color), msg);
         public void CharPrint(string id, int color, string msg) => CharPrint(GetObject(id), color, msg);
         public void CharPrint(int id, int color, string msg) => bridge.CharPrint(id, color, msg);
 
@@ -425,7 +432,7 @@ namespace InjectionScript.Runtime
         public void Cast(string spellName, string id) => Cast(spellName, GetObject(id));
         public void Cast(string spellName, int id) => bridge.Cast(spellName, id);
 
-        public void Morph(string type) => Morph(NumberConversions.Str2Int(type));
+        public void Morph(string type) => Morph(NumberConversions.ToInt(type));
         public void Morph(int type) => bridge.Morph(type);
         public void Terminate(string subrutineName) => bridge.Terminate(subrutineName);
 
@@ -443,6 +450,19 @@ namespace InjectionScript.Runtime
         }
 
         public int Random(int max) => random.Next(max);
+
+        private int ConvertContainer(InjectionValue containerId)
+        {
+            switch (containerId.Kind)
+            {
+                case InjectionValueKind.String:
+                    return ConvertContainer(containerId.String);
+                case InjectionValueKind.Integer:
+                    return containerId.Integer;
+                default:
+                    throw new NotImplementedException($"Conversion for {containerId.Kind})");
+            }
+        }
 
         private int ConvertContainer(string id)
         {

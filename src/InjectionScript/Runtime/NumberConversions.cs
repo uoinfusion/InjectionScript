@@ -9,7 +9,7 @@ namespace InjectionScript.Runtime
 {
     public static class NumberConversions
     {
-        public static int Str2Int(string str)
+        public static int ToInt(string str)
         {
             if (str.StartsWith("0x"))
             {
@@ -18,6 +18,19 @@ namespace InjectionScript.Runtime
             }
 
             return int.Parse(str, NumberStyles.Integer);
+        }
+
+        public static int ToInt(InjectionValue value)
+        {
+            switch (value.Kind)
+            {
+                case InjectionValueKind.Integer:
+                    return value.Integer;
+                case InjectionValueKind.String:
+                    return ToInt(value.String);
+                default:
+                    throw new NotImplementedException($"InjectionValueKind {value.Kind}");
+            }
         }
 
         public static bool TryStr2Int(string str, out int value)
