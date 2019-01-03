@@ -20,6 +20,18 @@ namespace InjectionScript.Runtime
         public IEnumerable<NativeSubrutineDefinition> NativeSubrutines => nativeSubrutines.Values;
         public IEnumerable<GlobalVariableDefinition> GlobalVariables => globalVariables.Values;
 
+        private static HashSet<string> shortcutVariables = new HashSet<string>()
+        {
+            "lastcorpse",
+            "self",
+            "backpack",
+            "finditem",
+            "laststatus",
+            "lasttarget"
+        };
+
+        public static IEnumerable<string> ShortcutVariables => shortcutVariables;
+
         public void Add(GlobalVariableDefinition globalVariable)
         {
             globalVariables.Add(globalVariable.Name, globalVariable);
@@ -84,6 +96,8 @@ namespace InjectionScript.Runtime
             return false;
         }
 
+        internal bool ShortcutVariableExists(string name) => shortcutVariables.Contains(name);
+        internal bool GlobalVariableExists(string name) => globalVariables.ContainsKey(name);
         internal bool NativeSubrutineExists(string name, int argumentCount)
             => nativeSubrutines.Any(x => x.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
                 && x.Value.ArgumentCount == argumentCount);

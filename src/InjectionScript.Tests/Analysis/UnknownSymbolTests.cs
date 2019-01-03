@@ -136,6 +136,41 @@ end sub");
         }
 
         [TestMethod]
+        public void No_warning_for_global_variables()
+        {
+            var messages = Parse(@"
+var x = 1;
+sub test()
+    x = x + 1
+end sub");
+
+            messages.AssertNoWarning(4, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
+        public void No_warning_for_variable_declared_in_for_cycle()
+        {
+            var messages = Parse(@"
+sub test()
+    for var i = 0 to 10
+    next
+end sub");
+
+            messages.AssertNoWarning(3, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
+        public void No_warning_for_shortcut_variable()
+        {
+            var messages = Parse(@"
+sub test()
+    UO.Print(backpack)
+end sub");
+
+            messages.AssertNoWarning(3, MessageCodes.UndefinedVariable);
+        }
+
+        [TestMethod]
         public void Warning_when_assigning_to_undefined_dim()
         {
             var messages = Parse(@"

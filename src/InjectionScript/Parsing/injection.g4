@@ -1,7 +1,8 @@
 ﻿grammar injection;
 
 file: fileSection*?;
-fileSection: emptyLine | subrutine | var;
+fileSection: emptyLine | subrutine | globalVar;
+globalVar: var;
 
 emptyLine: NEWLINE;
 subrutine: SUB subrutineName '(' parameters? ')' NEWLINE codeBlock? END_SUB (NEWLINE | EOF);

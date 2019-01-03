@@ -77,6 +77,15 @@ namespace InjectionScript.Analysis
             return base.VisitVarDef(context);
         }
 
+        public override bool VisitForVarDef([NotNull] injectionParser.ForVarDefContext context)
+        {
+            var name = context.assignment()?.lvalue()?.SYMBOL()?.GetText();
+            if (!string.IsNullOrEmpty(name))
+                varNames.Add(name);
+
+            return base.VisitForVarDef(context);
+        }
+
         public override bool VisitDimDef([NotNull] injectionParser.DimDefContext context)
         {
             var name = context.SYMBOL()?.GetText();
@@ -88,11 +97,15 @@ namespace InjectionScript.Analysis
         public override bool VisitAssignment([NotNull] injectionParser.AssignmentContext context)
         {
             var name = context.lvalue()?.SYMBOL()?.GetText();
-            if (!string.IsNullOrEmpty(name) && !varNames.Contains(name))
+            if (!string.IsNullOrEmpty(name))
             {
-                messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, context.lvalue().Stop.Line, context.lvalue().Stop.Column,
-                    MessageSeverity.Warning, MessageCodes.UndefinedVariable,
-                    $"Variable not found '{name}'."));
+                if (!varNames.Contains(name) && !metadata.GlobalVariableExists(name)
+                    && !metadata.ShortcutVariableExists(name))
+                {
+                    messages.Add(new Message(context.lvalue().Start.Line, context.lvalue().Start.Column, context.lvalue().Stop.Line, context.lvalue().Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                        $"Variable not found '{name}'."));
+                }
             }
             else
             {
@@ -125,12 +138,15 @@ namespace InjectionScript.Analysis
         public override bool VisitOperand([NotNull] injectionParser.OperandContext context)
         {
             var varName = context.SYMBOL()?.GetText();
-            if (!string.IsNullOrEmpty(varName) && !varNames.Contains(varName) && 
-                !metadata.TryGetIntrinsicVariable(varName, out _))
+            if (!string.IsNullOrEmpty(varName))
             {
-                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
-                    MessageSeverity.Warning, MessageCodes.UndefinedVariable,
-                    $"Variable not found '{varName}'."));
+                if (!varNames.Contains(varName) && !metadata.TryGetIntrinsicVariable(varName, out _) 
+                    && !metadata.ShortcutVariableExists(varName) && !metadata.GlobalVariableExists(varName))
+                {
+                    messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedVariable,
+                        $"Variable not found '{varName}'."));
+                }
             }
             else
             {

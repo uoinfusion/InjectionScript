@@ -26,7 +26,7 @@ namespace InjectionScript.Runtime
             return metadata;
         }
 
-        public override Metadata VisitFileSection([NotNull] injectionParser.FileSectionContext context)
+        public override Metadata VisitGlobalVar([NotNull] injectionParser.GlobalVarContext context)
         {
             if (context.var()?.varDef() != null)
             {
@@ -47,7 +47,8 @@ namespace InjectionScript.Runtime
                 return metadata;
             }
 
-            return base.VisitFileSection(context);
+            return base.VisitGlobalVar(context);
         }
+
     }
 }
