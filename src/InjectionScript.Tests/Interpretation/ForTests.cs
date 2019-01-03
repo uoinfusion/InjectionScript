@@ -20,7 +20,17 @@ next
 
 return j
 ");
+        }
 
+        [TestMethod]
+        public void Can_define_local_variable()
+        {
+            TestSubrutine(1, @"
+for var i = 0 to 1
+next
+
+return i
+");
         }
 
         [TestMethod]

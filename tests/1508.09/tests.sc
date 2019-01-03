@@ -126,6 +126,13 @@ sub for_with_step()
    tst_assert_num(6, j, "for_with_step")    
 end sub
 
+sub for_with_vardef()
+    for var i = 0 to 1
+    next
+    
+    tst_assert_num(1, i, "for_with_vardef")
+end sub
+
 sub trivial_repeat()
     var i = 0
     repeat

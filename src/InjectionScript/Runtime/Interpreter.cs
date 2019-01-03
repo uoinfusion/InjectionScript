@@ -88,7 +88,7 @@ namespace InjectionScript.Runtime
                         else if (statement.@for() != null)
                         {
                             instructionAddress++;
-                            forScopes.Push(InterpretFor(instructionAddress, statement.@for()));
+                            forScopes.Push(InterpretFor(instructionAddress, statement.@for(), semanticScope));
                         }
                         else if (statement.next() != null)
                         {
@@ -177,10 +177,19 @@ namespace InjectionScript.Runtime
             }
         }
 
-        private ForScope InterpretFor(int statementIndex, injectionParser.ForContext forContext)
+        private ForScope InterpretFor(int statementIndex, injectionParser.ForContext forContext, SemanticScope scope)
         {
-            var variableName = forContext.assignment().lvalue().SYMBOL().GetText();
-            Visit(forContext.assignment());
+            var variableName = forContext.assignment()?.lvalue()?.SYMBOL()?.GetText() 
+                ?? forContext.forVarDef()?.assignment()?.lvalue()?.SYMBOL()?.GetText();
+
+            if (forContext.forVarDef() != null)
+            {
+                scope.DefineVar(variableName);
+                Visit(forContext.forVarDef().assignment());
+            }
+            else
+                Visit(forContext.assignment());
+
             var range = Visit(forContext.expression());
             InjectionValue step;
             if (forContext.step()?.expression() != null)
