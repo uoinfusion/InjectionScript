@@ -1,7 +1,7 @@
 ﻿grammar injection;
 
 file: fileSection*?;
-fileSection: emptyLine | subrutine;
+fileSection: emptyLine | subrutine | var;
 
 emptyLine: NEWLINE;
 subrutine: SUB subrutineName '(' parameters? ')' NEWLINE codeBlock? END_SUB (NEWLINE | EOF);
@@ -30,9 +30,9 @@ returnStatement: RETURN expression? NEWLINE;
 goto: GOTO SYMBOL NEWLINE;
 label: SYMBOL ':' NEWLINE;
 
-var: VAR varDef (',' varDef)* NEWLINE;
+var: VAR varDef (',' varDef)* (NEWLINE | EOF);
 varDef: SYMBOL | assignment;
-dim: DIM dimDef (',' dimDef)* NEWLINE;
+dim: DIM dimDef (',' dimDef)* (NEWLINE | EOF);
 dimDef: SYMBOL '[' expression ']' dimDefAssignment?;
 dimDefAssignment: '=' expression;
 

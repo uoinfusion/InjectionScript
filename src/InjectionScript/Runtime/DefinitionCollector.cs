@@ -25,5 +25,29 @@ namespace InjectionScript.Runtime
 
             return metadata;
         }
+
+        public override Metadata VisitFileSection([NotNull] injectionParser.FileSectionContext context)
+        {
+            if (context.var()?.varDef() != null)
+            {
+                foreach (var varDef in context.var().varDef())
+                {
+                    if (varDef.assignment() != null)
+                    {
+                        if (varDef.assignment()?.lvalue() != null && varDef.assignment()?.expression() != null)
+                        {
+                            var name = varDef.assignment()?.lvalue().SYMBOL().GetText();
+                            metadata.Add(new GlobalVariableDefinition(name, varDef.assignment()?.expression()));
+                        }
+                    }
+                    else
+                        metadata.Add(new GlobalVariableDefinition(varDef.SYMBOL().GetText()));
+                }
+
+                return metadata;
+            }
+
+            return base.VisitFileSection(context);
+        }
     }
 }

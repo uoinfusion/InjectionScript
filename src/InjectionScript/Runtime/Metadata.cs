@@ -13,9 +13,17 @@ namespace InjectionScript.Runtime
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NativeSubrutineDefinition> intrinsicVariables
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, GlobalVariableDefinition> globalVariables
+            = new Dictionary<string, GlobalVariableDefinition>(StringComparer.OrdinalIgnoreCase);
 
         public IEnumerable<SubrutineDefinition> Subrutines => subrutines.Values;
         public IEnumerable<NativeSubrutineDefinition> NativeSubrutines => nativeSubrutines.Values;
+        public IEnumerable<GlobalVariableDefinition> GlobalVariables => globalVariables.Values;
+
+        public void Add(GlobalVariableDefinition globalVariable)
+        {
+            globalVariables.Add(globalVariable.Name, globalVariable);
+        }
 
         public void Add(SubrutineDefinition subrutineDef)
         {

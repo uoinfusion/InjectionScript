@@ -37,6 +37,8 @@ namespace InjectionScript.Runtime
             for (int i = 0; i < parameters.Length; i++)
                 semanticScope.DefineVar(parameters[i], argumentValues[i]);
 
+            semanticScope.DefineGlobalVariables(metadata.GlobalVariables, globalVar => VisitExpression(globalVar.InitialValueExpression));
+
             var name = subrutine.subrutineName().GetText();
             var subrutineDefinition = metadata.GetSubrutine(name, parameters.Length);
 
