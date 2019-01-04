@@ -210,6 +210,8 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.Terminate", (Action<string>)Terminate));
             metadata.Add(new NativeSubrutineDefinition("UO.Random", (Func<int, int>)Random));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.PrivateGetTile", (Func<int, int, int, int, int, string>)PrivateGetTile));
         }
 
         public void Set(string name, int value)
@@ -444,6 +446,9 @@ namespace InjectionScript.Runtime
         public void Morph(string type) => Morph(NumberConversions.ToInt(type));
         public void Morph(int type) => bridge.Morph(type);
         public void Terminate(string subrutineName) => bridge.Terminate(subrutineName);
+
+        public string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile)
+            => bridge.PrivateGetTile(x, y, unknown, minTile, maxTile);
 
         public int Timer() => (int)timeSource.SinceStart.TotalMilliseconds / 100;
         public int Date()
