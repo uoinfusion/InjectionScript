@@ -97,6 +97,7 @@
         int GetDir(int id);
 
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
+        void Snap(string name);
 
         void Error(string message);
     }

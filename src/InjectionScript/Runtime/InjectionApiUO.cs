@@ -212,6 +212,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Random", (Func<int, int>)Random));
 
             metadata.Add(new NativeSubrutineDefinition("UO.PrivateGetTile", (Func<int, int, int, int, int, string>)PrivateGetTile));
+            metadata.Add(new NativeSubrutineDefinition("UO.Snap", (Action<string>)Snap));
+            metadata.Add(new NativeSubrutineDefinition("UO.Snap", (Action)Snap));
         }
 
         public void Set(string name, int value)
@@ -449,6 +451,8 @@ namespace InjectionScript.Runtime
 
         public string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile)
             => bridge.PrivateGetTile(x, y, unknown, minTile, maxTile);
+        public void Snap(string name) => bridge.Snap(name);
+        public void Snap() => bridge.Snap(null);
 
         public int Timer() => (int)timeSource.SinceStart.TotalMilliseconds / 100;
         public int Date()
