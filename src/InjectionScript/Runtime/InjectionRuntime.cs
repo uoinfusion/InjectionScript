@@ -45,7 +45,7 @@ namespace InjectionScript.Runtime
             CurrentFileSyntax = parser.ParseFile(content, out var errors);
             CurrentFileName = fileName;
 
-            Metadata.ResetSubrutines();
+            Metadata.Reset();
             var collector = new DefinitionCollector(Metadata);
             collector.Visit(CurrentFileSyntax);
 
