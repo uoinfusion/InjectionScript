@@ -72,7 +72,12 @@ namespace InjectionScript.Runtime
             return GetSubrutineKey(definition.Name, paramCount);
         }
 
-        internal void ResetSubrutines() => subrutines.Clear();
+        internal void Reset()
+        {
+            subrutines.Clear();
+            globalVariables.Clear();
+        }
+
         private string GetSubrutineKey(string name, int paramCount)
             => $"{name}`{paramCount}";
 

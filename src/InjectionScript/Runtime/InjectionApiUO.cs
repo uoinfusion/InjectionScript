@@ -173,7 +173,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<int, string>)CharPrint));
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<string, string>)CharPrint));
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<int, int, string>)CharPrint));
-            metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<string, int, string>)CharPrint));
+            metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<InjectionValue, InjectionValue, InjectionValue>)CharPrint));
 
             metadata.Add(new NativeSubrutineDefinition("UO.InJournal", (Func<string, int>)InJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.InJournalBetweenTimes", (Func<string, int, int, int>)InJournalBetweenTimes));
@@ -231,6 +231,8 @@ namespace InjectionScript.Runtime
                 bridge.SetFindDistance(successfulConversion ? value : 0);
             }
         }
+
+        private int GetObject(InjectionValue name) => GetObject((string)name);
 
         private int GetObject(string name)
         {
@@ -403,8 +405,9 @@ namespace InjectionScript.Runtime
         public void Print(string msg) => bridge.Print(msg);
         public void CharPrint(int color, string msg) => CharPrint(bridge.Self, color, msg);
         public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.ToInt(color), msg);
-        public void CharPrint(string id, int color, string msg) => CharPrint(GetObject(id), color, msg);
         public void CharPrint(int id, int color, string msg) => bridge.CharPrint(id, color, msg);
+        public void CharPrint(InjectionValue id, InjectionValue color, InjectionValue msg) 
+            => CharPrint(GetObject(id), NumberConversions.ToInt(color), (string)msg);
 
         public int InJournal(string pattern) => bridge.InJournal(pattern);
         public int InJournalBetweenTimes(string pattern, int startTime, int endTime) => InJournalBetweenTimes(pattern, startTime, endTime, -1);
