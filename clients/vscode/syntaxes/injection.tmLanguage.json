@@ -6,6 +6,9 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#subrutines"
+		},
+		{
 			"include": "#strings"
 		},
 		{
@@ -14,10 +17,42 @@
 	],
 	"repository": {
 		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.injection",
-				"match": "\\b([iI][fF]|[eE][lL][sS][eE]|[tT][hH][eE][nN]|[wW][hH][iI][lL][eE]|[fF][oO][rR]|[rR][eE][tT][uU][rR][nN]|[rR][eE][pP][eE][aA][tT]|[uU][nN][tT][iI][lL]|[wW][eE][nN][dD]|[sS][uU][bB]|[eE][nN][dD] [sS][uU][bB]|[eE][nN][dD][sS][uU][bB]|[eE][nN][dD] [iI][fF]|[eE][nN][dD][iI][fF]|[nN][eE][xX][tT]|[dD][iI][mM]|[vV][aA][rR]|[rR][eE][tT][uU][rR][nN]|[gG][oO][tT][oO])\\b"
-			}]
+			"patterns":
+			[
+				{
+					"name": "keyword.control.injection",
+					"match": "\\b(?i:if|else|then|while|for|next|to|step|return|repeat|until|wend|sub|end sub|endsub|end if|endif|dim|var|goto)\\b"
+				},
+				{
+					"name": "keyword.operator.new.scp99",
+					"match": "((\\+|\\-|\\*|\\/|=|<|>)|(\\b(?i:and|not|or)\\b))"
+				},
+				{
+					"name": "constant.numeric.scp99",
+					"match": "\\b([0-9])+\\b"
+				}
+			]
+		},
+		"subrutines": {
+			"patterns":
+			[
+				{
+					"name": "entity.name.class.injection",
+					"match": "\\b(?i:UO)\\b"
+				},
+				{
+					"name": "entity.name.function.injection",
+					"match": "\\b(?i:wait|str|val|len|left|right|mid|now|getarraylength)\\b"
+				},
+				{
+					"name": "entity.name.function.injection",
+					"match": "\\b(?i:set|setglobal|getglobal|getx|gety|getz|getdistance|gethp|getmaxhp|getnotoriety|getinfo|getname|GetGraphic|GetDir|IsNpc|Exists|Getserial|GetQuantity|IsOnline|dead|Hidden|AddObject|FindType|FindCount|Ignore|IgnoreReset|Count|Click|UseObject|Attack|GetStatus|UseType|WaitTargetObject|WaitTargetSelf|WaitTargetLast|WaitTargetTile|Targeting|Grab|MoveItem|SetReceivingContainer|UnsetReceivingContainer|LClick|KeyPress|Press|Say|PlayWav|TextOpen|TextPrint|Msg|ServerPrint|Print|CharPrint|InJournal|InJournalBetweenTimes|DeleteJournal|Journal|JournalSerial|JournalColor|SetJournalLine|Arm|SetArm|Disarm|Unequip|Equip|ObjAtLayer|WarMode|UseSkill|Cast|Morph|Timer|Time|Date|Terminate|RandomPrivateGetTile|Snap)\\b"
+				},
+				{
+					"name": "variable.name.injection",
+					"match": "\\b(?i:str|int|dex|stamina|mana|weight|gold|life)\\b"
+				}
+			]
 		},
 		"strings": {
 			"name": "string.quoted.double.injection",
