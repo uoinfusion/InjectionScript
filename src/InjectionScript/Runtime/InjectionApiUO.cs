@@ -102,6 +102,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, int>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string, int, int>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string, string, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", FindType));
@@ -253,7 +254,7 @@ namespace InjectionScript.Runtime
 
         public int GetZ() => GetZ("self");
         public int GetZ(string id) => GetZ(GetObject(id));
-        public int GetZ(int id) => bridge.GetY(id);
+        public int GetZ(int id) => bridge.GetZ(id);
 
         public int GetDistance(string id) => GetDistance(GetObject(id));
         public int GetDistance(int id) => bridge.GetDistance(id);
@@ -372,6 +373,8 @@ namespace InjectionScript.Runtime
         public void FindType(int type, int color, string container)
             => FindType(type, color, ConvertContainer(container));
         public void FindType(int type, int color, int containerId) => bridge.FindType(type, color, containerId, -1);
+        public void FindType(string type, int color, int containerId)
+            => bridge.FindType(NumberConversions.ToInt(type), color, containerId, -1);
 
         public void FindType(InjectionValue type, InjectionValue color, InjectionValue containerId, InjectionValue range)
             => bridge.FindType(NumberConversions.ToInt(type),
