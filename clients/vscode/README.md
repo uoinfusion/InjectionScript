@@ -32,6 +32,12 @@ Implementation is very slow inefficient and incomplete.
 
 ## Release Notes
 
+### 0.0.8
+
+- Many bug fixes.
+- More supported Injection API.
+- More syntax highlighting colors.
+
 ### 0.0.6
 
 - F12 navigates to symbol definition (subrutine, variable, label).
