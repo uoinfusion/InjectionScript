@@ -80,7 +80,7 @@ namespace InjectionScript.Runtime
             catch (TargetInvocationException ex)
             {
                 if (ex.InnerException != null)
-                    throw new NativeSubrutineException("Native subrutine call failed.", ex.InnerException);
+                    throw new NativeSubrutineException(ex.InnerException.Message, ex.InnerException);
                 else
                     throw;
             }

@@ -159,7 +159,7 @@ namespace InjectionScript.Runtime
                     }
                     catch (Exception ex)
                     {
-                        throw new InternalInterpretationException(statement.Start.Line, ex);
+                        throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
                     }
                 }
 
