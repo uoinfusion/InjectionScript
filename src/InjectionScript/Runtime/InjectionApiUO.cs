@@ -98,13 +98,13 @@ namespace InjectionScript.Runtime
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.Gold", (Func<int>)Gold));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.Life", (Func<int>)Life));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, int>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string, int, int>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<string, string, string>)FindType));
-            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Action<int, int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<string, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<int, int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<int, int, int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<string, int, int, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<string, string, string, string>)FindType));
+            metadata.Add(new NativeSubrutineDefinition("UO.FindType", (Func<int, int, string, string>)FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindType", FindType));
             metadata.Add(new NativeSubrutineDefinition("UO.FindCount", (Func<int>)FindCount));
             metadata.Add(new NativeSubrutineDefinition("UO.FindCount", (Func<string, int>)((ignoredParam1) => FindCount())));
@@ -365,16 +365,17 @@ namespace InjectionScript.Runtime
             => MoveItem(GetObject(id), NumberConversions.ToInt(amount), GetObject(targetContainerId));
         public void MoveItem(int id, int amount, int targetContainerId) => bridge.MoveItem(id, amount, targetContainerId);
 
-        public void FindType(string typeStr) => FindType(NumberConversions.ToInt(typeStr));
-        public void FindType(int type) => FindType(type, -1, -1);
-        public void FindType(int type, int color) => FindType(type, color, -1);
-        public void FindType(string type, string color, string container)
+        public string FindType(string typeStr) => FindType(NumberConversions.ToInt(typeStr));
+        public string FindType(int type) => FindType(type, -1, -1);
+        public string FindType(int type, int color) => FindType(type, color, -1);
+        public string FindType(string type, string color, string container)
             => FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
-        public void FindType(int type, int color, string container)
+        public string FindType(int type, int color, string container)
             => FindType(type, color, ConvertContainer(container));
-        public void FindType(int type, int color, int containerId) => bridge.FindType(type, color, containerId, -1);
-        public void FindType(string type, int color, int containerId)
-            => bridge.FindType(NumberConversions.ToInt(type), color, containerId, -1);
+        public string FindType(int type, int color, int containerId) 
+            => NumberConversions.Int2Hex(bridge.FindType(type, color, containerId, -1));
+        public string FindType(string type, int color, int containerId)
+            => FindType(NumberConversions.ToInt(type), color, containerId);
 
         public void FindType(InjectionValue type, InjectionValue color, InjectionValue containerId, InjectionValue range)
             => bridge.FindType(NumberConversions.ToInt(type),
