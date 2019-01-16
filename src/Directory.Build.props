@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
-		<Version>0.0.8</Version>
-		<AssemblyVersion>0.0.8</AssemblyVersion>
+		<Version>0.0.9</Version>
+		<AssemblyVersion>0.0.9</AssemblyVersion>
 		<Authors>Jakub Linhart</Authors>
 		<Company>UOInfusion</Company>
 		<Product>InjectionScript</Product>

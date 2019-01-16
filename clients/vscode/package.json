@@ -3,7 +3,7 @@
     "displayName": "Injection.VsCode",
     "description": "Yoko Injection script extension for Visual Studio Code",
     "publisher": "uoinfusion",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "qna": "marketplace",
     "engines": {
         "vscode": "^1.30.0"
