@@ -95,6 +95,7 @@
         void Terminate(string subrutineName);
         int GetGraphics(int id);
         int GetDir(int id);
+        void StepToward(int x, int y);
 
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
         void Snap(string name);

@@ -215,6 +215,19 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.PrivateGetTile", (Func<int, int, int, int, int, string>)PrivateGetTile));
             metadata.Add(new NativeSubrutineDefinition("UO.Snap", (Action<string>)Snap));
             metadata.Add(new NativeSubrutineDefinition("UO.Snap", (Action)Snap));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.PMove", (Action <int, int>)PMove));
+            metadata.Add(new NativeSubrutineDefinition("UO.PMove", (Action <int, int, int>)PMove));
+        }
+
+        public void PMove(int x, int y, int z) => PMove(x, y);
+
+        public void PMove(int x, int y)
+        {
+            while (GetX() != x || GetY() != y)
+            {
+                bridge.StepToward(x, y);
+            }
         }
 
         public void Set(string name, int value)
