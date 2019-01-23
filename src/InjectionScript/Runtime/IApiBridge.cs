@@ -97,6 +97,9 @@
         int GetDir(int id);
         void StepToward(int x, int y);
 
+        void WaitGump(int triggerId);
+        void SendGumpSelect(int triggerId);
+
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
         void Snap(string name);
 

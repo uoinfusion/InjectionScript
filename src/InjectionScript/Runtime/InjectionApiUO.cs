@@ -218,10 +218,20 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.PMove", (Action <int, int>)PMove));
             metadata.Add(new NativeSubrutineDefinition("UO.PMove", (Action <int, int, int>)PMove));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitGump", (Action<int>)WaitGump));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitGump", (Action<string>)WaitGump));
+            metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<int>)SendGumpSelect));
+            metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<string>)SendGumpSelect));
         }
 
-        public void PMove(int x, int y, int z) => PMove(x, y);
+        public void WaitGump(string triggerId) => WaitGump(NumberConversions.ToInt(triggerId));
+        public void WaitGump(int triggerId) => bridge.WaitGump(triggerId);
 
+        public void SendGumpSelect(string triggerId) => SendGumpSelect(NumberConversions.ToInt(triggerId));
+        public void SendGumpSelect(int triggerId) => bridge.SendGumpSelect(triggerId);
+
+        public void PMove(int x, int y, int z) => PMove(x, y);
         public void PMove(int x, int y)
         {
             while (GetX() != x || GetY() != y)
