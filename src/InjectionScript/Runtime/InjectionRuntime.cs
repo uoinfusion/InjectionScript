@@ -33,7 +33,7 @@ namespace InjectionScript.Runtime
 
         private void RegisterNatives()
         {
-            Metadata.Add(new NativeSubrutineDefinition("UO.exec", (Action<string>)Exec));
+            Metadata.Add(new NativeSubrutineDefinition("UO.Exec", (Action<string>)Exec));
         }
 
         public MessageCollection Load(string fileName) 

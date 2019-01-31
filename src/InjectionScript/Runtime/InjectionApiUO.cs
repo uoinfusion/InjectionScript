@@ -223,6 +223,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitGump", (Action<string>)WaitGump));
             metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<int>)SendGumpSelect));
             metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<string>)SendGumpSelect));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.SaveConfig", (Action)SaveConfig));
         }
 
         public void WaitGump(string triggerId) => WaitGump(NumberConversions.ToInt(triggerId));
@@ -550,6 +552,8 @@ namespace InjectionScript.Runtime
         }
 
         public int Random(int max) => random.Next(max);
+
+        public void SaveConfig() => Print("SaveConfig is not implemented yet.");
 
         private int ConvertContainer(InjectionValue containerId)
         {
