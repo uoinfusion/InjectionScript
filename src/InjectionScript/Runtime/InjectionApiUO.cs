@@ -141,8 +141,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetSelf", (Action<string>)WaitTargetSelf));
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetLast", (Action)WaitTargetLast));
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetLast", (Action<string>)WaitTargetLast));
-            metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetTile", (Action<int, int, int, int>)WaitTargetTile));
-            metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetTile", (Action<string, string, string, string>)WaitTargetTile));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetTile", (Action<InjectionValue, InjectionValue, InjectionValue, InjectionValue>)WaitTargetTile));
             metadata.Add(new NativeSubrutineDefinition("UO.Targeting", (Func<int>)IsTargeting));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<int, int>)Grab));
@@ -422,9 +421,8 @@ namespace InjectionScript.Runtime
         public void WaitTargetSelf() => WaitTargetObject("self");
         public void WaitTargetLast(string id /* ignored */) => WaitTargetObject("lasttarget");
         public void WaitTargetLast() => WaitTargetObject("lasttarget");
-        public void WaitTargetTile(int type, int x, int y, int z) => bridge.WaitTargetTile(type, x, y, z);
-        public void WaitTargetTile(string type, string x, string y, string z) 
-            => WaitTargetTile(NumberConversions.ToInt(type), NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
+        public void WaitTargetTile(InjectionValue type, InjectionValue x, InjectionValue y, InjectionValue z)
+            => bridge.WaitTargetTile(NumberConversions.ToInt(type), NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
         public int IsTargeting() => bridge.IsTargeting();
 
         public void SetReceivingContainer(string id) => SetReceivingContainer(GetObject(id));
