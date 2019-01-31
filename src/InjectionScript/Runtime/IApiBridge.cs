@@ -95,7 +95,6 @@
         void Terminate(string subrutineName);
         int GetGraphics(int id);
         int GetDir(int id);
-        void StepToward(int x, int y);
 
         void WaitGump(int triggerId);
         void SendGumpSelect(int triggerId);

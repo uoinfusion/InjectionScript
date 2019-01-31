@@ -9,6 +9,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Infusion\Infusion.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Antlr4 Update="Parsing\injection.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>InjectionScript.Parsing.Syntax</CustomToolNamespace>

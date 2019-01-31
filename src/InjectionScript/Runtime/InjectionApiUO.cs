@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infusion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -231,12 +232,64 @@ namespace InjectionScript.Runtime
         public void SendGumpSelect(string triggerId) => SendGumpSelect(NumberConversions.ToInt(triggerId));
         public void SendGumpSelect(int triggerId) => bridge.SendGumpSelect(triggerId);
 
-        public void PMove(int x, int y, int z) => PMove(x, y);
-        public void PMove(int x, int y)
+        private void WaitForChange(int attemptDuration, int maxDuration, Func<bool> waitTest)
         {
-            while (GetX() != x || GetY() != y)
+            int totalDuration = 0;
+
+            while (waitTest() && totalDuration < maxDuration)
             {
-                bridge.StepToward(x, y);
+                bridge.Wait(attemptDuration);
+                totalDuration += attemptDuration;
+            }
+
+            if (totalDuration >= maxDuration)
+                throw new InjectionException($"Wait timeout.");
+        }
+
+        private int GetKey(Direction direction)
+        {
+            if (direction == Direction.North)
+                return 33;
+            else if (direction == Direction.Northeast)
+                return 39;
+            else if (direction == Direction.East)
+                return 34;
+            else if (direction == Direction.Southeast)
+                return 40;
+            else if (direction == Direction.South)
+                return 35;
+            else if (direction == Direction.Southwest)
+                return 37;
+            else if (direction == Direction.West)
+                return 36;
+            else if (direction == Direction.Northwest)
+                return 38;
+
+            throw new NotImplementedException(direction.ToString());
+        }
+
+        public void PMove(int x, int y, int z) => PMove(x, y);
+        public void PMove(int targetX, int targetY)
+        {
+            var target = new Location2D(targetX, targetY);
+            var current = new Location2D(GetX(), GetY());
+
+            while (target != current)
+            {
+                var direction = (target - current).ToDirection();
+
+                var key = GetKey(direction);
+
+                if ((int)direction != GetDir())
+                {
+                    Press(key);
+                    bridge.Wait(20);
+                }
+
+                Press(key);
+                WaitForChange(100, 30000, () => new Location2D(GetX(), GetY()) == current);
+
+                current = new Location2D(GetX(), GetY());
             }
         }
 
@@ -419,6 +472,7 @@ namespace InjectionScript.Runtime
         public void LClick(int x, int y) => bridge.LClick(x, y);
         public void Press(int key) => KeyPress(key);
         public void KeyPress(int key) => bridge.KeyPress(key);
+
         public void Say(string message) => bridge.Say(message);
 
         public void PlayWav(string file) => bridge.PlayWav(file);
