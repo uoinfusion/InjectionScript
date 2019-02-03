@@ -1,5 +1,4 @@
-﻿using Infusion;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -233,9 +232,14 @@ namespace InjectionScript.Runtime
         public void SendGumpSelect(string triggerId) => SendGumpSelect(NumberConversions.ToInt(triggerId));
         public void SendGumpSelect(int triggerId) => bridge.SendGumpSelect(triggerId);
 
-        private void WaitForChange(int attemptDuration, int maxDuration, Func<bool> waitTest)
+        private void MakeStep(int key, Func<bool> waitTest)
         {
             int totalDuration = 0;
+            int maxDuration = 30000;
+            int attemptDuration = 25;
+
+            var startTime = DateTime.UtcNow;
+            Press(key);
 
             while (waitTest() && totalDuration < maxDuration)
             {
@@ -245,25 +249,55 @@ namespace InjectionScript.Runtime
 
             if (totalDuration >= maxDuration)
                 throw new InjectionException($"Wait timeout.");
+
+            var endTime = DateTime.UtcNow;
+            var minDuration = TimeSpan.FromMilliseconds(150);
+            var duration = endTime - startTime;
+            if (duration < minDuration)
+            {
+                bridge.Wait((int)(minDuration - duration).TotalMilliseconds);
+            }
         }
 
-        private int GetKey(Direction direction)
+        private int GetDirection(int currentX, int currentY, int targetX, int targetY)
         {
-            if (direction == Direction.North)
+            if (targetX < currentX && targetY == currentY)
+                return 6;
+            else if (targetX > currentX && targetY == currentY)
+                return 2;
+            else if (targetX == currentX && targetY > currentY)
+                return 4;
+            else if (targetX == currentX && targetY < currentY)
+                return 0;
+            else if (targetX < currentX && targetY > currentY)
+                return 5;
+            else if (targetX > currentX && targetY < currentY)
+                return 1;
+            else if (targetX < currentX && targetY < currentY)
+                return 7;
+            else if (targetX > currentX && targetY > currentY)
+                return 3;
+
+            throw new NotImplementedException($"Unknown direction for {currentX}, {currentY} -> {targetX}, {targetY}");
+        }
+
+        private int GetKey(int direction)
+        {
+            if (direction == 0)
                 return 33;
-            else if (direction == Direction.Northeast)
+            else if (direction == 1)
                 return 39;
-            else if (direction == Direction.East)
+            else if (direction == 2)
                 return 34;
-            else if (direction == Direction.Southeast)
+            else if (direction == 3)
                 return 40;
-            else if (direction == Direction.South)
+            else if (direction == 4)
                 return 35;
-            else if (direction == Direction.Southwest)
+            else if (direction == 5)
                 return 37;
-            else if (direction == Direction.West)
+            else if (direction == 6)
                 return 36;
-            else if (direction == Direction.Northwest)
+            else if (direction == 7)
                 return 38;
 
             throw new NotImplementedException(direction.ToString());
@@ -272,25 +306,21 @@ namespace InjectionScript.Runtime
         public void PMove(int x, int y, int z) => PMove(x, y);
         public void PMove(int targetX, int targetY)
         {
-            var target = new Location2D(targetX, targetY);
-            var current = new Location2D(GetX(), GetY());
+            var currentX = GetX();
+            var currentY = GetY();
 
-            while (target != current)
+            while (targetX != currentX || targetY != currentY)
             {
-                var direction = (target - current).ToDirection();
-
+                var direction = GetDirection(currentX, currentY, targetX, targetY);
                 var key = GetKey(direction);
 
-                if ((int)direction != GetDir())
-                {
-                    Press(key);
-                    bridge.Wait(20);
-                }
+                if (direction != GetDir())
+                    MakeStep(key, () => GetDir() != direction);
+                else
+                    MakeStep(key, () => currentX == GetX() && currentY == GetY());
 
-                Press(key);
-                WaitForChange(100, 30000, () => new Location2D(GetX(), GetY()) == current);
-
-                current = new Location2D(GetX(), GetY());
+                currentX = GetX();
+                currentY = GetY();
             }
         }
 
