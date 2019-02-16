@@ -78,7 +78,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Exists", (Func<int, int>)Exists));
             metadata.Add(new NativeSubrutineDefinition("UO.Exists", (Func<string, int>)Exists));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.Getserial", (Func<string, string>)GetSerial));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetSerial", (Func<string, string>)GetSerial));
             metadata.Add(new NativeSubrutineDefinition("UO.GetQuantity", (Func<string, int>)GetQuantity));
             metadata.Add(new NativeSubrutineDefinition("UO.GetQuantity", (Func<int, int>)GetQuantity));
             metadata.Add(new NativeSubrutineDefinition("UO.IsOnline", (Func<int>)IsOnline));
