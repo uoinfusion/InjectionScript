@@ -34,7 +34,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("left", (Func<string, int, string>)InternalSubrutines.Left));
             metadata.Add(new NativeSubrutineDefinition("right", (Func<string, int, string>)InternalSubrutines.Right));
             metadata.Add(new NativeSubrutineDefinition("mid", (Func<string, int, int, string>)InternalSubrutines.Mid));
-            metadata.Add(new NativeSubrutineDefinition("GetArrayLength", InternalSubrutines.GetArrayLength));
+            metadata.Add(new NativeSubrutineDefinition("GetArrayLength", (Func<InjectionValue, InjectionValue>)InternalSubrutines.GetArrayLength));
             metadata.Add(new NativeSubrutineDefinition("Now", (Func<int>)Now));
 
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("true", (Func<int>)(() => 1)));
