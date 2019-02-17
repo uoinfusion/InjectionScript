@@ -19,6 +19,7 @@
 
         void Wait(int ms);
         void SetFindDistance(int distance);
+        void SetGrabDelay(int valueInt);
 
         int GetX(int id);
         int GetY(int id);

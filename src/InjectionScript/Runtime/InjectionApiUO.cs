@@ -160,6 +160,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Attack", (Action<int>)Attack));
             metadata.Add(new NativeSubrutineDefinition("UO.GetStatus", (Action<string>)GetStatus));
             metadata.Add(new NativeSubrutineDefinition("UO.GetStatus", (Action<int>)GetStatus));
+            metadata.Add(new NativeSubrutineDefinition("UO.ReceiveObjectName", (Action<InjectionValue>)ReceiveObjectName));
+            metadata.Add(new NativeSubrutineDefinition("UO.ReceiveObjectName", (Action<InjectionValue, InjectionValue>)ReceiveObjectName));
             metadata.Add(new NativeSubrutineDefinition("UO.UseType", (Action<int>)UseType));
             metadata.Add(new NativeSubrutineDefinition("UO.UseType", (Action<string>)UseType));
             metadata.Add(new NativeSubrutineDefinition("UO.UseType", (Action<int, int>)UseType));
@@ -366,11 +368,15 @@ namespace InjectionScript.Runtime
 
         public void Set(string name, string valueStr)
         {
-            bool successfulConversion = NumberConversions.TryStr2Int(valueStr, out var value);
+            int valueInt = NumberConversions.TryStr2Int(valueStr, out var value) ? value : 0;
 
             if (name.Equals("finddistance", StringComparison.OrdinalIgnoreCase))
             {
-                bridge.SetFindDistance(successfulConversion ? value : 0);
+                bridge.SetFindDistance(valueInt);
+            }
+            else if (name.Equals("grabdelay", StringComparison.OrdinalIgnoreCase))
+            {
+                bridge.SetGrabDelay(valueInt);
             }
         }
 
@@ -483,6 +489,8 @@ namespace InjectionScript.Runtime
         public void Attack(int id) => bridge.Attack(id);
         public void GetStatus(string id) => GetStatus(GetObject(id));
         public void GetStatus(int id) => bridge.GetStatus(id);
+        public void ReceiveObjectName(InjectionValue id) => bridge.Click(GetObject(id));
+        public void ReceiveObjectName(InjectionValue id, InjectionValue delay) => bridge.Click(GetObject(id));
 
         public void UseType(string type) => UseType(NumberConversions.ToInt(type));
         public void UseType(string type, string color) => UseType(NumberConversions.ToInt(type), NumberConversions.ToInt(color));
