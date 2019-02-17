@@ -14,6 +14,39 @@ namespace InjectionScript.Runtime
         private readonly Random random;
         private readonly ITimeSource timeSource;
 
+        private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>()
+        {
+            {"Rhand", 0x01 },
+            {"Lhand", 0x02 },
+            {"Shoes", 0x03 },
+            {"Pants", 0x04 },
+            {"Shirt", 0x05 },
+            {"Hat", 0x06 },
+            {"Gloves", 0x07 },
+            {"Ring", 0x08 },
+            {"Neck", 0x09 },
+            {"Hair", 0x0B },
+            {"Waist", 0x0C },
+            {"Torso", 0x0D },
+            {"Brace", 0x0E },
+            {"Beard", 0x10 },
+            {"Ear", 0x12 },
+            {"Arms", 0x13 },
+            {"Bpack", 0x15 },
+            {"Bank", 0x1D },
+            {"Rstk", 0x1A },
+            {"NRstk", 0x1B },
+            { "Sell", 0x1C },
+        };
+
+        private static readonly Dictionary<int, string> layerNumberToName = new Dictionary<int, string>();
+
+        static InjectionApiUO()
+        {
+            foreach (var pair in layerNameToNumber)
+                layerNumberToName.Add(pair.Value, pair.Key);
+        }
+
         internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource)
         {
             this.bridge = bridge;
@@ -48,6 +81,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<string, int>)GetDistance));
             metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<int, int>)GetDistance));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<InjectionValue, InjectionValue, InjectionValue, int>)GetDistance));
             metadata.Add(new NativeSubrutineDefinition("UO.GetDistance", (Func<int, int, int, int, int>)GetDistance));
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetHP", (Func<int>)GetHP));
@@ -67,6 +101,9 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<string, int>)GetGraphics));
             metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<int, int>)GetGraphics));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.GetColor", (Func<InjectionValue, string>)GetColor));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetLayer", (Func<InjectionValue, string>)GetLayer));
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetDir", (Func<string, int>)GetDir));
             metadata.Add(new NativeSubrutineDefinition("UO.GetDir", (Func<int, int>)GetDir));
@@ -162,6 +199,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.TextOpen", (Action)TextOpen));
             metadata.Add(new NativeSubrutineDefinition("UO.TextPrint", (Action<string>)TextPrint));
+            metadata.Add(new NativeSubrutineDefinition("UO.TextClear", (Action)TextClear));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Msg", (Action<string>)Msg));
             metadata.Add(new NativeSubrutineDefinition("UO.ServerPrint", (Action<string>)ServerPrint));
@@ -369,6 +407,15 @@ namespace InjectionScript.Runtime
             return Math.Max(dx, dy);
         }
 
+        public int GetDistance(InjectionValue id1, InjectionValue x2, InjectionValue y2)
+        {
+            var obj1 = GetObject(id1);
+            int x1 = bridge.GetX(obj1);
+            int y1 = bridge.GetY(obj1);
+
+            return GetDistance(x1, y1, NumberConversions.ToInt(x2), NumberConversions.ToInt(y2));
+        }
+
         public int GetHP() => GetHP("self");
         public int GetHP(string id) => GetHP(GetObject(id));
         public int GetHP(int id) => bridge.GetHP(id);
@@ -394,6 +441,9 @@ namespace InjectionScript.Runtime
         public int GetGraphics(string id) => GetGraphics(GetObject(id));
         public int GetGraphics(int id) => bridge.GetGraphics(id);
 
+        public string GetColor(InjectionValue id) => NumberConversions.ToHex((short)bridge.GetColor(GetObject(id)));
+        public string GetLayer(InjectionValue id) => ConvertLayer(bridge.GetLayer(GetObject(id)));
+
         public int GetDir() => GetDir("self");
         public int GetDir(string id) => GetDir(GetObject(id));
         public int GetDir(int id) => bridge.GetDir(id);
@@ -406,7 +456,7 @@ namespace InjectionScript.Runtime
 
         public int Exists(string id) => Exists(GetObject(id));
         public int Exists(int id) => bridge.Exists(id);
-        public string GetSerial(string id) => NumberConversions.Int2Hex(GetObject(id));
+        public string GetSerial(string id) => NumberConversions.ToHex(GetObject(id));
         public int IsOnline() => bridge.IsOnline();
         public int Dead() => bridge.Dead();
         public int Hidden() => Hidden("self");
@@ -485,7 +535,7 @@ namespace InjectionScript.Runtime
                 NumberConversions.ToInt(range));
 
         public string FindType(int type, int color, int containerId, int range)
-            => NumberConversions.Int2Hex(bridge.FindType(type, color, containerId, range));
+            => NumberConversions.ToHex(bridge.FindType(type, color, containerId, range));
 
         public int FindCount() => bridge.FindCount();
         public int Count(string type) => bridge.Count(NumberConversions.ToInt(type), -1, -1);
@@ -508,6 +558,7 @@ namespace InjectionScript.Runtime
 
         public void TextOpen() => bridge.TextOpen();
         public void TextPrint(string text) => bridge.TextPrint(text);
+        public void TextClear() => bridge.TextClear();
 
         public void Msg(string message) => bridge.ServerPrint(message);
         public void ServerPrint(string message) => bridge.ServerPrint(message);
@@ -538,12 +589,12 @@ namespace InjectionScript.Runtime
             Unequip("Rhand");
         }
 
-        public void Unequip(string layer) => bridge.Unequip(layer);
-        public void Equip(string layer, int id) => bridge.Equip(layer, id);
+        public void Unequip(string layer) => bridge.Unequip(ConvertLayer(layer));
+        public void Equip(string layer, int id) => bridge.Equip(ConvertLayer(layer), id);
         public void Equip(string layer, string id) => Equip(layer, GetObject(id));
         public InjectionValue ObjAtLayer(string layer)
         {
-            var id = bridge.ObjAtLayer(layer);
+            var id = bridge.ObjAtLayer(ConvertLayer(layer));
             if (id == 0)
                 return InjectionValue.Zero;
 
@@ -606,5 +657,8 @@ namespace InjectionScript.Runtime
 
             return GetObject(id);
         }
+
+        private int ConvertLayer(string layer) => layerNameToNumber[layer];
+        private string ConvertLayer(int layer) => layerNumberToName[layer];
     }
 }

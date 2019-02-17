@@ -62,6 +62,7 @@
 
         void TextOpen();
         void TextPrint(string text);
+        void TextClear();
 
         void ServerPrint(string message);
         void Print(string msg);
@@ -77,9 +78,9 @@
         void SetJournalLine(int index);
         void Arm(string name);
         void SetArm(string name);
-        void Equip(string layer, int id);
-        void Unequip(string layer);
-        int ObjAtLayer(string layer);
+        void Equip(int layer, int id);
+        void Unequip(int layer);
+        int ObjAtLayer(int layer);
         void WarMode(int mode);
         int WarMode();
         void UseSkill(string skillName);
@@ -95,6 +96,8 @@
         void Terminate(string subrutineName);
         int GetGraphics(int id);
         int GetDir(int id);
+        int GetColor(int id);
+        int GetLayer(int id);
 
         void WaitGump(int triggerId);
         void SendGumpSelect(int triggerId);

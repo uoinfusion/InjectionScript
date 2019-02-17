@@ -44,7 +44,8 @@ namespace InjectionScript.Runtime
             return int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
         }
 
-        public static string Int2Hex(int id) => $"0x{id:X8}";
-        public static string Int2Hex(uint id) => Int2Hex((int)id);
+        public static string ToHex(int id) => $"0x{id:X8}";
+        public static string ToHex(short id) => $"0x{id:X4}";
+        public static string Int2Hex(uint id) => ToHex((int)id);
     }
 }
