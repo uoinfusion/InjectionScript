@@ -54,6 +54,7 @@
         void UnsetReceivingContainer();
         void Grab(int amount, int id);
         void MoveItem(int id, int amount, int targetContainerId);
+        void ReceiveObjectName(int id, int delay);
 
         void LClick(int x, int y);
         void KeyPress(int key);

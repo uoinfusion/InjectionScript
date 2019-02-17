@@ -489,8 +489,8 @@ namespace InjectionScript.Runtime
         public void Attack(int id) => bridge.Attack(id);
         public void GetStatus(string id) => GetStatus(GetObject(id));
         public void GetStatus(int id) => bridge.GetStatus(id);
-        public void ReceiveObjectName(InjectionValue id) => bridge.Click(GetObject(id));
-        public void ReceiveObjectName(InjectionValue id, InjectionValue delay) => bridge.Click(GetObject(id));
+        public void ReceiveObjectName(InjectionValue id) => bridge.ReceiveObjectName(GetObject(id), 0);
+        public void ReceiveObjectName(InjectionValue id, InjectionValue timeout) => bridge.ReceiveObjectName(GetObject(id), NumberConversions.ToInt(timeout));
 
         public void UseType(string type) => UseType(NumberConversions.ToInt(type));
         public void UseType(string type, string color) => UseType(NumberConversions.ToInt(type), NumberConversions.ToInt(color));
