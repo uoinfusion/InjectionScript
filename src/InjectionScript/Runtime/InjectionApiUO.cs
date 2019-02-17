@@ -14,7 +14,7 @@ namespace InjectionScript.Runtime
         private readonly Random random;
         private readonly ITimeSource timeSource;
 
-        private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>()
+        private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
             {"Rhand", 0x01 },
             {"Lhand", 0x02 },
