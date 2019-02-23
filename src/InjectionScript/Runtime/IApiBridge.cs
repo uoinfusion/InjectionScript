@@ -104,6 +104,8 @@
         void WaitGump(int triggerId);
         void SendGumpSelect(int triggerId);
 
+        void MakeStepByKey(int key);
+
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
         void Snap(string name);
 

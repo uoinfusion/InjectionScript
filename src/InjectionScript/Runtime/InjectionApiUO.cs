@@ -268,33 +268,6 @@ namespace InjectionScript.Runtime
         public void SendGumpSelect(string triggerId) => SendGumpSelect(NumberConversions.ToInt(triggerId));
         public void SendGumpSelect(int triggerId) => bridge.SendGumpSelect(triggerId);
 
-        private void MakeStep(int key, Func<bool> waitTest)
-        {
-            int totalDuration = 0;
-            int maxDuration = 30000;
-            int attemptDuration = 25;
-
-            var startTime = DateTime.UtcNow;
-            Press(key);
-
-            while (waitTest() && totalDuration < maxDuration)
-            {
-                bridge.Wait(attemptDuration);
-                totalDuration += attemptDuration;
-            }
-
-            if (totalDuration >= maxDuration)
-                throw new InjectionException($"Wait timeout.");
-
-            var endTime = DateTime.UtcNow;
-            var minDuration = TimeSpan.FromMilliseconds(150);
-            var duration = endTime - startTime;
-            if (duration < minDuration)
-            {
-                bridge.Wait((int)(minDuration - duration).TotalMilliseconds);
-            }
-        }
-
         private int GetDirection(int currentX, int currentY, int targetX, int targetY)
         {
             if (targetX < currentX && targetY == currentY)
@@ -350,10 +323,7 @@ namespace InjectionScript.Runtime
                 var direction = GetDirection(currentX, currentY, targetX, targetY);
                 var key = GetKey(direction);
 
-                if (direction != GetDir())
-                    MakeStep(key, () => GetDir() != direction);
-                else
-                    MakeStep(key, () => currentX == GetX() && currentY == GetY());
+                bridge.MakeStepByKey(key);
 
                 currentX = GetX();
                 currentY = GetY();
