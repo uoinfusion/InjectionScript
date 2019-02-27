@@ -22,7 +22,7 @@ end sub");
 
             testDebugger.AddBreakpoint(4);
             testDebugger.CallSubrutineAsync("sub1");
-            testDebugger.WaitForBreakpointHit();
+            testDebugger.WaitForBreakHit();
 
             var result = testDebugger.EvaluateExpression("x");
 
@@ -44,13 +44,13 @@ end sub");
             testDebugger.AddBreakpoint(4);
             testDebugger.AddBreakpoint(5);
             testDebugger.CallSubrutineAsync("sub1");
-            testDebugger.WaitForBreakpointHit();
+            testDebugger.WaitForBreakHit();
 
             var result = testDebugger.EvaluateExpression("x");
             result.Result.Value.Should().Be(33);
 
             testDebugger.Continue();
-            testDebugger.WaitForBreakpointHit();
+            testDebugger.WaitForBreakHit();
 
             result = testDebugger.EvaluateExpression("x");
             result.Result.Value.Should().Be(34);

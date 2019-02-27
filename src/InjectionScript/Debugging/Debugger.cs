@@ -17,6 +17,7 @@ namespace InjectionScript.Debugging
         private StatementExecutionContext currentContext;
         private bool traceEnabled = false;
         private readonly RingStringAppender traceBuffer = new RingStringAppender(1024, 1024);
+        private bool breakNextStatement = false;
 
         public Debugger(DebuggerServer server)
         {
@@ -32,8 +33,14 @@ namespace InjectionScript.Debugging
 
             if (server.TryGetBreakpoint(context.File, context.Line, out var breakpoint))
             {
-                server.OnBreak(this, breakpoint);
+                server.OnBreak(this, new BreakpointDebuggerBreak(breakpoint));
                 currentContext = context;
+                continueEvent.WaitOne();
+            }
+            else if (breakNextStatement)
+            {
+                breakNextStatement = false;
+                server.OnBreak(this, new StepDebuggerBreak(new SourceCodeLocation(context.File, context.Line)));
                 continueEvent.WaitOne();
             }
         }
@@ -59,6 +66,12 @@ namespace InjectionScript.Debugging
         public void Continue()
         {
             currentContext = null;
+            continueEvent.Set();
+        }
+
+        public void Step()
+        {
+            breakNextStatement = true;
             continueEvent.Set();
         }
 

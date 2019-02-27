@@ -19,18 +19,36 @@ namespace InjectionScript.Debugging
         private readonly List<Debugger> debuggers = new List<Debugger>();
         private bool tracingEnabled;
 
-        public ManualResetEvent BreakpointHitEvent { get; } = new ManualResetEvent(false);
-        public event EventHandler<Breakpoint> BreakpointHit;
+        public event EventHandler<DebuggerBreak> DebuggerBreakHit;
+
+        public Breakpoint[] Breakpoints => breakpoints.ToArray();
 
         public void Continue()
         {
-            BreakpointHitEvent.Reset();
+            ActiveDebuggerExecute(dbg => dbg.Continue());
 
             lock (activeDebuggerLock)
             {
                 if (activeDebugger != null)
                 {
                     activeDebugger.Continue();
+                    activeDebugger = null;
+                }
+            }
+        }
+
+        public void Step()
+        {
+            ActiveDebuggerExecute(dbg => dbg.Step());
+        }
+
+        private void ActiveDebuggerExecute(Action<Debugger> action)
+        {
+            lock (activeDebuggerLock)
+            {
+                if (activeDebugger != null)
+                {
+                    action(activeDebugger);
                     activeDebugger = null;
                 }
             }
@@ -50,17 +68,16 @@ namespace InjectionScript.Debugging
             }
         }
 
-        internal void OnBreak(Debugger debugger, Breakpoint breakpoint)
+        internal void OnBreak(Debugger debugger, DebuggerBreak debuggerBreak)
         {
             lock (activeDebuggerLock)
             {
                 if (activeDebugger != null)
                     throw new NotImplementedException("Multiple active debuggers.");
                 activeDebugger = debugger;
-                BreakpointHitEvent.Set();
             }
 
-            BreakpointHit?.Invoke(this, breakpoint);
+            DebuggerBreakHit?.Invoke(this, debuggerBreak);
         }
 
         public void AddBreakpoint(string fileName, int line)
@@ -68,6 +85,20 @@ namespace InjectionScript.Debugging
             lock (breakpointLock)
             {
                 breakpoints.Add(new Breakpoint(fileName, line));
+            }
+        }
+
+        public bool RemoveBreakpoint(string fileName, int line)
+        {
+            lock (breakpointLock)
+            {
+                if (TryGetBreakpoint(fileName, line, out Breakpoint breakpoint))
+                {
+                    breakpoints.Remove(breakpoint);
+                    return true;
+                }
+
+                return false;
             }
         }
 

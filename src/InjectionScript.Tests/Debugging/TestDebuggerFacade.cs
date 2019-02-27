@@ -4,6 +4,7 @@ using InjectionScript.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InjectionScript.Tests.Debugging
@@ -13,7 +14,10 @@ namespace InjectionScript.Tests.Debugging
         private readonly DebuggerServer debuggerServer = new DebuggerServer();
         private readonly ITracer tracer;
         private readonly InjectionRuntime runtime;
+        private readonly AutoResetEvent breakHitEvent = new AutoResetEvent(false);
         private Task subrutineTask;
+
+        public DebuggerBreak LastBreak { get; private set; }
 
         public TestDebuggerFacade()
             : this(new RealTimeSource())
@@ -24,6 +28,13 @@ namespace InjectionScript.Tests.Debugging
         {
             runtime = new InjectionRuntime(null, debuggerServer, timeSource);
             tracer = debuggerServer;
+            debuggerServer.DebuggerBreakHit += HandleDebuggerBreakHit;
+        }
+
+        private void HandleDebuggerBreakHit(object sender, DebuggerBreak e)
+        {
+            breakHitEvent.Set();
+            LastBreak = e;
         }
 
         public void Load(string sourceCode)
@@ -44,6 +55,7 @@ namespace InjectionScript.Tests.Debugging
         }
 
         public void AddBreakpoint(int line) => debuggerServer.AddBreakpoint("test.sc", line);
+        public void Step() => debuggerServer.Step();
 
         public Task CallSubrutineAsync(string name)
         {
@@ -67,8 +79,8 @@ namespace InjectionScript.Tests.Debugging
             return result;
         }
 
-        public void WaitForBreakpointHit()
-            => debuggerServer.BreakpointHitEvent.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("breakpoint is expected to be hit");
+        public void WaitForBreakHit()
+            => breakHitEvent.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("breakpoint is expected to be hit");
 
         public void Continue() => debuggerServer.Continue();
 

@@ -16,5 +16,7 @@ namespace InjectionScript.Debugging
             FileName = fileName;
             Line = line;
         }
+
+        public override string ToString() => $"{FileName}, {Line}";
     }
 }

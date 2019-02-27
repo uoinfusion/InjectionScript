@@ -62,7 +62,7 @@ namespace InjectionScript.Runtime
                         continue;
                     }
 
-                    if (debugger != null)
+                    if (debugger != null && statement.emptyStatement() == null)
                     {
                         var context = new StatementExecutionContext(instructionAddress, statement.Start.Line, currentFileName, statement, this);
                         debugger.BeforeStatement(context);
