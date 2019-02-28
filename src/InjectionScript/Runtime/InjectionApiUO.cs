@@ -440,7 +440,11 @@ namespace InjectionScript.Runtime
         public int Hidden(int id) => bridge.Hidden(id);
 
         public void AddObject(string name, int id) => injectionApi.SetObject(name, id);
-        public void AddObject(string name) => bridge.AddObject(name);
+        public void AddObject(string name)
+        {
+            SystemMessage($"What is {name}");
+            bridge.AddObject(name);
+        }
 
         public int Str() => bridge.Strength;
         public int Int() => bridge.Intelligence;
@@ -541,6 +545,7 @@ namespace InjectionScript.Runtime
         public void Msg(string message) => bridge.ServerPrint(message);
         public void ServerPrint(string message) => bridge.ServerPrint(message);
 
+        public void SystemMessage(string msg) => bridge.Print(msg);
         public void Print(string msg) => bridge.Print(msg);
         public void CharPrint(int color, string msg) => CharPrint(bridge.Self, color, msg);
         public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.ToInt(color), msg);
