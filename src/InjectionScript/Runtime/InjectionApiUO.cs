@@ -396,7 +396,7 @@ namespace InjectionScript.Runtime
         public int GetHP(string id) => GetHP(GetObject(id));
         public int GetHP(int id) => bridge.GetHP(id);
 
-        public int GetMaxHP() => GetHP("self");
+        public int GetMaxHP() => GetMaxHP("self");
         public int GetMaxHP(string id) => GetMaxHP(GetObject(id));
         public int GetMaxHP(int id) => bridge.GetMaxHP(id);
 
