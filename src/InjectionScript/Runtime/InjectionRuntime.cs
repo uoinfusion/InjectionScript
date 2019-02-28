@@ -16,9 +16,8 @@ namespace InjectionScript.Runtime
         public Interpreter Interpreter => interpreter.Value;
         public Globals Globals { get; } = new Globals();
         public Objects Objects { get; } = new Objects();
-        public string CurrentFileName { get; private set; }
-        public injectionParser.FileContext CurrentFileSyntax { get; private set; }
         public InjectionApi Api { get; }
+        public ScriptFile CurrentScript { get; private set; }
 
         public InjectionRuntime() : this(null, new NullDebuggerServer(), new RealTimeSource())
         {
@@ -26,7 +25,7 @@ namespace InjectionScript.Runtime
 
         public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer, ITimeSource timeSource)
         {
-            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentFileName, debuggerServer.Create()));
+            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentScript.FileName, debuggerServer.Create()));
             Api = new InjectionApi(bridge, Metadata, Globals, timeSource);
             RegisterNatives();
         }
@@ -42,18 +41,18 @@ namespace InjectionScript.Runtime
         public MessageCollection Load(string content, string fileName)
         {
             var parser = new Parser();
-            CurrentFileSyntax = parser.ParseFile(content, out var errors);
-            CurrentFileName = fileName;
+            var syntax = parser.ParseFile(content, out var errors);
+            CurrentScript = new ScriptFile(fileName, content, syntax);
 
             Metadata.Reset();
             var collector = new DefinitionCollector(Metadata);
-            collector.Visit(CurrentFileSyntax);
+            collector.Visit(CurrentScript.Syntax);
 
             if (errors.Any())
                 return errors;
 
             var sanityAnalyzer = new SanityAnalyzer();
-            return sanityAnalyzer.Analyze(CurrentFileSyntax, Metadata);
+            return sanityAnalyzer.Analyze(CurrentScript.Syntax, Metadata);
         }
 
         public void Load(injectionParser.FileContext file)
