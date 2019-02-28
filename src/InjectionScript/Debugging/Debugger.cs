@@ -66,6 +66,7 @@ namespace InjectionScript.Debugging
         public void Continue()
         {
             currentContext = null;
+            breakNextStatement = false;
             continueEvent.Set();
         }
 
