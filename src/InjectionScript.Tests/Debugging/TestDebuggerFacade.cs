@@ -11,11 +11,13 @@ namespace InjectionScript.Tests.Debugging
 {
     internal sealed class TestDebuggerFacade
     {
-        private readonly DebuggerServer debuggerServer = new DebuggerServer();
+        private readonly DebuggerServer debuggerServer;
         private readonly ITracer tracer;
         private readonly InjectionRuntime runtime;
         private readonly AutoResetEvent breakHitEvent = new AutoResetEvent(false);
         private Task subrutineTask;
+
+        public CancellationTokenSource ScriptCancellation { get; private set; }
 
         public DebuggerBreak LastBreak { get; private set; }
 
@@ -26,7 +28,10 @@ namespace InjectionScript.Tests.Debugging
 
         public TestDebuggerFacade(ITimeSource timeSource)
         {
-            runtime = new InjectionRuntime(null, debuggerServer, timeSource);
+            ScriptCancellation = new CancellationTokenSource();
+            debuggerServer = new DebuggerServer(() => ScriptCancellation.Token);
+
+            runtime = new InjectionRuntime(null, debuggerServer, timeSource, () => ScriptCancellation.Token);
             tracer = debuggerServer;
             debuggerServer.DebuggerBreakHit += HandleDebuggerBreakHit;
         }
@@ -52,6 +57,7 @@ namespace InjectionScript.Tests.Debugging
                 Assert.Fail("No subrutine started.");
 
             subrutineTask.Wait(TimeSpan.FromSeconds(1)).Should().BeTrue("subrutine is expected to finish");
+            subrutineTask = null;
         }
 
         public void AddBreakpoint(int line) => debuggerServer.AddBreakpoint("test.sc", line);
@@ -62,6 +68,8 @@ namespace InjectionScript.Tests.Debugging
             if (subrutineTask != null)
                 Assert.Fail("Cannot run more subrutines in parallel.");
 
+            ScriptCancellation = new CancellationTokenSource();
+
             subrutineTask = Task.Run(() => runtime.CallSubrutine(name));
 
             return subrutineTask;
@@ -71,6 +79,7 @@ namespace InjectionScript.Tests.Debugging
 
         internal EvaluationResult EvaluateExpression(string expression)
         {
+            ScriptCancellation = new CancellationTokenSource();
             var result = debuggerServer.EvaluateExpression(expression);
 
             result.Result.HasValue.Should().BeTrue("evaluation is expected to succeed");

@@ -13,15 +13,17 @@ namespace InjectionScript.Debugging
     public class Debugger : IDebugger
     {
         private readonly DebuggerServer server;
+        private readonly Func<CancellationToken?> retrieveCancellationToken;
         private readonly AutoResetEvent continueEvent = new AutoResetEvent(false);
         private StatementExecutionContext currentContext;
         private bool traceEnabled = false;
         private readonly RingStringAppender traceBuffer = new RingStringAppender(1024, 1024);
         private bool breakNextStatement = false;
 
-        public Debugger(DebuggerServer server)
+        public Debugger(DebuggerServer server, Func<CancellationToken?> retrieveCancellationToken)
         {
             this.server = server;
+            this.retrieveCancellationToken = retrieveCancellationToken;
         }
 
         public void BeforeStatement(StatementExecutionContext context)
@@ -35,14 +37,27 @@ namespace InjectionScript.Debugging
             {
                 server.OnBreak(this, new BreakpointDebuggerBreak(breakpoint));
                 currentContext = context;
-                continueEvent.WaitOne();
+                WaitForContinue();
             }
             else if (breakNextStatement)
             {
                 breakNextStatement = false;
                 server.OnBreak(this, new StepDebuggerBreak(new SourceCodeLocation(context.File, context.Line)));
-                continueEvent.WaitOne();
+                WaitForContinue();
             }
+        }
+
+        private void WaitForContinue()
+        {
+            var cancellationToken = retrieveCancellationToken?.Invoke();
+            if (cancellationToken.HasValue)
+            {
+                WaitHandle.WaitAny(new WaitHandle[] { continueEvent, cancellationToken.Value.WaitHandle });
+            }
+            else
+                continueEvent.WaitOne();
+
+            server.OnDebuggerResumed();
         }
 
         public void BeforeVariableAssignment(VariableAssignmentContext context)
@@ -87,5 +102,6 @@ namespace InjectionScript.Debugging
         internal void DumpTrace(StringBuilder output) => traceBuffer.Dump(output);
         internal void DisableTracing() => traceEnabled = false;
         internal void EnableTracing() => traceEnabled = true;
+        public void ExecutionFailed(Exception ex) => server.OnDebuggerResumed();
     }
 }

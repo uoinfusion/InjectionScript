@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace InjectionScript.Runtime
 {
@@ -14,13 +15,15 @@ namespace InjectionScript.Runtime
         private readonly Metadata metadata;
         private readonly string currentFileName;
         private readonly IDebugger debugger;
+        private readonly Func<CancellationToken?> retrieveCancellationToken;
         private readonly SemanticScope semanticScope = new SemanticScope();
 
-        public Interpreter(Metadata metadata, string currentFileName, IDebugger debugger = null)
+        public Interpreter(Metadata metadata, string currentFileName, IDebugger debugger = null, Func<CancellationToken?> retrieveCancellationToken = null)
         {
             this.metadata = metadata;
             this.currentFileName = currentFileName;
             this.debugger = debugger;
+            this.retrieveCancellationToken = retrieveCancellationToken;
         }
 
         public InjectionValue CallSubrutine(injectionParser.SubrutineContext subrutine)
@@ -49,6 +52,8 @@ namespace InjectionScript.Runtime
                 {
                     var currentInstruction = subrutineDefinition.Instructions[instructionAddress];
                     var statement = currentInstruction.Statement;
+
+                    retrieveCancellationToken?.Invoke()?.ThrowIfCancellationRequested();
 
                     if (statement == null)
                     {
@@ -147,18 +152,22 @@ namespace InjectionScript.Runtime
                     }
                     catch (StatementFailedException ex)
                     {
+                        debugger?.ExecutionFailed(ex);
                         throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
                     }
-                    catch (ScriptFailedException)
+                    catch (ScriptFailedException ex)
                     {
+                        debugger?.ExecutionFailed(ex);
                         throw;
                     }
-                    catch (OperationCanceledException)
+                    catch (OperationCanceledException ex)
                     {
+                        debugger?.ExecutionFailed(ex);
                         throw;
                     }
                     catch (Exception ex)
                     {
+                        debugger?.ExecutionFailed(ex);
                         throw new ScriptFailedException(ex.Message, statement.Start.Line, ex);
                     }
                 }

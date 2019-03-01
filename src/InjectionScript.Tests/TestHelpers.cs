@@ -2,6 +2,9 @@
 using InjectionScript.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
 
 namespace InjectionScript.Tests
 {
@@ -94,6 +97,18 @@ namespace InjectionScript.Tests
 
             Assert.AreEqual(InjectionValueKind.String, actual.Kind, codeBlock);
             Assert.AreEqual(expected, actual.String, codeBlock);
+        }
+
+        public static Task<InjectionValue> RunSubrutine(string subrutineName, Func<CancellationToken?> retrieveCancellationToken, string file)
+        {
+            return Task.Run(() =>
+            {
+                var runtime = new InjectionRuntime(retrieveCancellationToken);
+                var parser = new Parser();
+                runtime.Load(parser.ParseFile(file, new FailTestErrorListener()));
+
+                return runtime.CallSubrutine(subrutineName);
+            });
         }
 
         public static void TestSubrutine(int expected, string subrutineName, string file)

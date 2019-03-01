@@ -17,24 +17,21 @@ namespace InjectionScript.Debugging
         private readonly List<Breakpoint> breakpoints = new List<Breakpoint>();
         private readonly Parser parser = new Parser();
         private readonly List<Debugger> debuggers = new List<Debugger>();
+        private readonly Func<CancellationToken?> retrieveCancellationToken;
         private bool tracingEnabled;
 
         public event EventHandler<DebuggerBreak> DebuggerBreakHit;
 
         public Breakpoint[] Breakpoints => breakpoints.ToArray();
 
+        public DebuggerServer(Func<CancellationToken?> retrieveCancellationToken)
+        {
+            this.retrieveCancellationToken = retrieveCancellationToken;
+        }
+
         public void Continue()
         {
             ActiveDebuggerExecute(dbg => dbg.Continue());
-
-            lock (activeDebuggerLock)
-            {
-                if (activeDebugger != null)
-                {
-                    activeDebugger.Continue();
-                    activeDebugger = null;
-                }
-            }
         }
 
         public void Step()
@@ -48,8 +45,14 @@ namespace InjectionScript.Debugging
             {
                 if (activeDebugger != null)
                 {
-                    action(activeDebugger);
-                    activeDebugger = null;
+                    try
+                    {
+                        action(activeDebugger);
+                    }
+                    finally
+                    {
+                        activeDebugger = null;
+                    }
                 }
             }
         }
@@ -78,6 +81,11 @@ namespace InjectionScript.Debugging
             }
 
             DebuggerBreakHit?.Invoke(this, debuggerBreak);
+        }
+
+        internal void OnCancelled()
+        {
+            activeDebugger = null;
         }
 
         public void AddBreakpoint(string fileName, int line)
@@ -111,9 +119,14 @@ namespace InjectionScript.Debugging
             }
         }
 
+        internal void OnDebuggerResumed()
+        {
+            activeDebugger = null;
+        }
+
         IDebugger IDebuggerServer.Create()
         {
-            var debugger = new Debugger(this);
+            var debugger = new Debugger(this, retrieveCancellationToken);
 
             debuggers.Add(debugger);
             if (tracingEnabled)

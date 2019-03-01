@@ -10,7 +10,10 @@ namespace InjectionScript.Runtime
 {
     public class InjectionRuntime
     {
-        private readonly ThreadLocal<Interpreter> interpreter;
+        ThreadLocal<Interpreter> interpreter;
+        private readonly IDebuggerServer debuggerServer;
+        private readonly ITimeSource timeSource;
+        private readonly Func<CancellationToken?> retrieveCancellationToken;
 
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter => interpreter.Value;
@@ -19,15 +22,22 @@ namespace InjectionScript.Runtime
         public InjectionApi Api { get; }
         public ScriptFile CurrentScript { get; private set; }
 
-        public InjectionRuntime() : this(null, new NullDebuggerServer(), new RealTimeSource())
+        public InjectionRuntime(Func<CancellationToken?> retrieveCancellationToken = null)
+            : this(null, new NullDebuggerServer(), new RealTimeSource(), retrieveCancellationToken)
         {
         }
 
-        public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer, ITimeSource timeSource)
+        public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer, ITimeSource timeSource, Func<CancellationToken?> retrieveCancellationToken)
         {
-            interpreter = new ThreadLocal<Interpreter>(() => new Interpreter(Metadata, CurrentScript.FileName, debuggerServer.Create()));
             Api = new InjectionApi(bridge, Metadata, Globals, timeSource);
             RegisterNatives();
+            this.debuggerServer = debuggerServer;
+            this.timeSource = timeSource;
+            this.retrieveCancellationToken = retrieveCancellationToken;
+
+            CurrentScript = new ScriptFile("<empty>", string.Empty, null);
+            interpreter = new ThreadLocal<Interpreter>(()
+                => new Interpreter(Metadata, CurrentScript.FileName, debuggerServer.Create(), retrieveCancellationToken));
         }
 
         private void RegisterNatives()
@@ -43,6 +53,8 @@ namespace InjectionScript.Runtime
             var parser = new Parser();
             var syntax = parser.ParseFile(content, out var errors);
             CurrentScript = new ScriptFile(fileName, content, syntax);
+            interpreter = new ThreadLocal<Interpreter>(() 
+                => new Interpreter(Metadata, CurrentScript.FileName, debuggerServer.Create(), retrieveCancellationToken));
 
             Metadata.Reset();
             var collector = new DefinitionCollector(Metadata);
@@ -57,6 +69,11 @@ namespace InjectionScript.Runtime
 
         public void Load(injectionParser.FileContext file)
         {
+            CurrentScript = new ScriptFile("<script>", file.GetText(), file);
+            interpreter = new ThreadLocal<Interpreter>(()
+                => new Interpreter(Metadata, CurrentScript.FileName, debuggerServer.Create(), retrieveCancellationToken));
+
+            Metadata.Reset();
             var collector = new DefinitionCollector(Metadata);
             collector.Visit(file);
         }
