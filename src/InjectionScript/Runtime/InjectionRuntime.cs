@@ -11,6 +11,7 @@ namespace InjectionScript.Runtime
     public class InjectionRuntime
     {
         ThreadLocal<Interpreter> interpreter;
+        private readonly IApiBridge bridge;
         private readonly IDebuggerServer debuggerServer;
         private readonly ITimeSource timeSource;
         private readonly Func<CancellationToken?> retrieveCancellationToken;
@@ -31,6 +32,7 @@ namespace InjectionScript.Runtime
         {
             Api = new InjectionApi(bridge, Metadata, Globals, timeSource);
             RegisterNatives();
+            this.bridge = bridge;
             this.debuggerServer = debuggerServer;
             this.timeSource = timeSource;
             this.retrieveCancellationToken = retrieveCancellationToken;
@@ -114,7 +116,12 @@ namespace InjectionScript.Runtime
             }
             else if (parts.Length == 2)
             {
-                CallNativeSubrutine(parts[0], new InjectionValue(parts[1].Trim('\'')));
+                if (parts[0].Equals("exec", StringComparison.OrdinalIgnoreCase))
+                {
+                    bridge.Exec(parts[1]);
+                }
+                else
+                    CallNativeSubrutine(parts[0], new InjectionValue(parts[1].Trim('\'')));
             }
             else
                 throw new NotImplementedException();

@@ -110,5 +110,7 @@
         void Snap(string name);
 
         void Error(string message);
+
+        void Exec(string subrutineName);
     }
 }
