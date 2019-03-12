@@ -532,7 +532,11 @@ namespace InjectionScript.Runtime
 
         public void LClick(int x, int y) => bridge.LClick(x, y);
         public void Press(int key) => KeyPress(key);
-        public void KeyPress(int key) => bridge.KeyPress(key);
+        public void KeyPress(int key)
+        {
+            bridge.KeyPress(key);
+            bridge.Wait(105);
+        }
 
         public void Say(string message) => bridge.Say(message);
 
