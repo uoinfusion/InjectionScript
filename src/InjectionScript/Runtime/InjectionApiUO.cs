@@ -185,11 +185,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<int, string>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<string, string>)Grab));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, string>)MoveItem));
-            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, int>)MoveItem));
-            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<int, int>)MoveItem));
-            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<string, string, string>)MoveItem));
-            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<int, int, int>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<InjectionValue, InjectionValue>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<InjectionValue, InjectionValue, InjectionValue>)MoveItem));
 
             metadata.Add(new NativeSubrutineDefinition("UO.SetReceivingContainer", (Action<int>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.SetReceivingContainer", (Action<string>)SetReceivingContainer));
@@ -509,12 +506,10 @@ namespace InjectionScript.Runtime
         public void Grab(string amount, string id) => Grab(NumberConversions.ToInt(amount), GetObject(id));
         public void Grab(int amount, int id) => bridge.Grab(amount, id);
 
-        public void MoveItem(int id, int amount) => MoveItem(id, amount, 0);
-        public void MoveItem(string id, int amount) => MoveItem(GetObject(id), amount, 0);
-        public void MoveItem(string id, string amount) => MoveItem(GetObject(id), NumberConversions.ToInt(amount), 0);
-        public void MoveItem(string id, string amount, string targetContainerId)
-            => MoveItem(GetObject(id), NumberConversions.ToInt(amount), GetObject(targetContainerId));
-        public void MoveItem(int id, int amount, int targetContainerId) => bridge.MoveItem(id, amount, targetContainerId);
+        public void MoveItem(InjectionValue id, InjectionValue amount)
+            => bridge.MoveItem(GetObject(id), NumberConversions.ToInt(amount), 0);
+        public void MoveItem(InjectionValue id, InjectionValue amount, InjectionValue targetContainer) 
+            => bridge.MoveItem(GetObject(id), NumberConversions.ToInt(amount), ConvertContainer(targetContainer));
 
         public string FindType(InjectionValue type)
             => FindType(NumberConversions.ToInt(type));
