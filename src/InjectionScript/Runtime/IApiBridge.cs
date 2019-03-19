@@ -85,7 +85,8 @@
         int ObjAtLayer(int layer);
         void WarMode(int mode);
         int WarMode();
-        void UseSkill(string skillName);
+        void UseSkill(int skillId);
+        int SkillVal(int skillId);
         void Cast(string spellName, int id);
         void Morph(int type);
         void Cast(string spellName);

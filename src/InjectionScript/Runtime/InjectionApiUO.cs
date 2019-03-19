@@ -234,6 +234,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WarMode", (Func<int>)WarMode));
 
             metadata.Add(new NativeSubrutineDefinition("UO.UseSkill", (Action<string>)UseSkill));
+            metadata.Add(new NativeSubrutineDefinition("UO.SkillVal", (Func<string, int>)SkillVal));
+
             metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<string>)Cast));
             metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<string, string>)Cast));
 
@@ -591,7 +593,24 @@ namespace InjectionScript.Runtime
         public void WarMode(int mode) => bridge.WarMode(mode);
         public int WarMode() => bridge.WarMode();
 
-        public void UseSkill(string skillName) => bridge.UseSkill(skillName);
+        public void UseSkill(string skillName)
+        {
+            var skillId = ConvertSkillName(skillName);
+            if (skillId.HasValue)
+                bridge.UseSkill(skillId.Value);
+            else
+                SystemMessage("Unknown action skill name");
+        }
+
+        public int SkillVal(string skillName)
+        {
+            var skillId = ConvertSkillName(skillName);
+            if (skillId.HasValue)
+                return bridge.SkillVal(skillId.Value);
+            else
+                return 0;
+        }
+
         public void Cast(string spellName) => bridge.Cast(spellName);
         public void Cast(string spellName, string id) => Cast(spellName, GetObject(id));
         public void Cast(string spellName, int id) => bridge.Cast(spellName, id);
@@ -647,5 +666,67 @@ namespace InjectionScript.Runtime
 
         private int ConvertLayer(string layer) => layerNameToNumber[layer];
         private string ConvertLayer(int layer) => layerNumberToName[layer];
+
+        private static readonly Dictionary<string, int> skillNameToSkillId = new Dictionary<string, int>()
+        {
+            { "Alchemy", 1 },
+            { "Anatomy", 2 },
+            { "Animal Lore", 3 },
+            { "Item ID", 4 },
+            { "Arms Lore", 5 },
+            { "Parrying", 6 },
+            { "Begging", 7 },
+            { "Blacksmithing", 8 },
+            { "Bowcraft", 9 },
+            { "Peacemaking", 10 },
+            { "Camping", 11 },
+            { "Carpentry", 12 },
+            { "Cartography", 13 },
+            { "Cooking", 14 },
+            { "Detect Hidden", 15 },
+            { "Enticement", 16 },
+            { "Evaluate Intelligence", 17 },
+            { "Healing", 18 },
+            { "Fishing", 19 },
+            { "Forensic Evaluation", 20 },
+            { "Herding", 21 },
+            { "Hiding", 22 },
+            { "Provocation", 23 },
+            { "Inscription", 24 },
+            { "Lockpicking", 25 },
+            { "Magery", 26 },
+            { "Magic Resistance", 27 },
+            { "Tactics", 28 },
+            { "Snooping", 29 },
+            { "Musicianship", 30 },
+            { "Poisoning", 31 },
+            { "Archery", 32 },
+            { "Spirit Speak", 33 },
+            { "Stealing", 34 },
+            { "Tailoring", 35 },
+            { "Animal Taming", 36 },
+            { "Taste Identification", 37 },
+            { "Tinkering", 38 },
+            { "Tracking", 39 },
+            { "Veterinary", 40 },
+            { "Swordsmanship", 41 },
+            { "Mace Fighting", 42 },
+            { "Fencing", 43 },
+            { "Wrestling", 44 },
+            { "Lumberjacking", 45 },
+            { "Mining", 46 },
+            { "Meditation", 47 },
+            { "Stealth", 48 },
+            { "Remove Trap", 49 },
+            { "Necromancy", 50 }
+        };
+
+        private int? ConvertSkillName(string skillName)
+        {
+            if (skillNameToSkillId.TryGetValue(skillName, out var skillId))
+                return skillId;
+
+            return null;
+        }
     }
 }
