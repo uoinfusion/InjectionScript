@@ -15,6 +15,7 @@ namespace InjectionScript.Runtime
         private readonly IDebuggerServer debuggerServer;
         private readonly ITimeSource timeSource;
         private readonly Func<CancellationToken?> retrieveCancellationToken;
+        private readonly Paths paths;
 
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter => interpreter.Value;
@@ -30,7 +31,9 @@ namespace InjectionScript.Runtime
 
         public InjectionRuntime(IApiBridge bridge, IDebuggerServer debuggerServer, ITimeSource timeSource, Func<CancellationToken?> retrieveCancellationToken)
         {
-            Api = new InjectionApi(bridge, Metadata, Globals, timeSource);
+            paths = new Paths(() => Path.GetDirectoryName(CurrentScript.FileName));
+
+            Api = new InjectionApi(bridge, Metadata, Globals, timeSource, paths);
             RegisterNatives();
             this.bridge = bridge;
             this.debuggerServer = debuggerServer;

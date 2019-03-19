@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace InjectionScript.Runtime
         private readonly Globals globals;
         private readonly Random random;
         private readonly ITimeSource timeSource;
+        private readonly Paths paths;
 
         private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
@@ -47,7 +49,7 @@ namespace InjectionScript.Runtime
                 layerNumberToName.Add(pair.Value, pair.Key);
         }
 
-        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource)
+        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths)
         {
             this.bridge = bridge;
             this.injectionApi = injectionApi;
@@ -55,6 +57,7 @@ namespace InjectionScript.Runtime
             Register(metadata);
             random = new Random();
             this.timeSource = timeSource;
+            this.paths = paths;
         }
 
         internal void Register(Metadata metadata)
@@ -198,6 +201,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Say", (Action<string>)Say));
 
             metadata.Add(new NativeSubrutineDefinition("UO.PlayWav", (Action<string>)PlayWav));
+            metadata.Add(new NativeSubrutineDefinition("UO.Launch", (Action<string>)Launch));
 
             metadata.Add(new NativeSubrutineDefinition("UO.TextOpen", (Action)TextOpen));
             metadata.Add(new NativeSubrutineDefinition("UO.TextPrint", (Action<string>)TextPrint));
@@ -543,6 +547,24 @@ namespace InjectionScript.Runtime
         public void Say(string message) => bridge.Say(message);
 
         public void PlayWav(string file) => bridge.PlayWav(file);
+
+        public void Launch(string fileName)
+        {
+            var info = new ProcessStartInfo(fileName)
+            {
+                WorkingDirectory = paths.ScriptPath,
+                UseShellExecute = true
+            };
+
+            try
+            {
+                Process.Start(info);
+            }
+            catch (Exception)
+            {
+                // just swallow it, Injection doesn't show any error message
+            }
+        }
 
         public void TextOpen() => bridge.TextOpen();
         public void TextPrint(string text) => bridge.TextPrint(text);

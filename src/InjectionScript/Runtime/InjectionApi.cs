@@ -13,10 +13,10 @@ namespace InjectionScript.Runtime
         private readonly Objects objects = new Objects();
         public InjectionApiUO UO { get; }
 
-        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource)
+        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths)
         {
             this.bridge = bridge;
-            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource);
+            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource, paths);
             Register(metadata);
             this.timeSource = timeSource;
         }
