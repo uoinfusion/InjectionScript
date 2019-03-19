@@ -265,6 +265,10 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<int>)SendGumpSelect));
             metadata.Add(new NativeSubrutineDefinition("UO.SendGumpSelect", (Action<string>)SendGumpSelect));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitMenu", (Action<string, string>)WaitMenu));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitMenu", (Action<string, string, string, string>)WaitMenu));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitMenu", (Action<string, string, string, string, string, string>)WaitMenu));
+
             metadata.Add(new NativeSubrutineDefinition("UO.SaveConfig", (Action)SaveConfig));
         }
 
@@ -273,6 +277,13 @@ namespace InjectionScript.Runtime
 
         public void SendGumpSelect(string triggerId) => SendGumpSelect(NumberConversions.ToInt(triggerId));
         public void SendGumpSelect(int triggerId) => bridge.SendGumpSelect(triggerId);
+
+        public void WaitMenu(string prompt, string choice)
+            => bridge.WaitMenu(prompt, choice);
+        public void WaitMenu(string prompt1, string choice1, string prompt2, string choice2)
+            => bridge.WaitMenu(prompt1, choice1, prompt2, choice2);
+        public void WaitMenu(string prompt1, string choice1, string prompt2, string choice2, string prompt3, string choice3)
+            => bridge.WaitMenu(prompt1, choice1, prompt2, choice2, prompt3, choice3);
 
         private int GetDirection(int currentX, int currentY, int targetX, int targetY)
         {
