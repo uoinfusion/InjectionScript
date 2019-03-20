@@ -78,7 +78,6 @@ END_SUB: [eE][nN][dD] WS* [sS][uU][bB];
 SUB: [sS][uU][bB];
 END_IF: [eE][nN][dD] WS* [iI][fF];
 IF: [iI][fF];
-END: [eE][nN][dD];
 ELSE: [eE][lL][sS][eE];
 THEN: [tT][hH][eE][nN];
 WHILE: [wW][hH][iI][lL][eE];

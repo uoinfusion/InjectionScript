@@ -64,6 +64,22 @@ return x
 end sub
 ");
         }
+
+        [TestMethod]
+        public void Label_can_have_end_name()
+        {
+            TestSubrutine(2, "sub1", @"sub sub1()
+var x = 1
+goto end
+x = x + 1
+
+end:
+x = x + 1
+
+return x
+end sub
+");
+        }
     }
 
 }
