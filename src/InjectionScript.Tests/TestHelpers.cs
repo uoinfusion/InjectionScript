@@ -131,16 +131,26 @@ namespace InjectionScript.Tests
 
         public static void AssertWarning(this MessageCollection collection, int line, string code)
         {
-            if (!collection.Any(x => x.Severity == MessageSeverity.Warning))
-                Assert.Fail("No warning found.");
+            AssertMessage(collection, MessageSeverity.Warning, "warning", line, code);
+        }
 
-            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.StartLine == line))
-                Assert.Fail($"No warning found on line {line}.");
+        public static void AssertError(this MessageCollection collection, int line, string code)
+        {
+            AssertMessage(collection, MessageSeverity.Error, "error", line, code);
+        }
 
-            if (!collection.Any(x => x.Severity == MessageSeverity.Warning && x.StartLine == line && x.IsCode(code)))
-                Assert.Fail($"No warning found on line {line} with code {code}.");
+        private static void AssertMessage(MessageCollection collection, MessageSeverity severity, string severityText, int line, string code)
+        {
+            if (!collection.Any(x => x.Severity == severity))
+                Assert.Fail($"No {severityText} found.");
 
-            Assert.IsTrue(collection.Any(m => m.Severity == MessageSeverity.Warning && m.StartLine == line && m.IsCode(code)));
+            if (!collection.Any(x => x.Severity == severity && x.StartLine == line))
+                Assert.Fail($"No {severityText} found on line {line}.");
+
+            if (!collection.Any(x => x.Severity == severity && x.StartLine == line && x.IsCode(code)))
+                Assert.Fail($"No {severityText} found on line {line} with code {code}.");
+
+            Assert.IsTrue(collection.Any(m => m.Severity == severity && m.StartLine == line && m.IsCode(code)));
         }
 
         public static void AssertNoWarning(this MessageCollection collection, int line, string code)

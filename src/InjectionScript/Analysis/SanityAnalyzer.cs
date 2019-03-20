@@ -22,6 +22,9 @@ namespace InjectionScript.Analysis
             var nativeSubrutineIncorrectArgumentsVisitor = new NativeSubrutineIncorrectArgumentsVisitor(messages);
             nativeSubrutineIncorrectArgumentsVisitor.Visit(fileContext);
 
+            var invalidBreakVisitor = new InvalidBreakVisitor(messages);
+            invalidBreakVisitor.Visit(fileContext);
+
             return new MessageCollection(messages);
         }
     }

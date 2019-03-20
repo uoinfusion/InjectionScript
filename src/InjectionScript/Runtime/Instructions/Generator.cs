@@ -11,6 +11,7 @@ namespace InjectionScript.Runtime.Instructions
 {
     public class Generator : injectionBaseVisitor<bool>
     {
+        private readonly Stack<List<JumpInstruction>> breakJumps = new Stack<List<JumpInstruction>>();
         private readonly List<Instruction> instructions = new List<Instruction>();
         private int currentAddress;
         private readonly MultiValueDictionary<string, GotoInstruction> gotos
@@ -35,6 +36,33 @@ namespace InjectionScript.Runtime.Instructions
             return true;
         }
 
+        private void AddBreakJump()
+        {
+            if (breakJumps.Any())
+            {
+                var breakJump = new JumpInstruction();
+                AddInstruction(breakJump);
+                var currentScopeJumpList = breakJumps.Peek();
+
+                currentScopeJumpList.Add(breakJump);
+            }
+        }
+
+        private void StartBreakScope()
+        {
+            breakJumps.Push(new List<JumpInstruction>());
+        }
+
+        private void EndBreakScope()
+        {
+            var currentScopeBreakJumps = breakJumps.Pop();
+
+            foreach (var jump in currentScopeBreakJumps)
+            {
+                jump.TargetAddress = currentAddress;
+            }
+        }
+
         public override bool VisitStatement([NotNull] injectionParser.StatementContext context)
         {
             if (context.@goto() != null)
@@ -45,6 +73,18 @@ namespace InjectionScript.Runtime.Instructions
                 Generate(context.@if());
             else if (context.@while() != null)
                 Generate(context.@while());
+            else if (context.@break() != null)
+                AddBreakJump();
+            else if (context.repeat() != null)
+            {
+                StartBreakScope();
+                AddInstruction(new GenericStatementInstruction(context));
+            }
+            else if (context.until() != null)
+            {
+                AddInstruction(new GenericStatementInstruction(context));
+                EndBreakScope();
+            }
             else
                 AddInstruction(new GenericStatementInstruction(context));
 
@@ -53,6 +93,7 @@ namespace InjectionScript.Runtime.Instructions
 
         private void Generate(injectionParser.WhileContext whileContext)
         {
+            StartBreakScope();
             var whileInstruction = new WhileInstruction(whileContext);
             int whileAddress = currentAddress;
             AddInstruction(whileInstruction);
@@ -60,11 +101,14 @@ namespace InjectionScript.Runtime.Instructions
             var statements = whileContext.codeBlock()?.statement()
                 ?? Enumerable.Empty<injectionParser.StatementContext>();
             foreach (var statement in statements)
+            {
                 VisitStatement(statement);
+            }
 
             AddInstruction(new JumpInstruction(whileAddress));
 
             whileInstruction.WendAddress = currentAddress;
+            EndBreakScope();
         }
 
         private void Generate(injectionParser.LabelContext context)

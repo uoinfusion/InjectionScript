@@ -10,7 +10,7 @@ subrutineName: SYMBOL;
 parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+?;
-statement: label | if | while | wend | repeat | until | var | dim | assignStatement
+statement: label | if | while | wend | break | repeat | until | var | dim | assignStatement
     | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif | incompleteWhile
     | emptyLine;
 
@@ -20,6 +20,7 @@ else: ELSE NEWLINE codeBlock?;
 while: WHILE expression NEWLINE codeBlock? WEND NEWLINE;
 incompleteWhile: WHILE expression NEWLINE;
 wend: WEND NEWLINE;
+break: BREAK;
 repeat: REPEAT NEWLINE;
 until: UNTIL expression NEWLINE;
 for: FOR (assignment | forVarDef) TO expression step? NEWLINE;
@@ -82,6 +83,7 @@ ELSE: [eE][lL][sS][eE];
 THEN: [tT][hH][eE][nN];
 WHILE: [wW][hH][iI][lL][eE];
 WEND: [wW][eE][nN][dD];
+BREAK: [bB][rR][eE][aA][kK];
 REPEAT: [rR][eE][pP][eE][aA][tT];
 UNTIL: [uU][nN][tT][iI][lL];
 VAR: [vV][aA][rR];
