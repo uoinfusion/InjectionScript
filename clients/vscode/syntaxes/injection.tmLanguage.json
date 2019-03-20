@@ -21,7 +21,7 @@
 			[
 				{
 					"name": "keyword.control.injection",
-					"match": "\\b(?i:if|else|then|while|for|next|to|step|return|repeat|until|wend|sub|end sub|endsub|end if|endif|dim|var|goto)\\b"
+					"match": "\\b(?i:if|else|then|while|for|next|to|step|return|repeat|until|wend|break|sub|end sub|endsub|end if|endif|dim|var|goto)\\b"
 				},
 				{
 					"name": "keyword.operator.new.scp99",
