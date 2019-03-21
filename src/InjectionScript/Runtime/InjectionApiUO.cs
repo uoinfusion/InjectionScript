@@ -636,17 +636,27 @@ namespace InjectionScript.Runtime
 
         public void UseSkill(string skillName)
         {
+            UseSkillCore(skillName);
+        }
+
+        private bool UseSkillCore(string skillName)
+        {
             var skillId = ConvertSkillName(skillName);
-            if (skillId.HasValue)
-                bridge.UseSkill(skillId.Value);
-            else
+            if (!skillId.HasValue)
+            {
                 SystemMessage("Unknown action skill name");
+                return false;
+            }
+
+            bridge.UseSkill(skillId.Value);
+
+            return true;
         }
 
         public void UseSkill(InjectionValue skillName, InjectionValue target)
         {
-            UseSkill((string)skillName);
-            WaitTargetObject(GetObject(target));
+            if (UseSkillCore((string)skillName))
+                WaitTargetObject(GetObject(target));
         }
 
         public int SkillVal(string skillName)
@@ -660,19 +670,26 @@ namespace InjectionScript.Runtime
 
         public void Cast(string spellName)
         {
+            CastCore(spellName);
+        }
+
+        private bool CastCore(string spellName)
+        {
             var spellId = ConvertSpellName(spellName);
             if (!spellId.HasValue)
             {
                 SystemMessage("Unknown spell name");
-                return;
+                return false;
             }
             bridge.Cast(spellId.Value);
+
+            return true;
         }
 
         public void Cast(InjectionValue spellName, InjectionValue target)
         {
-            Cast((string)spellName);
-            WaitTargetObject(GetObject(target));
+            if (CastCore((string)spellName))
+                WaitTargetObject(GetObject(target));
         }
 
         public void Morph(string type) => Morph(NumberConversions.ToInt(type));
