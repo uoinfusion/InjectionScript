@@ -8,7 +8,7 @@ using Antlr4.Runtime;
 
 namespace InjectionScript.Analysis
 {
-    internal sealed class UnknownSymbolVisitor : injectionBaseVisitor<bool>
+    internal sealed class InvalidSymbolVisitor : injectionBaseVisitor<bool>
     {
         private readonly List<Message> messages;
         private readonly Metadata metadata;
@@ -17,7 +17,7 @@ namespace InjectionScript.Analysis
         private readonly List<injectionParser.GotoContext> referencedLabels 
             = new List<injectionParser.GotoContext>();
 
-        public UnknownSymbolVisitor(List<Message> messages, Metadata metadata)
+        public InvalidSymbolVisitor(List<Message> messages, Metadata metadata)
         {
             this.messages = messages;
             this.metadata = metadata;
@@ -124,6 +124,13 @@ namespace InjectionScript.Analysis
         public override bool VisitGoto([NotNull] injectionParser.GotoContext context)
         {
             referencedLabels.Add(context);
+
+            if (!string.IsNullOrEmpty(context.invalid?.Text))
+            {
+                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                    MessageSeverity.Warning, MessageCodes.InvalidLabelName,
+                    $"Lable name '{context.SYMBOL().GetText()}' is followed by invalid characters {context.invalid?.Text}. Remove them, they are ignored by Injection and may confuse reader."));
+            }
 
             return base.VisitGoto(context);
         }

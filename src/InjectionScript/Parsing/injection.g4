@@ -31,7 +31,7 @@ assignStatement: assignment NEWLINE;
 callStatement: call NEWLINE;
 emptyStatement: NEWLINE;
 returnStatement: RETURN expression? NEWLINE;
-goto: GOTO SYMBOL NEWLINE;
+goto: GOTO SYMBOL invalid=~(NEWLINE)* NEWLINE;
 label: SYMBOL ':' NEWLINE;
 
 var: VAR varDef (',' varDef)* (NEWLINE | EOF);

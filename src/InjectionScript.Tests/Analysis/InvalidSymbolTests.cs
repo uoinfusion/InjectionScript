@@ -7,7 +7,7 @@ using static InjectionScript.Tests.TestHelpers;
 namespace InjectionScript.Tests.Analysis
 {
     [TestClass]
-    public class UnknownSymbolTests
+    public class InvalidSymbolTests
     {
         [TestMethod]
         public void Warning_when_a_subrutine_not_defined()
@@ -324,6 +324,19 @@ undefinedlabel:
 end sub");
 
             messages.AssertNoWarning(4, MessageCodes.UndefinedLabel);
+        }
+
+        [TestMethod]
+        public void Warning_for_label_name_followed_by_invalid_chars()
+        {
+            var messages = Parse(@"
+sub test()
+validLabel:
+    goto validLabel:+-23545:
+    return
+end sub");
+
+            messages.AssertWarning(4, MessageCodes.InvalidLabelName);
         }
     }
 }

@@ -13,8 +13,8 @@ namespace InjectionScript.Analysis
             var extraneousEndifVisitor = new MisplacedStatementsVisitor(messages);
             extraneousEndifVisitor.Visit(fileContext);
 
-            var unknownSymbolVisitor = new UnknownSymbolVisitor(messages, metadata);
-            unknownSymbolVisitor.Visit(fileContext);
+            var invalidSymbolVisitor = new InvalidSymbolVisitor(messages, metadata);
+            invalidSymbolVisitor.Visit(fileContext);
 
             var subrutineDefinitionsVisitor = new SubrutineDefinitionsVisitor(messages);
             subrutineDefinitionsVisitor.Visit(fileContext);
