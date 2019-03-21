@@ -51,5 +51,33 @@ end sub");
             messages.AssertWarning(3, MessageCodes.IncompleteWhile);
             messages.AssertWarning(5, MessageCodes.MisplacedWend);
         }
+
+        [TestMethod]
+        public void Orphaned_else_emits_warning()
+        {
+            var messages = Parse(@"
+sub test()
+    else
+        return 1
+    endif
+end sub");
+
+            messages.AssertWarning(3, MessageCodes.OrphanedElse);
+        }
+
+        [TestMethod]
+        public void Valid_else_without_warning()
+        {
+            var messages = Parse(@"
+sub test()
+    if 0 then
+        return 1
+    else
+        return 2
+    endif
+end sub");
+
+            messages.AssertNoWarning(4, MessageCodes.OrphanedElse);
+        }
     }
 }

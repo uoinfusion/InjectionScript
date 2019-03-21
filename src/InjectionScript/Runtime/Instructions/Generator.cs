@@ -137,11 +137,11 @@ namespace InjectionScript.Runtime.Instructions
                     VisitStatement(statement);
             }
 
-            if (ifContext.@else()?.codeBlock()?.statement() != null)
+            if (ifContext.@else()?.FirstOrDefault()?.codeBlock()?.statement() != null)
             {
                 AddInstruction(endIfJump);
                 ifInstruction.ElseAddress = currentAddress;
-                foreach (var statement in ifContext.@else().codeBlock().statement())
+                foreach (var statement in ifContext.@else()?.FirstOrDefault()?.codeBlock().statement())
                     VisitStatement(statement);
             }
 

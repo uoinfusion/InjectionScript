@@ -39,6 +39,14 @@ namespace InjectionScript.Analysis
 
             return true;
         }
-    }
 
+        public override bool VisitOrphanedElse([NotNull] injectionParser.OrphanedElseContext context)
+        {
+            messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                MessageSeverity.Warning, MessageCodes.OrphanedElse,
+                "This 'else' block doesn't belong to any 'if' and is never executed."));
+
+            return true;
+        }
+    }
 }

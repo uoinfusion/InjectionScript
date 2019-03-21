@@ -11,12 +11,14 @@ parameters:  parameterName (',' parameterName)*;
 parameterName: SYMBOL;
 codeBlock: statement+?;
 statement: label | if | while | wend | break | repeat | until | var | dim | assignStatement
-    | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif | incompleteWhile
+    | callStatement | emptyStatement | returnStatement | for | next | goto | missplacedEndif
+	| orphanedElse | incompleteWhile
     | emptyLine;
 
-if: IF expression THEN NEWLINE codeBlock? else? END_IF (NEWLINE | EOF);
+if: IF expression THEN NEWLINE codeBlock? else* END_IF (NEWLINE | EOF);
 missplacedEndif: END_IF;
 else: ELSE NEWLINE codeBlock?;
+orphanedElse: ELSE codeBlock? END_IF (NEWLINE | EOF);
 while: WHILE expression NEWLINE codeBlock? WEND NEWLINE;
 incompleteWhile: WHILE expression NEWLINE;
 wend: WEND NEWLINE;

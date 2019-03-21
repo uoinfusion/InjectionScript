@@ -53,6 +53,17 @@ return 1");
         }
 
         [TestMethod]
+        public void If_trivial_false_condition_else_and_with_empty_then()
+        {
+            TestSubrutine(123, @"if 0 then
+else
+    return 123
+endif
+
+return 1");
+        }
+
+        [TestMethod]
         public void If_trivial_true_condition_with_else()
         {
             TestSubrutine(3, @"var i = 0
@@ -165,6 +176,29 @@ return i");
     return 2
 else
     return 3
+endif
+
+return 1");
+        }
+
+        [TestMethod]
+        public void Orphaned_else_is_not_executed()
+        {
+            TestSubrutine(1, @"else
+    return 666
+endif
+
+return 1");
+        }
+
+        [TestMethod]
+        public void Orphaned_else_after_valid_else_is_not_executed()
+        {
+            TestSubrutine(1, @"if 0 then
+else
+    return 1
+else
+    return 666
 endif
 
 return 1");

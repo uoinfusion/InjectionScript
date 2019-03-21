@@ -19,6 +19,7 @@ namespace InjectionScript
         public static string UndefinedLabel => "SC009";
         public static string InvalidBreak => "SC010";
         public static string InvalidLabelName => "SC011";
+        public static string OrphanedElse => "SC012";
 
         public static string DebuggerNotAttached => "DBG001";
     }
