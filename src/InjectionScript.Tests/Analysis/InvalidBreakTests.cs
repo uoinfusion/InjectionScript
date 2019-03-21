@@ -49,5 +49,20 @@ end sub");
 
             messages.AssertWarning(4, MessageCodes.InvalidBreak);
         }
+
+        [TestMethod]
+        public void Break_inside_while_nested_in_if_no_warning()
+        {
+            var messages = Parse(@"
+sub test()
+    if 1 then
+        while 1
+            break
+        wend
+    endif
+end sub");
+
+            messages.AssertNoWarning(5, MessageCodes.InvalidBreak);
+        }
     }
 }

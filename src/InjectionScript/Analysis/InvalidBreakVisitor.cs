@@ -38,23 +38,30 @@ namespace InjectionScript.Analysis
 
         private void StartValidContext()
         {
-            breakScopeValidity.Push(null);
+            StartContext(null);
         }
 
         private void EndContext()
         {
-            breakScopeValidity.Pop();
+            if (breakScopeValidity.Any())
+                breakScopeValidity.Pop();
         }
 
         public override bool VisitSubrutine([NotNull] injectionParser.SubrutineContext context)
         {
-            if (context.codeBlock() == null)
-                return false;
-
             ResetContext();
             StartValidContext();
 
-            foreach (var statement in context.codeBlock().statement())
+            base.VisitSubrutine(context);
+
+            EndContext();
+
+            return true;
+        }
+
+        public override bool VisitCodeBlock([NotNull] injectionParser.CodeBlockContext context)
+        {
+            foreach (var statement in context.statement())
             {
                 if (statement.@for() != null)
                     StartContext(MessageSeverity.Error);
@@ -67,8 +74,6 @@ namespace InjectionScript.Analysis
                 else
                     Visit(statement);
             }
-
-            EndContext();
 
             return true;
         }
