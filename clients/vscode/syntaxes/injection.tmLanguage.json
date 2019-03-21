@@ -9,7 +9,10 @@
 			"include": "#subrutines"
 		},
 		{
-			"include": "#strings"
+			"include": "#string1"
+		},
+		{
+			"include": "#string2"
 		},
 		{
 			"include": "#comments"
@@ -54,16 +57,17 @@
 				}
 			]
 		},
-		"strings": {
+		"string1": {
 			"name": "string.quoted.double.injection",
-			"begin": "(\"|')",
-			"end": "(\"|')",
-			"patterns": [
-				{
-					"name": "constant.character.escape.injection",
-					"match": "\\\\."
-				}
-			]
+			"begin": "(\")",
+			"end": "(\")",
+			"patterns": [ ]
+		},
+		"string2": {
+			"name": "string.quoted.double.injection",
+			"begin": "(')",
+			"end": "(')",
+			"patterns": [ ]
 		},
 		"comments": {
 			"patterns": [{
