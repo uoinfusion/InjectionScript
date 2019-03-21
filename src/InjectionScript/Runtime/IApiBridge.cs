@@ -87,9 +87,8 @@
         int WarMode();
         void UseSkill(int skillId);
         int SkillVal(int skillId);
-        void Cast(string spellName, int id);
         void Morph(int type);
-        void Cast(string spellName);
+        void Cast(int spellId);
 
         int FindCount();
         int FindType(int type, int color, int containerId, int range);

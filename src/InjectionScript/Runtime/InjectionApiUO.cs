@@ -243,7 +243,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.SkillVal", (Func<string, int>)SkillVal));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<string>)Cast));
-            metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<string, string>)Cast));
+            metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<InjectionValue, InjectionValue>)Cast));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Morph", (Action<string>)Morph));
             metadata.Add(new NativeSubrutineDefinition("UO.Morph", (Action<int>)Morph));
@@ -658,9 +658,22 @@ namespace InjectionScript.Runtime
                 return 0;
         }
 
-        public void Cast(string spellName) => bridge.Cast(spellName);
-        public void Cast(string spellName, string id) => Cast(spellName, GetObject(id));
-        public void Cast(string spellName, int id) => bridge.Cast(spellName, id);
+        public void Cast(string spellName)
+        {
+            var spellId = ConvertSpellName(spellName);
+            if (!spellId.HasValue)
+            {
+                SystemMessage("Unknown spell name");
+                return;
+            }
+            bridge.Cast(spellId.Value);
+        }
+
+        public void Cast(InjectionValue spellName, InjectionValue target)
+        {
+            Cast((string)spellName);
+            WaitTargetObject(GetObject(target));
+        }
 
         public void Morph(string type) => Morph(NumberConversions.ToInt(type));
         public void Morph(int type) => bridge.Morph(type);
@@ -713,6 +726,82 @@ namespace InjectionScript.Runtime
 
         private int ConvertLayer(string layer) => layerNameToNumber[layer];
         private string ConvertLayer(int layer) => layerNumberToName[layer];
+
+        private static readonly Dictionary<string, int> spellNameToSpellId = new Dictionary<string, int>()
+        {
+            {"Clumsy", 1},
+            {"Create Food", 2},
+            {"Feeblemind", 3},
+            {"Heal", 4},
+            {"Magic Arrow", 5},
+            {"Night Sight", 6},
+            {"Reactive Armor", 7},
+            {"Weaken", 8},
+            {"Agility", 9},
+            {"Cunning", 10},
+            {"Cure", 11},
+            {"Harm", 12},
+            {"Magic Trap", 13},
+            {"Magic Untrap", 14},
+            {"Protection", 15},
+            {"Strength", 16},
+            {"Bless", 17},
+            {"Fireball", 18},
+            {"Magic Lock", 19},
+            {"Poison", 20},
+            {"Telekenisis", 21},
+            {"Teleport", 22},
+            {"Unlock", 23},
+            {"Wall of Stone", 24},
+            {"Arch Cure", 25},
+            {"Arch Protection", 26},
+            {"Curse", 27},
+            {"Fire Field", 28},
+            {"Greater Heal", 29},
+            {"Lightning", 30},
+            {"Mana Drain", 31},
+            {"Recall", 32},
+            {"Blade Spirits", 33},
+            {"Dispel Field", 34},
+            {"Incognito", 35},
+            {"Reflection", 36},
+            {"Mind Blast", 37},
+            {"Paralyze", 38},
+            {"Poison Field", 39},
+            {"Summon Creature", 40},
+            {"Dispel", 41},
+            {"Energy Bolt", 42},
+            {"Explosion", 43},
+            {"Invisibility", 44},
+            {"Mark", 45},
+            {"Mass Curse", 46},
+            {"Paralyze Field", 47},
+            {"Reveal", 48},
+            {"Chain Lightning", 49},
+            {"Energy Field", 50},
+            {"Flame Strike", 51},
+            {"Gate", 52},
+            {"Mana Vampire", 53},
+            {"Mass Dispel", 54},
+            {"Meteor Swarm", 55},
+            {"Polymorph", 56},
+            {"Earthquake", 57},
+            {"Energy Vortex", 58},
+            {"Resurrection", 59},
+            {"Air Elemental", 60},
+            {"Summon Daemon", 61},
+            {"Earth Elemental", 62},
+            {"Fire Elemental", 63},
+            {"Water Elemental", 64}
+        };
+
+        private int? ConvertSpellName(string spellName)
+        {
+            if (spellNameToSpellId.TryGetValue(spellName, out var spellId))
+                return spellId;
+
+            return null;
+        }
 
         private static readonly Dictionary<string, int> skillNameToSkillId = new Dictionary<string, int>()
         {
