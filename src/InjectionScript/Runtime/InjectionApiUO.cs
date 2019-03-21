@@ -239,6 +239,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WarMode", (Func<int>)WarMode));
 
             metadata.Add(new NativeSubrutineDefinition("UO.UseSkill", (Action<string>)UseSkill));
+            metadata.Add(new NativeSubrutineDefinition("UO.UseSkill", (Action<InjectionValue, InjectionValue>)UseSkill));
             metadata.Add(new NativeSubrutineDefinition("UO.SkillVal", (Func<string, int>)SkillVal));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Cast", (Action<string>)Cast));
@@ -640,6 +641,12 @@ namespace InjectionScript.Runtime
                 bridge.UseSkill(skillId.Value);
             else
                 SystemMessage("Unknown action skill name");
+        }
+
+        public void UseSkill(InjectionValue skillName, InjectionValue target)
+        {
+            UseSkill((string)skillName);
+            WaitTargetObject(GetObject(target));
         }
 
         public int SkillVal(string skillName)
