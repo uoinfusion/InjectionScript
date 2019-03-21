@@ -194,7 +194,11 @@ namespace InjectionScript.Runtime
             
             metadata.Add(new NativeSubrutineDefinition("UO.LClick", (Action<int, int>)LClick));
             metadata.Add(new NativeSubrutineDefinition("UO.KeyPress", (Action<int>)KeyPress));
+            metadata.Add(new NativeSubrutineDefinition("UO.KeyPress", (Action<int, int>)KeyPress));
+            metadata.Add(new NativeSubrutineDefinition("UO.KeyPress", (Action<int, int, int>)KeyPress));
             metadata.Add(new NativeSubrutineDefinition("UO.Press", (Action<int>)Press));
+            metadata.Add(new NativeSubrutineDefinition("UO.Press", (Action<int, int>)Press));
+            metadata.Add(new NativeSubrutineDefinition("UO.Press", (Action<int, int, int>)Press));
             metadata.Add(new NativeSubrutineDefinition("UO.Say", (Action<string>)Say));
 
             metadata.Add(new NativeSubrutineDefinition("UO.PlayWav", (Action<string>)PlayWav));
@@ -544,10 +548,18 @@ namespace InjectionScript.Runtime
 
         public void LClick(int x, int y) => bridge.LClick(x, y);
         public void Press(int key) => KeyPress(key);
-        public void KeyPress(int key)
+        public void Press(int key, int count) => KeyPress(key, count);
+        public void Press(int key, int count, int delay) => KeyPress(key, count, delay);
+        public void KeyPress(int key) => KeyPress(key, 1);
+        public void KeyPress(int key, int count) => KeyPress(key, count, 105);
+        public void KeyPress(int key, int count, int delay)
         {
-            bridge.KeyPress(key);
-            bridge.Wait(105);
+            while (count > 0)
+            {
+                bridge.KeyPress(key);
+                bridge.Wait(delay);
+                count--;
+            }
         }
 
         public void Say(string message) => bridge.Say(message);
