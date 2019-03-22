@@ -185,6 +185,9 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetTile", (Action<InjectionValue, InjectionValue, InjectionValue, InjectionValue>)WaitTargetTile));
             metadata.Add(new NativeSubrutineDefinition("UO.Targeting", (Func<int>)IsTargeting));
 
+            metadata.Add(new NativeSubrutineDefinition("UO.LastTile", (Func<string>)LastTile));
+            metadata.Add(new NativeSubrutineDefinition("UO.LastTile", (Func<InjectionValue, int>)LastTile));
+
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<int, int>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<int, string>)Grab));
             metadata.Add(new NativeSubrutineDefinition("UO.Grab", (Action<string, string>)Grab));
@@ -542,6 +545,23 @@ namespace InjectionScript.Runtime
         public void WaitTargetTile(InjectionValue type, InjectionValue x, InjectionValue y, InjectionValue z)
             => bridge.WaitTargetTile(NumberConversions.ToInt(type), NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
         public int IsTargeting() => bridge.IsTargeting();
+
+        public string LastTile()
+        {
+            var tileInfo = bridge.LastTile() ?? new[] { 0, 0, 0, 0 };
+
+            return $"{tileInfo[0]} {tileInfo[1]} {tileInfo[2]} {tileInfo[3]}";
+        }
+
+        public int LastTile(InjectionValue index)
+        {
+            var i = NumberConversions.ToInt(index);
+            if (i < 0 || i > 3)
+                return 0;
+
+            return bridge?.LastTile()[i] ?? 0;
+
+        }
 
         public void SetReceivingContainer(string id) => SetReceivingContainer(GetObject(id));
         public void SetReceivingContainer(int id) => bridge.SetReceivingContainer(id);

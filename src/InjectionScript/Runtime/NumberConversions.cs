@@ -28,6 +28,10 @@ namespace InjectionScript.Runtime
                     return value.Integer;
                 case InjectionValueKind.String:
                     return ToInt(value.String);
+                case InjectionValueKind.Array:
+                    return 0;
+                case InjectionValueKind.Decimal:
+                    return (int)value.Decimal;
                 default:
                     throw new NotImplementedException($"InjectionValueKind {value.Kind}");
             }
