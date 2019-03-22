@@ -217,7 +217,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.Msg", (Action<string>)Msg));
             metadata.Add(new NativeSubrutineDefinition("UO.ServerPrint", (Action<string>)ServerPrint));
-            metadata.Add(new NativeSubrutineDefinition("UO.Print", (Action<string>)Print));
+            metadata.Add(new NativeSubrutineDefinition("UO.Print", (Action<InjectionValue>)Print));
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<int, string>)CharPrint));
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<string, string>)CharPrint));
             metadata.Add(new NativeSubrutineDefinition("UO.CharPrint", (Action<int, int, string>)CharPrint));
@@ -655,7 +655,12 @@ namespace InjectionScript.Runtime
         public void ServerPrint(string message) => bridge.ServerPrint(message);
 
         public void SystemMessage(string msg) => bridge.Print(msg);
-        public void Print(string msg) => bridge.Print(msg);
+        public void Print(InjectionValue msg)
+        {
+            if (msg.Kind == InjectionValueKind.String)
+                bridge.Print(msg.String);
+        }
+
         public void CharPrint(int color, string msg) => CharPrint(bridge.Self, color, msg);
         public void CharPrint(string color, string msg) => CharPrint(bridge.Self, NumberConversions.ToInt(color), msg);
         public void CharPrint(int id, int color, string msg) => bridge.CharPrint(id, color, msg);
@@ -778,7 +783,7 @@ namespace InjectionScript.Runtime
 
         public int Random(int max) => random.Next(max);
 
-        public void SaveConfig() => Print("SaveConfig is not implemented yet.");
+        public void SaveConfig() => SystemMessage("SaveConfig is not implemented yet.");
 
         private int ConvertContainer(InjectionValue containerId)
         {
