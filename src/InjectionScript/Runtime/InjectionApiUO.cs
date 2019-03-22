@@ -125,6 +125,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.GetQuantity", (Func<int, int>)GetQuantity));
             metadata.Add(new NativeSubrutineDefinition("UO.IsOnline", (Func<int>)IsOnline));
             metadata.Add(new NativeSubrutineDefinition("UO.Dead", (Func<int>)Dead));
+            metadata.Add(new NativeSubrutineDefinition("UO.Dead", (Func<InjectionValue, int>)Dead));
             metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<int>)Hidden));
             metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<string, int>)Hidden));
 
@@ -155,8 +156,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Ignore", (Action<int>)Ignore));
             metadata.Add(new NativeSubrutineDefinition("UO.Ignore", (Action<string>)Ignore));
             metadata.Add(new NativeSubrutineDefinition("UO.IgnoreReset", (Action)IgnoreReset));
-            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<string, int>)Count));
-            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<int, int>)Count));
+            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, int>)Count));
+            metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, InjectionValue, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, InjectionValue, InjectionValue, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<string>)Click));
             metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<int>)Click));
@@ -447,6 +448,13 @@ namespace InjectionScript.Runtime
         public string GetSerial(string id) => NumberConversions.ToHex(GetObject(id));
         public int IsOnline() => bridge.IsOnline();
         public int Dead() => bridge.Dead();
+        public int Dead(InjectionValue id)
+        {
+            if (id.Kind == InjectionValueKind.String && id.String.Equals("self", StringComparison.OrdinalIgnoreCase))
+                return Dead();
+
+            return 0;
+        }
         public int Hidden() => Hidden("self");
         public int Hidden(string idText) => Hidden(GetObject(idText));
         public int Hidden(int id) => bridge.Hidden(id);
@@ -568,11 +576,14 @@ namespace InjectionScript.Runtime
             => NumberConversions.ToHex(bridge.FindType(type, color, containerId, range));
 
         public int FindCount() => bridge.FindCount();
-        public int Count(string type) => bridge.Count(NumberConversions.ToInt(type), -1, -1);
-        public int Count(int type) => bridge.Count(type, -1, -1);
-        public int Count(int type, int color) => bridge.Count(type, color, 01);
-        public int Count(InjectionValue type, InjectionValue color, InjectionValue container) => 
-            bridge.Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
+        public int Count(InjectionValue type) 
+            => Count(NumberConversions.ToInt(type), -1, -1);
+        public int Count(InjectionValue type, InjectionValue color) 
+            => Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), 0);
+        public int Count(InjectionValue type, InjectionValue color, InjectionValue container)
+            => Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
+        public int Count(int type, int color, int container)
+            => bridge.Count(type, color, container);
 
         public void Ignore(string id) => Ignore(GetObject(id));
         public void Ignore(int id) => bridge.Ignore(id);
