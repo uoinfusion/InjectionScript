@@ -10,7 +10,6 @@ namespace InjectionScript.Runtime
     {
         private readonly IApiBridge bridge;
         private readonly ITimeSource timeSource;
-        private readonly Objects objects = new Objects();
         public InjectionApiUO UO { get; }
 
         public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths)
@@ -42,35 +41,6 @@ namespace InjectionScript.Runtime
         }
 
         public int Now() => (int)timeSource.SinceStart.TotalMilliseconds;
-
-        public int GetObject(string id)
-        {
-            if (id.Equals("finditem", StringComparison.OrdinalIgnoreCase))
-                return bridge.FindItem;
-            if (id.Equals("self", StringComparison.OrdinalIgnoreCase))
-                return bridge.Self;
-            if (id.Equals("lastcorpse", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastCorpse;
-            if (id.Equals("lasttarget", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastTarget;
-            if (id.Equals("laststatus", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastStatus;
-            if (id.Equals("backpack", StringComparison.OrdinalIgnoreCase))
-                return bridge.Backpack;
-
-            if (objects.TryGet(id, out var value))
-                return value;
-
-            if (NumberConversions.TryStr2Int(id, out value))
-                return value;
-
-            return 0;
-        }
-
-        public void SetObject(string name, int value)
-        {
-            objects.Set(name, value);
-        }
 
         public void Wait(int ms) => bridge.Wait(ms);
     }

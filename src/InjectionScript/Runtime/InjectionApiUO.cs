@@ -15,6 +15,7 @@ namespace InjectionScript.Runtime
         private readonly Random random;
         private readonly ITimeSource timeSource;
         private readonly Paths paths;
+        private readonly Objects objects = new Objects();
 
         private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
@@ -128,6 +129,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string, int>)AddObject));
             metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string>)AddObject));
+            metadata.Add(new NativeSubrutineDefinition("UO.DeleteObject", (Action<string>)DeleteObject));
 
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.Str", (Func<int>)Str));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("UO.Int", (Func<int>)Int));
@@ -369,17 +371,6 @@ namespace InjectionScript.Runtime
             }
         }
 
-        private int GetObject(InjectionValue name) => GetObject((string)name);
-
-        private int GetObject(string name)
-        {
-            var id = injectionApi.GetObject(name);
-            if (id == 0)
-                bridge.Error($"Unknown object {name}");
-
-            return id;
-        }
-
         public int GetX() => GetX("self");
         public int GetX(string id) => GetX(GetObject(id));
         public int GetX(int id) => bridge.GetX(id);
@@ -458,12 +449,51 @@ namespace InjectionScript.Runtime
         public int Hidden(string idText) => Hidden(GetObject(idText));
         public int Hidden(int id) => bridge.Hidden(id);
 
-        public void AddObject(string name, int id) => injectionApi.SetObject(name, id);
+        public void AddObject(string name, int id) => objects.Set(name, id);
         public void AddObject(string name)
         {
             SystemMessage($"What is {name}");
             bridge.AddObject(name);
         }
+
+        public void DeleteObject(string name)
+        {
+            if (objects.TryGet(name, out int value))
+            {
+                objects.Remove(name);
+                SystemMessage($"Object {name} has been deleted");
+            }
+            else
+                SystemMessage($"Object {name} not found");
+        }
+
+        private int GetObject(InjectionValue name) => GetObject((string)name);
+        public int GetObject(string name)
+        {
+            if (name.Equals("finditem", StringComparison.OrdinalIgnoreCase))
+                return bridge.FindItem;
+            if (name.Equals("self", StringComparison.OrdinalIgnoreCase))
+                return bridge.Self;
+            if (name.Equals("lastcorpse", StringComparison.OrdinalIgnoreCase))
+                return bridge.LastCorpse;
+            if (name.Equals("lasttarget", StringComparison.OrdinalIgnoreCase))
+                return bridge.LastTarget;
+            if (name.Equals("laststatus", StringComparison.OrdinalIgnoreCase))
+                return bridge.LastStatus;
+            if (name.Equals("backpack", StringComparison.OrdinalIgnoreCase))
+                return bridge.Backpack;
+
+            if (objects.TryGet(name, out var value))
+                return value;
+
+            if (NumberConversions.TryStr2Int(name, out value))
+                return value;
+
+            bridge.Error($"Unknown object {name}");
+
+            return 0;
+        }
+
 
         public int Str() => bridge.Strength;
         public int Int() => bridge.Intelligence;

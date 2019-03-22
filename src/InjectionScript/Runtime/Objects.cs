@@ -14,5 +14,6 @@ namespace InjectionScript.Runtime
         public int Get(string name) => objects[name];
 
         public bool TryGet(string name, out int value) => objects.TryGetValue(name, out value);
+        public void Remove(string name) => objects.Remove(name);
     }
 }

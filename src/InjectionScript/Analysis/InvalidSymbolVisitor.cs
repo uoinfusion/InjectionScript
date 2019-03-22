@@ -129,7 +129,7 @@ namespace InjectionScript.Analysis
             {
                 messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
                     MessageSeverity.Warning, MessageCodes.InvalidLabelName,
-                    $"Lable name '{context.SYMBOL().GetText()}' is followed by invalid characters '{context.invalid?.Text}'. Remove them, they are ignored by Injection."));
+                    $"Label name '{context.SYMBOL().GetText()}' is followed by invalid characters '{context.invalid?.Text}'. Remove them, they are ignored by Injection."));
             }
 
             return base.VisitGoto(context);
