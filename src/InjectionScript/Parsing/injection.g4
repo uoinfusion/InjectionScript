@@ -53,7 +53,7 @@ lvalue: SYMBOL | indexedSymbol;
 expression: logicalOperand logicalOperation*;
 logicalOperation: logicalOperator logicalOperand;
 logicalOperator: OR | AND;
-logicalOperand: comparativeOperand comparativeOperation*;
+logicalOperand: NOT? comparativeOperand comparativeOperation*;
 
 comparativeOperation: comparativeOperator comparativeOperand;
 comparativeOperator: EQUAL | NOT_EQUAL | LESS_THAN | LESS_THAN_STRICT | MORE_THAN | MORE_THAN_STRICT;

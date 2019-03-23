@@ -310,6 +310,11 @@ namespace InjectionScript.Runtime
                     throw new NotImplementedException();
             }
 
+            if (!string.IsNullOrEmpty(context.NOT()?.GetText()))
+            {
+                return result != InjectionValue.Zero ? InjectionValue.False : InjectionValue.True;
+            }
+
             return result;
         }
 

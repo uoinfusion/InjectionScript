@@ -77,6 +77,17 @@ namespace InjectionScript.Tests.Interpretation
             TestExpression("5 * (1 == 5)", 0);
             TestExpression("5 == 5 and 1", 1);
             TestExpression("1 + 4 == 4 + 1 and 1", 1);
+
+            TestExpression("not 1 == 2", 1);
+            TestExpression("not 1 == not 1", 1);
+            TestExpression("not 1 == not 0", 0);
+            TestExpression("not 1 == not 0", 0);
+            TestExpression("not 1 == not 0 == 0", 1);
+            TestExpression("not 1 == not 0 == not 0", 0);
+
+            TestExpression("not 1 && 0", 0);
+            TestExpression("not (1 && 0)", 1);
+            TestExpression("(not 1) && 0", 0);
         }
 
         [TestMethod]
