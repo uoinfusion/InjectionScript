@@ -52,6 +52,11 @@ namespace InjectionScript.Runtime
         {
         }
 
+        public NativeSubrutineDefinition(string name, Action<InjectionValue, InjectionValue, InjectionValue, InjectionValue, InjectionValue, InjectionValue> subrutine)
+            : this(name, subrutine, new[] { InjectionValueKind.Any, InjectionValueKind.Any, InjectionValueKind.Any, InjectionValueKind.Any, InjectionValueKind.Any, InjectionValueKind.Any })
+        {
+        }
+
         public NativeSubrutineDefinition(string name, Func<InjectionValue, string> subrutine)
             : this(name, subrutine, new[] { InjectionValueKind.Any })
         {

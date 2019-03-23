@@ -194,6 +194,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<InjectionValue, InjectionValue>)MoveItem));
             metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<InjectionValue, InjectionValue, InjectionValue>)MoveItem));
+            metadata.Add(new NativeSubrutineDefinition("UO.MoveItem", (Action<InjectionValue, InjectionValue, InjectionValue, InjectionValue, InjectionValue, InjectionValue>)MoveItem));
 
             metadata.Add(new NativeSubrutineDefinition("UO.SetReceivingContainer", (Action<int>)SetReceivingContainer));
             metadata.Add(new NativeSubrutineDefinition("UO.SetReceivingContainer", (Action<string>)SetReceivingContainer));
@@ -572,8 +573,11 @@ namespace InjectionScript.Runtime
 
         public void MoveItem(InjectionValue id, InjectionValue amount)
             => bridge.MoveItem(GetObject(id), NumberConversions.ToInt(amount), 0);
-        public void MoveItem(InjectionValue id, InjectionValue amount, InjectionValue targetContainer) 
+        public void MoveItem(InjectionValue id, InjectionValue amount, InjectionValue targetContainer)
             => bridge.MoveItem(GetObject(id), NumberConversions.ToInt(amount), ConvertContainer(targetContainer));
+        public void MoveItem(InjectionValue id, InjectionValue amount, InjectionValue targetContainer, InjectionValue x, InjectionValue y, InjectionValue z)
+            => bridge.MoveItem(GetObject(id), NumberConversions.ToInt(amount), ConvertContainer(targetContainer),
+                NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
 
         public string FindType(InjectionValue type)
             => FindType(NumberConversions.ToInt(type));
