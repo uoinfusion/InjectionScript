@@ -33,7 +33,7 @@ namespace InjectionScript.Runtime
         {
             paths = new Paths(() => Path.GetDirectoryName(CurrentScript.FileName));
 
-            Api = new InjectionApi(bridge, Metadata, Globals, timeSource, paths);
+            Api = new InjectionApi(bridge, Metadata, Globals, timeSource, paths, Objects);
             RegisterNatives();
             this.bridge = bridge;
             this.debuggerServer = debuggerServer;

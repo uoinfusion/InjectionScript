@@ -15,7 +15,7 @@ namespace InjectionScript.Runtime
         private readonly Random random;
         private readonly ITimeSource timeSource;
         private readonly Paths paths;
-        private readonly Objects objects = new Objects();
+        private readonly Objects objects;
 
         private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
@@ -50,7 +50,7 @@ namespace InjectionScript.Runtime
                 layerNumberToName.Add(pair.Value, pair.Key);
         }
 
-        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths)
+        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths, Objects objects)
         {
             this.bridge = bridge;
             this.injectionApi = injectionApi;
@@ -59,6 +59,7 @@ namespace InjectionScript.Runtime
             random = new Random();
             this.timeSource = timeSource;
             this.paths = paths;
+            this.objects = objects;
         }
 
         internal void Register(Metadata metadata)

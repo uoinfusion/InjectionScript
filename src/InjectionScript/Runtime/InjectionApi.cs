@@ -12,10 +12,10 @@ namespace InjectionScript.Runtime
         private readonly ITimeSource timeSource;
         public InjectionApiUO UO { get; }
 
-        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths)
+        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths, Objects objects)
         {
             this.bridge = bridge;
-            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource, paths);
+            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource, paths, objects);
             Register(metadata);
             this.timeSource = timeSource;
         }
