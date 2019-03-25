@@ -7,7 +7,6 @@ To use this extension you have to install:
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [.NET Core 2.1](https://dotnet.microsoft.com/download/dotnet-core/2.1)
 
-
 This extension is in very early development stage so there are many bugs
 and unimplemented features. If you are interested in this project, please file a bug on [Github](https://github.com/uoinfusion/InjectionScript/issues) or on [Discord](https://discord.gg/Ng3RDke).
 
@@ -31,6 +30,13 @@ and unimplemented features. If you are interested in this project, please file a
 Implementation is very slow inefficient and incomplete.
 
 ## Release Notes
+
+### 0.0.15
+
+- `break` keyword.
+- Added/fixed `UO.MoveItem`, `UO.Print`, `UO.LastTile`, `UO.Count`, `UO.Dead`, `UO.GetName`, `UO.DeleteObject`, `UO.UseSkill`, `UO.WaitMenu`, `UO.Launch`, `UO.SkillVal`.
+- Fixed literal parsing (problems with `"` inside `'` or `'` inside `"`).
+- Fixed escaped characters - `\` doesn't denotes escaped characters anymore.
 
 ### 0.0.8
 
