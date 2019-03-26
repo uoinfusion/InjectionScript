@@ -104,7 +104,7 @@ namespace InjectionScript.Lsp
             var runtime = new InjectionRuntime();
             runtime.Load(fileContent, "test.sc");
 
-            return GetCompletions(runtime.CurrentFileSyntax, runtime.Metadata, line, column);
+            return GetCompletions(runtime.CurrentScript.Syntax, runtime.Metadata, line, column);
         }
 
         private injectionParser.SubrutineContext GetSubrutine(injectionParser.FileContext fileSyntax, int line, int column)

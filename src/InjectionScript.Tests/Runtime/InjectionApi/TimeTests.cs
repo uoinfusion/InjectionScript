@@ -17,7 +17,8 @@ namespace InjectionScript.Tests.Runtime.InjectionApi
         public void Initialize()
         {
             timeSource = new TestTimeSource();
-            injectionApi = new InjectionScript.Runtime.InjectionApi(null, new Metadata(), new Globals(), timeSource, new Paths(() => string.Empty));
+            injectionApi = new InjectionScript.Runtime.InjectionApi(null, new Metadata(), new Globals(), timeSource,
+                new Paths(() => string.Empty), new Objects());
         }
 
         [TestMethod]

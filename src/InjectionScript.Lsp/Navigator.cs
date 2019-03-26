@@ -37,7 +37,7 @@ namespace InjectionScript.Lsp
             var runtime = new InjectionRuntime();
             runtime.Load(fileContent, fileName);
 
-            var rule = FindRule(runtime.CurrentFileSyntax, line, column);
+            var rule = FindRule(runtime.CurrentScript.Syntax, line, column);
             if (rule == null)
                 return null;
 
