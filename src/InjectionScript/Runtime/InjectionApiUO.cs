@@ -110,6 +110,7 @@ namespace InjectionScript.Runtime
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetColor", (Func<InjectionValue, string>)GetColor));
             metadata.Add(new NativeSubrutineDefinition("UO.GetLayer", (Func<InjectionValue, string>)GetLayer));
+            metadata.Add(new NativeSubrutineDefinition("UO.ContainerOf", (Func<InjectionValue, string>)ContainerOf));
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetDir", (Func<string, int>)GetDir));
             metadata.Add(new NativeSubrutineDefinition("UO.GetDir", (Func<int, int>)GetDir));
@@ -440,6 +441,20 @@ namespace InjectionScript.Runtime
         public string GetColor(InjectionValue id) => NumberConversions.ToHex((short)bridge.GetColor(GetObject(id)));
         public string GetLayer(InjectionValue id) => ConvertLayer(bridge.GetLayer(GetObject(id)));
 
+        public string ContainerOf(InjectionValue name)
+        {
+            if (TryGetObject(name, out int id))
+            {
+                var containerId = bridge.ContainerOf(id);
+                if (containerId < 0)
+                    return "0xFFFFFFFF";
+
+                return $"0x{containerId:X8}";
+            }
+
+            return "0x00000000";
+        }
+
         public int GetDir() => GetDir("self");
         public int GetDir(string id) => GetDir(GetObject(id));
         public int GetDir(int id) => bridge.GetDir(id);
@@ -485,30 +500,49 @@ namespace InjectionScript.Runtime
         }
 
         private int GetObject(InjectionValue name) => GetObject((string)name);
-        public int GetObject(string name)
+        public bool TryGetObject(InjectionValue name, out int id)
         {
+            return TryGetObject((string)name, out id);
+        }
+
+        public bool TryGetObject(string name, out int id)
+        {
+            id = -1;
             if (name.Equals("finditem", StringComparison.OrdinalIgnoreCase))
-                return bridge.FindItem;
+                id = bridge.FindItem;
             if (name.Equals("self", StringComparison.OrdinalIgnoreCase))
-                return bridge.Self;
+                id = bridge.Self;
             if (name.Equals("lastcorpse", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastCorpse;
+                id = bridge.LastCorpse;
             if (name.Equals("lasttarget", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastTarget;
+                id = bridge.LastTarget;
             if (name.Equals("laststatus", StringComparison.OrdinalIgnoreCase))
-                return bridge.LastStatus;
+                id = bridge.LastStatus;
             if (name.Equals("backpack", StringComparison.OrdinalIgnoreCase))
-                return bridge.Backpack;
+                id = bridge.Backpack;
 
             if (objects.TryGet(name, out var value))
-                return value;
+                id = value;
 
             if (NumberConversions.TryStr2Int(name, out value))
-                return value;
+                id = value;
 
-            bridge.Error($"Unknown object {name}");
+            if (id > -1)
+                return true;
 
-            return 0;
+            id = 0;
+            return false;
+        }
+
+        public int GetObject(string name)
+        {
+            if (!TryGetObject(name, out int id))
+            {
+                bridge.Error($"Unknown object {name}");
+                return 0;
+            }
+
+            return id;
         }
 
         public int Str() => bridge.Strength;

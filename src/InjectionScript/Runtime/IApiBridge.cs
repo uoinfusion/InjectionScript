@@ -108,6 +108,7 @@
         int GetDir(int id);
         int GetColor(int id);
         int GetLayer(int id);
+        int ContainerOf(int id);
 
         void WaitGump(int triggerId);
         void SendGumpSelect(int triggerId);
