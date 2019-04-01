@@ -621,20 +621,24 @@ namespace InjectionScript.Runtime
         public string FindType(int type)
             => FindType(type, -1, -1);
         public string FindType(InjectionValue type, InjectionValue color)
-            => FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), -1, -1);
+            => FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), -1, -1, false);
         public string FindType(InjectionValue type, InjectionValue color, InjectionValue container)
-            => FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
+            => FindType(type, color, container, new InjectionValue(-1));
+
         public string FindType(int type, int color, int containerId)
-            => FindType(type, color, containerId, -1);
+            => FindType(type, color, containerId, -1, false);
 
-        public string FindType(InjectionValue type, InjectionValue color, InjectionValue containerId, InjectionValue range)
-            => FindType(NumberConversions.ToInt(type),
-                NumberConversions.ToInt(color),
-                ConvertContainer(containerId),
-                NumberConversions.ToInt(range));
+        public string FindType(InjectionValue type, InjectionValue color, InjectionValue container, InjectionValue range)
+        {
+            if (container.Kind == InjectionValueKind.String && container.String.Equals("my", StringComparison.OrdinalIgnoreCase))
+                return FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container), NumberConversions.ToInt(range), true);
+            else
+                return FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container), NumberConversions.ToInt(range), false);
 
-        public string FindType(int type, int color, int containerId, int range)
-            => NumberConversions.ToHex(bridge.FindType(type, color, containerId, range));
+        }
+
+        public string FindType(int type, int color, int containerId, int range, bool recursive)
+            => NumberConversions.ToHex(bridge.FindType(type, color, containerId, range, recursive));
 
         public int FindCount() => bridge.FindCount();
         public int Count(InjectionValue type) 

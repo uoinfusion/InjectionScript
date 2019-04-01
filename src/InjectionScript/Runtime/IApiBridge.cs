@@ -95,7 +95,7 @@
         void Cast(int spellId);
 
         int FindCount();
-        int FindType(int type, int color, int containerId, int range);
+        int FindType(int type, int color, int containerId, int range, bool recursive);
         int Count(int type, int color, int containerId);
         void Ignore(int id);
         void IgnoreReset();
