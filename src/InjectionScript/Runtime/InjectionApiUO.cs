@@ -284,6 +284,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitMenu", (Action<string, string, string, string, string, string>)WaitMenu));
 
             metadata.Add(new NativeSubrutineDefinition("UO.SaveConfig", (Action)SaveConfig));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.BandageSelf", (Action)BandageSelf));
         }
 
         public void WaitGump(string triggerId) => WaitGump(NumberConversions.ToInt(triggerId));
@@ -840,6 +842,18 @@ namespace InjectionScript.Runtime
         public int Random(int max) => random.Next(max);
 
         public void SaveConfig() => SystemMessage("SaveConfig is not implemented yet.");
+
+        public void BandageSelf()
+        {
+            var foundBandages = FindType(new InjectionValue(0x0e21), new InjectionValue(0), new InjectionValue("my"));
+            if (foundBandages != string.Empty)
+            {
+                WaitTargetSelf();
+                UseObject(foundBandages);
+            }
+            else
+                SystemMessage("No bandages found.");
+        }
 
         private int ConvertContainer(InjectionValue containerId)
         {
