@@ -99,7 +99,11 @@
         int Count(int type, int color, int containerId);
         void Ignore(int id);
         void IgnoreReset();
+
         void Terminate(string subrutineName);
+        void Exec(string subrutineName);
+        bool FunRunning(string subrutineName);
+
         int GetGraphics(int id);
         int GetDir(int id);
         int GetColor(int id);
@@ -116,7 +120,5 @@
         void Snap(string name);
 
         void Error(string message);
-
-        void Exec(string subrutineName);
     }
 }
