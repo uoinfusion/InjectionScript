@@ -508,7 +508,7 @@ namespace InjectionScript.Runtime
         public bool TryGetObject(string name, out int id)
         {
             id = -1;
-            if (name.Equals("finditem", StringComparison.OrdinalIgnoreCase))
+            if (name.Equals("finditem", StringComparison.OrdinalIgnoreCase) && bridge.FindItem != 0)
                 id = bridge.FindItem;
             if (name.Equals("self", StringComparison.OrdinalIgnoreCase))
                 id = bridge.Self;
@@ -537,10 +537,7 @@ namespace InjectionScript.Runtime
         public int GetObject(string name)
         {
             if (!TryGetObject(name, out int id))
-            {
-                bridge.Error($"Unknown object {name}");
                 return 0;
-            }
 
             return id;
         }
@@ -554,7 +551,14 @@ namespace InjectionScript.Runtime
         public int Gold() => bridge.Gold;
         public int Life() => GetHP("self");
 
-        public void Click(string id) => Click(GetObject(id));
+        public void Click(string name)
+        {
+            if (TryGetObject(name, out int id))
+                Click(id);
+            else
+                SystemMessage($"invalid object: {name}");
+        }
+
         public void Click(int id) => bridge.Click(id);
         public void UseObject(string id) => UseObject(GetObject(id));
         public void UseObject(int id) => bridge.UseObject(id);
@@ -634,11 +638,16 @@ namespace InjectionScript.Runtime
                 return FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container), NumberConversions.ToInt(range), true);
             else
                 return FindType(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container), NumberConversions.ToInt(range), false);
-
         }
 
         public string FindType(int type, int color, int containerId, int range, bool recursive)
-            => NumberConversions.ToHex(bridge.FindType(type, color, containerId, range, recursive));
+        {
+            var result = bridge.FindType(type, color, containerId, range, recursive);
+            if (result == 0)
+                return string.Empty;
+
+            return NumberConversions.ToHex(result);
+        }
 
         public int FindCount() => bridge.FindCount();
         public int Count(InjectionValue type) 
