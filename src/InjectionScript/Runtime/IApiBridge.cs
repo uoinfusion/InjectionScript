@@ -124,6 +124,9 @@
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
         void Snap(string name);
 
+        void Track(int x, int y);
+        void TrackOff();
+
         void Error(string message);
     }
 }

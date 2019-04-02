@@ -291,6 +291,9 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.ConColor", (Action<InjectionValue>)ConColor));
 
             metadata.Add(new NativeSubrutineDefinition("UO.BandageSelf", (Action)BandageSelf));
+            metadata.Add(new NativeSubrutineDefinition("UO.Track", (Action)Track));
+            metadata.Add(new NativeSubrutineDefinition("UO.Track", (Action<InjectionValue>)Track));
+            metadata.Add(new NativeSubrutineDefinition("UO.Track", (Action<InjectionValue, InjectionValue, InjectionValue>)Track));
         }
 
         public void WaitGump(string triggerId) => WaitGump(NumberConversions.ToInt(triggerId));
@@ -897,6 +900,19 @@ namespace InjectionScript.Runtime
             }
             else
                 SystemMessage("No bandages found.");
+        }
+
+        public void Track() => Track(1, GetX(), GetY());
+        public void Track(InjectionValue flag) => Track(NumberConversions.ToInt(flag), GetX(), GetY());
+        public void Track(InjectionValue flagRaw, InjectionValue x, InjectionValue y)
+            => Track(NumberConversions.ToInt(flagRaw), NumberConversions.ToInt(x), NumberConversions.ToInt(y));
+
+        public void Track(int flag, int x, int y)
+        {
+            if (flag != 0)
+                bridge.Track(x, y);
+            else
+                bridge.TrackOff();
         }
 
         private int ConvertContainer(InjectionValue containerId)
