@@ -51,6 +51,8 @@
         void WaitTargetTile(int type, int x, int y, int z);
         int IsTargeting();
         void CancelNextTarget();
+        void CancelTarget();
+        int[] GetWaitTargetQueue();
 
         int[] LastTile();
 

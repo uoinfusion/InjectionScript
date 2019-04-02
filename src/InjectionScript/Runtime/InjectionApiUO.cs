@@ -189,6 +189,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetType", (Action<InjectionValue>)WaitTargetType));
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetType", (Action<InjectionValue, InjectionValue>)WaitTargetType));
             metadata.Add(new NativeSubrutineDefinition("UO.Targeting", (Func<int>)IsTargeting));
+            metadata.Add(new NativeSubrutineDefinition("UO.CancelTarget", (Action)CancelTarget));
 
             metadata.Add(new NativeSubrutineDefinition("UO.LastTile", (Func<string>)LastTile));
             metadata.Add(new NativeSubrutineDefinition("UO.LastTile", (Func<InjectionValue, int>)LastTile));
@@ -616,6 +617,18 @@ namespace InjectionScript.Runtime
         }
 
         public int IsTargeting() => bridge.IsTargeting();
+
+        public void CancelTarget()
+        {
+            var waitTargetQueue = bridge.GetWaitTargetQueue();
+            if (waitTargetQueue.Length > 0)
+            {
+                bridge.CancelTarget();
+                SystemMessage("Targeting cancelled");
+            }
+            else
+                SystemMessage("Error: no target to cancel");
+        }
 
         public string LastTile()
         {
