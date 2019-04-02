@@ -133,7 +133,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<int>)Hidden));
             metadata.Add(new NativeSubrutineDefinition("UO.Hidden", (Func<string, int>)Hidden));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string, int>)AddObject));
+            metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<InjectionValue, InjectionValue>)AddObject));
             metadata.Add(new NativeSubrutineDefinition("UO.AddObject", (Action<string>)AddObject));
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteObject", (Action<string>)DeleteObject));
 
@@ -163,8 +163,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, InjectionValue, int>)Count));
             metadata.Add(new NativeSubrutineDefinition("UO.Count", (Func<InjectionValue, InjectionValue, InjectionValue, int>)Count));
-            metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<string>)Click));
-            metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<int>)Click));
+            metadata.Add(new NativeSubrutineDefinition("UO.Click", (Action<InjectionValue>)Click));
             metadata.Add(new NativeSubrutineDefinition("UO.UseObject", (Action<string>)UseObject));
             metadata.Add(new NativeSubrutineDefinition("UO.UseObject", (Action<int>)UseObject));
             metadata.Add(new NativeSubrutineDefinition("UO.Attack", (Action<string>)Attack));
@@ -488,7 +487,11 @@ namespace InjectionScript.Runtime
         public int Hidden(string idText) => Hidden(GetObject(idText));
         public int Hidden(int id) => bridge.Hidden(id);
 
-        public void AddObject(string name, int id) => objects.Set(name, id);
+        public void AddObject(InjectionValue name, InjectionValue objectRawId) 
+            => ObjectChecked(objectRawId, id => AddObject((string)name, id));
+        public void AddObject(string name, int id)
+            => objects.Set(name, id);
+
         public void AddObject(string name)
         {
             SystemMessage($"What is {name}");
@@ -504,6 +507,14 @@ namespace InjectionScript.Runtime
             }
             else
                 SystemMessage($"Object {name} not found");
+        }
+
+        private void ObjectChecked(InjectionValue name, Action<int> actionOnObject)
+        {
+            if (TryGetObject(name, out int id))
+                actionOnObject(id);
+            else
+                SystemMessage($"invalid object: {name}");
         }
 
         private int GetObject(InjectionValue name) => GetObject((string)name);
@@ -558,14 +569,7 @@ namespace InjectionScript.Runtime
         public int Gold() => bridge.Gold;
         public int Life() => GetHP("self");
 
-        public void Click(string name)
-        {
-            if (TryGetObject(name, out int id))
-                Click(id);
-            else
-                SystemMessage($"invalid object: {name}");
-        }
-
+        public void Click(InjectionValue name) => ObjectChecked(name, id => Click(id));
         public void Click(int id) => bridge.Click(id);
         public void UseObject(string id) => UseObject(GetObject(id));
         public void UseObject(int id) => bridge.UseObject(id);
