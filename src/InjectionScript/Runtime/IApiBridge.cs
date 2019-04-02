@@ -50,6 +50,7 @@
         void WaitTargetObject(int id1, int id2);
         void WaitTargetTile(int type, int x, int y, int z);
         int IsTargeting();
+        void CancelNextTarget();
 
         int[] LastTile();
 

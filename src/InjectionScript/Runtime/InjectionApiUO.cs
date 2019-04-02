@@ -185,6 +185,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetLast", (Action)WaitTargetLast));
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetLast", (Action<string>)WaitTargetLast));
             metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetTile", (Action<InjectionValue, InjectionValue, InjectionValue, InjectionValue>)WaitTargetTile));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetType", (Action<InjectionValue>)WaitTargetType));
+            metadata.Add(new NativeSubrutineDefinition("UO.WaitTargetType", (Action<InjectionValue, InjectionValue>)WaitTargetType));
             metadata.Add(new NativeSubrutineDefinition("UO.Targeting", (Func<int>)IsTargeting));
 
             metadata.Add(new NativeSubrutineDefinition("UO.LastTile", (Func<string>)LastTile));
@@ -588,6 +590,24 @@ namespace InjectionScript.Runtime
         public void WaitTargetLast() => WaitTargetObject("lasttarget");
         public void WaitTargetTile(InjectionValue type, InjectionValue x, InjectionValue y, InjectionValue z)
             => bridge.WaitTargetTile(NumberConversions.ToInt(type), NumberConversions.ToInt(x), NumberConversions.ToInt(y), NumberConversions.ToInt(z));
+
+
+        public void WaitTargetType(InjectionValue type) => WaitTargetType(NumberConversions.ToInt(type), -1);
+        public void WaitTargetType(InjectionValue type, InjectionValue color)
+            => WaitTargetType(NumberConversions.ToInt(type), NumberConversions.ToInt(color));
+
+        public void WaitTargetType(int type, int color)
+        {
+            var item = bridge.FindType(type, color, bridge.Backpack, -1, true);
+            if (item <= 0)
+            {
+                SystemMessage("No item found. Next target request will be canceled");
+                bridge.CancelNextTarget();
+            }
+            else
+                bridge.WaitTargetObject(item);
+        }
+
         public int IsTargeting() => bridge.IsTargeting();
 
         public string LastTile()
