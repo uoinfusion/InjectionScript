@@ -234,7 +234,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.InJournalBetweenTimes", (Func<string, int, int, int>)InJournalBetweenTimes));
             metadata.Add(new NativeSubrutineDefinition("UO.InJournalBetweenTimes", (Func<string, int, int, int, int>)InJournalBetweenTimes));
             metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action)DeleteJournal));
-            metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action<string>)DeleteJournal));
+            metadata.Add(new NativeSubrutineDefinition("UO.DeleteJournal", (Action<InjectionValue>)DeleteJournal));
             metadata.Add(new NativeSubrutineDefinition("UO.Journal", (Func<int, string>)GetJournalText));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalSerial", (Func<int, string>)JournalSerial));
             metadata.Add(new NativeSubrutineDefinition("UO.JournalColor", (Func<int, string>)JournalColor));
@@ -770,7 +770,7 @@ namespace InjectionScript.Runtime
         public int InJournalBetweenTimes(string pattern, int startTime, int endTime) => InJournalBetweenTimes(pattern, startTime, endTime, -1);
         public int InJournalBetweenTimes(string pattern, int startTime, int endTime, int limit) => bridge.InJournalBetweenTimes(pattern, startTime, endTime, limit);
         public void DeleteJournal() => bridge.DeleteJournal();
-        public void DeleteJournal(string text) => bridge.DeleteJournal(text);
+        public void DeleteJournal(InjectionValue text) => bridge.DeleteJournal((string)text);
         public string GetJournalText(int index) => bridge.GetJournalText(index);
         public string JournalSerial(int index) => bridge.JournalSerial(index);
         public string JournalColor(int index) => bridge.JournalColor(index);
