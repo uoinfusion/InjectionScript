@@ -120,6 +120,7 @@
         void WaitMenu(params string[] parameters);
 
         void MakeStepByKey(int key);
+        void EnableMove(bool enabled);
 
         string PrivateGetTile(int x, int y, int unknown, int minTile, int maxTile);
         void Snap(string name);
