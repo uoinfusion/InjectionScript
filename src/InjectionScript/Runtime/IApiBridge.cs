@@ -73,6 +73,7 @@
 
         void ServerPrint(string message);
         void Print(string msg);
+        void Print(int color, string msg);
         void CharPrint(int id, int color, string msg);
 
         int InJournal(string pattern);

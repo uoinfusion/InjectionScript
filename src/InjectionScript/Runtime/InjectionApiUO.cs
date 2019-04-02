@@ -17,6 +17,8 @@ namespace InjectionScript.Runtime
         private readonly Paths paths;
         private readonly Objects objects;
 
+        private int systemMessageColor = 0x0440;
+
         private static readonly Dictionary<string, int> layerNameToNumber = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
             {"Rhand", 0x01 },
@@ -286,6 +288,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.WaitMenu", (Action<string, string, string, string, string, string>)WaitMenu));
 
             metadata.Add(new NativeSubrutineDefinition("UO.SaveConfig", (Action)SaveConfig));
+            metadata.Add(new NativeSubrutineDefinition("UO.ConColor", (Action<InjectionValue>)ConColor));
 
             metadata.Add(new NativeSubrutineDefinition("UO.BandageSelf", (Action)BandageSelf));
         }
@@ -730,7 +733,7 @@ namespace InjectionScript.Runtime
         public void Msg(string message) => bridge.ServerPrint(message);
         public void ServerPrint(string message) => bridge.ServerPrint(message);
 
-        public void SystemMessage(string msg) => bridge.Print(msg);
+        public void SystemMessage(string msg) => bridge.Print(systemMessageColor, msg);
         public void Print(InjectionValue msg)
         {
             if (msg.Kind == InjectionValueKind.String)
@@ -862,6 +865,10 @@ namespace InjectionScript.Runtime
         public int Random(int max) => random.Next(max);
 
         public void SaveConfig() => SystemMessage("SaveConfig is not implemented yet.");
+        public void ConColor(InjectionValue color)
+        {
+            systemMessageColor = NumberConversions.ToInt(color);
+        }
 
         public void BandageSelf()
         {
