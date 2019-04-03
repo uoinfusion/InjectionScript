@@ -42,7 +42,7 @@ dim: DIM dimDef (',' dimDef)* (NEWLINE | EOF);
 dimDef: SYMBOL '[' expression ']' dimDefAssignment?;
 dimDefAssignment: '=' expression;
 
-call: SYMBOL argumentList;
+call: SAFE_CALL? SYMBOL argumentList;
 argumentList: '(' arguments? ')';
 arguments: argument (',' argument)*;
 argument: expression | literal;
@@ -95,6 +95,7 @@ GOTO: [gG][oO][tT][oO];
 TO: [tT][oO];
 NEXT: [nN][eE][xX][tT];
 STEP: [sS][tT][eE][pP];
+SAFE_CALL: [sS][aA][fF][eE] (' ')+ [cC][aA][lL][lL];
 
 PLUS: '+' ;
 MINUS: '-' ;
