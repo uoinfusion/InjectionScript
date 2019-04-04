@@ -26,15 +26,17 @@ namespace InjectionScript.Analysis
         public override bool VisitCall([NotNull] injectionParser.CallContext context)
         {
             var name = context.SYMBOL().GetText();
-
-            var argumentCount = context.argumentList().arguments()?.argument()?.Count() ?? 0;
-
-            if (!metadata.NativeSubrutineExists(name, argumentCount)
-                && !metadata.TryGetSubrutine(name, argumentCount, out var customSubrutine))
+            if (!name.Contains('.'))
             {
-                messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
-                    MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
-                    $"Subrutine {name} with {argumentCount} arguments not found."));
+                var argumentCount = context.argumentList().arguments()?.argument()?.Count() ?? 0;
+
+                if (!metadata.NativeSubrutineExists(name, argumentCount)
+                    && !metadata.TryGetSubrutine(name, argumentCount, out var customSubrutine))
+                {
+                    messages.Add(new Message(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column,
+                        MessageSeverity.Warning, MessageCodes.UndefinedSubrutine,
+                        $"Subrutine {name} with {argumentCount} arguments not found."));
+                }
             }
 
             return base.VisitCall(context);

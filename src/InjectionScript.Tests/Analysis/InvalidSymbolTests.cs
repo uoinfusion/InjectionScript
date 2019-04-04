@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using InjectionScript.Runtime;
+using InjectionScript.Runtime.ObjectTypes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,6 +20,29 @@ sub test()
 end sub");
 
             messages.AssertWarning(3, MessageCodes.UndefinedSubrutine);
+        }
+
+        private class MyObject : InjectionObject
+        {
+            public MyObject() : base("MyObject")
+                => Register(new NativeSubrutineDefinition("SomeSubrutine", (Action)SomeSubrutine));
+
+            private void SomeSubrutine() { }
+        }
+
+        [TestMethod]
+        public void No_warning_for_object_subrutine()
+        {
+            var runtime = new InjectionRuntime();
+            runtime.Metadata.Add(new NativeSubrutineDefinition("MyObject", (Action)(() => new MyObject())));
+            var messages = runtime.Load(@"
+sub test()
+    var x = MyObject()
+    x.SomeSubrutine()
+end sub
+", "test.sc");
+
+            messages.AssertNoWarning(4, MessageCodes.UndefinedSubrutine);
         }
 
         [TestMethod]
