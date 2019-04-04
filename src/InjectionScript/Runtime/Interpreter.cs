@@ -467,7 +467,11 @@ namespace InjectionScript.Runtime
 
             var result = InjectionValue.Unit;
 
-            if (metadata.TryGetNativeSubrutine(name, argumentValues, out var nativeSubrutine))
+            if (TryGetObjectSubrutine(name, argumentValues, out var objectSubrutine))
+            {
+                result = objectSubrutine.Call(argumentValues);
+            }
+            else if (metadata.TryGetNativeSubrutine(name, argumentValues, out var nativeSubrutine))
             {
                 result = nativeSubrutine.Call(argumentValues);
             }
@@ -488,6 +492,25 @@ namespace InjectionScript.Runtime
                 debugger.AfterCall(new AfterCallContext(context, name, argumentValues, result));
 
             return result;
+        }
+
+        private bool TryGetObjectSubrutine(string name, InjectionValue[] argumentValues, out NativeSubrutineDefinition nativeSubrutine)
+        {
+            var segments = name.Split('.');
+            if (segments.Length == 2)
+            {
+                string varName = segments[0];
+
+                if (semanticScope.TryGetVar(varName, out InjectionValue value) && value.Kind == InjectionValueKind.Object)
+                {
+                    string subrutineName = segments[1];
+                    if (value.Object.TryGet(subrutineName, argumentValues, out nativeSubrutine))
+                        return true;
+                }
+            }
+
+            nativeSubrutine = null;
+            return false;
         }
     }
 }

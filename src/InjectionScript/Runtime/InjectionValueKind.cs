@@ -8,5 +8,6 @@
         Decimal,
         String,
         Array,
+        Object
     }
 }

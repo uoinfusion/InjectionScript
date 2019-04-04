@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InjectionScript.Runtime.ObjectTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,6 +13,7 @@ namespace InjectionScript.Runtime
         public static InjectionValue MinusOne { get; } = new InjectionValue(-1);
         public static InjectionValue Zero { get; } = new InjectionValue(0);
 
+        public InjectionObject Object { get; }
         public int Integer { get; }
         public double Decimal { get; }
         public string String { get; }
@@ -26,6 +28,7 @@ namespace InjectionScript.Runtime
                 Decimal = 0;
                 String = null;
                 Array = System.Array.Empty<InjectionValue>();
+                Object = null;
                 Kind = InjectionValueKind.Unit;
             }
             else if (value is string str)
@@ -34,6 +37,7 @@ namespace InjectionScript.Runtime
                 Integer = 0;
                 Decimal = 0;
                 Array = System.Array.Empty<InjectionValue>();
+                Object = null;
                 Kind = InjectionValueKind.String;
             }
             else if (value is int i)
@@ -42,6 +46,7 @@ namespace InjectionScript.Runtime
                 String = null;
                 Decimal = 0;
                 Array = System.Array.Empty<InjectionValue>();
+                Object = null;
                 Kind = InjectionValueKind.Integer;
             }
             else if (value is double d)
@@ -50,6 +55,7 @@ namespace InjectionScript.Runtime
                 String = null;
                 Decimal = d;
                 Array = System.Array.Empty<InjectionValue>();
+                Object = null;
                 Kind = InjectionValueKind.Decimal;
             }
             else if (value is IEnumerable<InjectionValue> array)
@@ -58,7 +64,17 @@ namespace InjectionScript.Runtime
                 String = null;
                 Decimal = 0;
                 Array = array.ToArray();
+                Object = null;
                 Kind = InjectionValueKind.Array;
+            }
+            else if (value is InjectionObject obj)
+            {
+                Integer = 0;
+                String = null;
+                Decimal = 0;
+                Array = System.Array.Empty<InjectionValue>();
+                Object = null;
+                Kind = InjectionValueKind.Object;
             }
             else
                 throw new NotSupportedException($"Unsupported return type {value.GetType()}");
@@ -70,6 +86,7 @@ namespace InjectionScript.Runtime
             String = null;
             Decimal = 0;
             Array = System.Array.Empty<InjectionValue>();
+            Object = null;
             Kind = InjectionValueKind.Integer;
         }
 
@@ -87,6 +104,8 @@ namespace InjectionScript.Runtime
                     return (string)this;
                 case InjectionValueKind.Array:
                     return (InjectionValue[])this;
+                case InjectionValueKind.Object:
+                    return (InjectionObject)this;
                 default:
                     throw new NotImplementedException($"Conversion from {this.Kind} to {targetKind}.");
             }
@@ -98,6 +117,7 @@ namespace InjectionScript.Runtime
             Integer = 0;
             Decimal = 0;
             Array = System.Array.Empty<InjectionValue>();
+            Object = null;
             Kind = InjectionValueKind.String;
         }
 
@@ -107,6 +127,7 @@ namespace InjectionScript.Runtime
             Integer = 0;
             Decimal = d;
             Array = System.Array.Empty<InjectionValue>();
+            Object = null;
 
             Kind = InjectionValueKind.Decimal;
         }
@@ -117,7 +138,20 @@ namespace InjectionScript.Runtime
             Integer = 0;
             Decimal = 0;
             Array = array;
+            Object = null;
+
             Kind = InjectionValueKind.Array;
+        }
+
+        public InjectionValue(InjectionObject obj)
+        {
+            String = null;
+            Integer = 0;
+            Decimal = 0;
+            Array = System.Array.Empty<InjectionValue>();
+            Object = obj;
+
+            Kind = InjectionValueKind.Object;
         }
 
         public static InjectionValueKind GetKind(Type type)
@@ -132,6 +166,8 @@ namespace InjectionScript.Runtime
                 return InjectionValueKind.Decimal;
             else if (typeof(Array).IsAssignableFrom(type))
                 return InjectionValueKind.Array;
+            else if (typeof(InjectionObject).IsAssignableFrom(type))
+                return InjectionValueKind.Object;
 
             throw new NotSupportedException($"Unsupported type {type.Name}.");
         }
@@ -143,6 +179,7 @@ namespace InjectionScript.Runtime
             Kind = kind;
             Decimal = 0;
             Array = System.Array.Empty<InjectionValue>();
+            Object = null;
         }
 
         public static InjectionValue operator +(InjectionValue v1, InjectionValue v2)
@@ -322,6 +359,14 @@ namespace InjectionScript.Runtime
             return v1.Array;
         }
 
+        public static explicit operator InjectionObject(InjectionValue v1)
+        {
+            if (v1.Kind != InjectionValueKind.Object)
+                throw new NotImplementedException();
+
+            return v1.Object;
+        }
+
         public object ToValue()
         {
             switch (Kind)
@@ -336,6 +381,8 @@ namespace InjectionScript.Runtime
                     return Unit;
                 case InjectionValueKind.Array:
                     return this.Array;
+                case InjectionValueKind.Object:
+                    return this.Object;
                 default:
                     throw new NotImplementedException(Kind.ToString());
             }
@@ -355,6 +402,8 @@ namespace InjectionScript.Runtime
                     return Decimal.ToString();
                 case InjectionValueKind.Array:
                     return Array.ToString();
+                case InjectionValueKind.Object:
+                    return Object.Name;
                 default:
                     throw new NotImplementedException();
             }
@@ -391,13 +440,15 @@ namespace InjectionScript.Runtime
             hashCode = hashCode * -1521134295 + Kind.GetHashCode();
             hashCode = hashCode * -1521134295 + Decimal.GetHashCode();
             hashCode = hashCode * -1521134295 + Array.GetHashCode();
+            hashCode = hashCode * -1521134295 + Object.GetHashCode();
             return hashCode;
         }
 
         public static bool IsSupported(Type type)
         {
             return type == typeof(string) || type == typeof(int) || type == typeof(void) || type == typeof(double)
-                || type == typeof(InjectionValue) || typeof(IEnumerable<InjectionValue>).IsAssignableFrom(type);
+                || type == typeof(InjectionValue) || typeof(IEnumerable<InjectionValue>).IsAssignableFrom(type)
+                || type == typeof(InjectionObject);
         }
     }
 }

@@ -12,6 +12,11 @@ namespace InjectionScript.Runtime
         internal int ArgumentCount => parameterKinds.Length;
         private readonly InjectionValueKind[] parameterKinds;
 
+        public NativeSubrutineDefinition(string name, Func<InjectionValue> subrutine)
+            : this(name, subrutine, Array.Empty<InjectionValueKind>())
+        {
+        }
+
         public NativeSubrutineDefinition(string name, Func<InjectionValue, InjectionValue> subrutine)
             : this(name, subrutine, new[] { InjectionValueKind.Any })
         {

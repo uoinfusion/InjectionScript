@@ -9,15 +9,14 @@ namespace InjectionScript.Runtime
         private readonly Dictionary<string, SubrutineDefinition> subrutines
             = new Dictionary<string, SubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> subrutineNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, NativeSubrutineDefinition> nativeSubrutines
-            = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NativeSubrutineDefinition> intrinsicVariables
             = new Dictionary<string, NativeSubrutineDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, GlobalVariableDefinition> globalVariables
             = new Dictionary<string, GlobalVariableDefinition>(StringComparer.OrdinalIgnoreCase);
+        private readonly NativeSubrutineMetadata nativeSubrutines = new NativeSubrutineMetadata();
 
         public IEnumerable<SubrutineDefinition> Subrutines => subrutines.Values;
-        public IEnumerable<NativeSubrutineDefinition> NativeSubrutines => nativeSubrutines.Values;
+        public IEnumerable<NativeSubrutineDefinition> NativeSubrutines => nativeSubrutines.Subrutines;
         public IEnumerable<GlobalVariableDefinition> GlobalVariables => globalVariables.Values;
 
         private static HashSet<string> shortcutVariables = new HashSet<string>()
@@ -44,12 +43,9 @@ namespace InjectionScript.Runtime
         }
 
         public void Add(NativeSubrutineDefinition[] subrutineDefs)
-        {
-            foreach (var subrutineDef in subrutineDefs)
-                nativeSubrutines.Add(subrutineDef.GetSignature(), subrutineDef);
-        }
+            => nativeSubrutines.Add(subrutineDefs);
         public void Add(NativeSubrutineDefinition subrutineDef)
-            => nativeSubrutines.Add(subrutineDef.GetSignature(), subrutineDef);
+            => nativeSubrutines.Add(subrutineDef);
 
         public void AddIntrinsicVariables(NativeSubrutineDefinition[] subrutineDefs)
         {
@@ -82,30 +78,12 @@ namespace InjectionScript.Runtime
             => $"{name}`{paramCount}";
 
         public bool TryGetNativeSubrutine(string name, IEnumerable<InjectionValue> argumentValues, out NativeSubrutineDefinition subrutineDefinition)
-        {
-            var key = NativeSubrutineDefinition.GetSignature(name, argumentValues);
-            if (nativeSubrutines.TryGetValue(key, out var value))
-            {
-                subrutineDefinition = value;
-                return true;
-            }
-
-            key = NativeSubrutineDefinition.GetAnySignature(name, argumentValues);
-            if (nativeSubrutines.TryGetValue(key, out value))
-            {
-                subrutineDefinition = value;
-                return true;
-            }
-
-            subrutineDefinition = null;
-            return false;
-        }
+            => nativeSubrutines.TryGet(name, argumentValues, out subrutineDefinition);
 
         internal bool ShortcutVariableExists(string name) => shortcutVariables.Contains(name);
         internal bool GlobalVariableExists(string name) => globalVariables.ContainsKey(name);
         internal bool NativeSubrutineExists(string name, int argumentCount)
-            => nativeSubrutines.Any(x => x.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
-                && x.Value.ArgumentCount == argumentCount);
+            => nativeSubrutines.Exists(name, argumentCount);
 
         public bool TryGetIntrinsicVariable(string name, out NativeSubrutineDefinition variable)
             => intrinsicVariables.TryGetValue(name, out variable);

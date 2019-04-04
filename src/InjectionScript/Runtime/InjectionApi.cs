@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InjectionScript.Runtime.ObjectTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,10 +36,13 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("mid", (Func<string, int, int, string>)InternalSubrutines.Mid));
             metadata.Add(new NativeSubrutineDefinition("GetArrayLength", (Func<InjectionValue, InjectionValue>)InternalSubrutines.GetArrayLength));
             metadata.Add(new NativeSubrutineDefinition("Now", (Func<int>)Now));
+            metadata.Add(new NativeSubrutineDefinition("File", (Func<InjectionValue, InjectionValue>)File));
 
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("true", (Func<int>)(() => 1)));
             metadata.AddIntrinsicVariable(new NativeSubrutineDefinition("false", (Func<int>)(() => 0)));
         }
+
+        public InjectionValue File(InjectionValue fileName) => new InjectionValue(FileObject.Create((string)fileName));
 
         public int Now() => (int)timeSource.SinceStart.TotalMilliseconds;
 
