@@ -889,7 +889,7 @@ namespace InjectionScript.Runtime
 
         public int Random(int max) => random.Next(max);
 
-        public void SaveConfig() => SystemMessage("SaveConfig is not implemented yet.");
+        public void SaveConfig() => bridge.SaveConfig();
         public void ConColor(InjectionValue color)
         {
             systemMessageColor = NumberConversions.ToInt(color);
