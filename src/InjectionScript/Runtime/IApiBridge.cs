@@ -129,5 +129,6 @@
         void TrackOff();
 
         void Error(string message);
+        void SaveConfig();
     }
 }

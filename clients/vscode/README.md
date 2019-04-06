@@ -31,6 +31,11 @@ Implementation is very slow inefficient and incomplete.
 
 ## Release Notes
 
+### 0.0.16
+- Added `safe call` syntax.
+- Added `UO.MoveOn`, `UO.MoveOff`, `UO.Track`, `UO.CancelTarget`, `UO.ConColor`, `UO.WaitTargetType`, `UO.BandageSelf`, `UO.ContainerOff`, `UO.FunRunning`.
+- Fixed overloads `UO.Click`, `UO.DeleteJournal`, `UO.AddObject`.
+
 ### 0.0.15
 
 - `break` keyword.
