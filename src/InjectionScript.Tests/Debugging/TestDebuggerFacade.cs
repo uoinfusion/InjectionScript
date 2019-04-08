@@ -89,7 +89,7 @@ namespace InjectionScript.Tests.Debugging
         }
 
         public void WaitForBreakHit()
-            => breakHitEvent.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("breakpoint is expected to be hit");
+            => breakHitEvent.WaitOne(TimeSpan.FromSeconds(10)).Should().BeTrue("breakpoint is expected to be hit in 10 seconds");
 
         public void Continue() => debuggerServer.Continue();
 
