@@ -9,25 +9,25 @@ namespace InjectionScript.Tests.Debugging
     [TestClass]
     public class ExpressionEvaluationTests
     {
-        [TestMethod]
-        public void Can_evaluate()
-        {
-            var testDebugger = new TestDebuggerFacade();
+//        [TestMethod]
+//        public void Can_evaluate()
+//        {
+//            var testDebugger = new TestDebuggerFacade();
 
-            testDebugger.Load(@"
-sub sub1()
-    var x = 33
-    x = x + 1
-end sub");
+//            testDebugger.Load(@"
+//sub sub1()
+//    var x = 33
+//    x = x + 1
+//end sub");
 
-            testDebugger.AddBreakpoint(4);
-            testDebugger.CallSubrutineAsync("sub1");
-            testDebugger.WaitForBreakHit();
+//            testDebugger.AddBreakpoint(4);
+//            testDebugger.CallSubrutineAsync("sub1");
+//            testDebugger.WaitForBreakHit();
 
-            var result = testDebugger.EvaluateExpression("x");
+//            var result = testDebugger.EvaluateExpression("x");
 
-            result.Result.Value.Should().Be(33);
-        }
+//            result.Result.Value.Should().Be(33);
+//        }
 
         [TestMethod]
         public void Can_evaluate_continue_and_evaluate_again()

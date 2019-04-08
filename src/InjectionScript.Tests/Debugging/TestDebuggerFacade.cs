@@ -82,7 +82,7 @@ namespace InjectionScript.Tests.Debugging
             ScriptCancellation = new CancellationTokenSource();
             var result = debuggerServer.EvaluateExpression(expression);
 
-            result.Result.HasValue.Should().BeTrue("evaluation is expected to succeed");
+            result.Result.HasValue.Should().BeFalse("evaluation is expected to succeed");
             result.Messages.Should().BeEmpty("no error messages expected");
 
             return result;
