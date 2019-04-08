@@ -35,12 +35,13 @@ namespace InjectionScript.Debugging
 
             if (server.TryGetBreakpoint(context.File, context.Line, out var breakpoint))
             {
-                server.OnBreak(this, new BreakpointDebuggerBreak(breakpoint));
                 currentContext = context;
+                server.OnBreak(this, new BreakpointDebuggerBreak(breakpoint));
                 WaitForContinue();
             }
             else if (breakNextStatement)
             {
+                currentContext = context;
                 breakNextStatement = false;
                 server.OnBreak(this, new StepDebuggerBreak(new SourceCodeLocation(context.File, context.Line)));
                 WaitForContinue();
