@@ -1,0 +1,15 @@
+version: 1.0.16-{build}
+skip_tags: true
+image: Visual Studio 2019 Preview
+configuration: Release
+platform: Any CPU
+clone_folder: c:\projects\InjectionScript
+init:
+- cmd: git config --global core.autocrlf true
+install:
+- cmd: nuget restore src\InjectionScript.sln
+build:
+  project: src\InjectionScript.sln
+  verbosity: minimal
+on_finish:
+- ps: $blockRdp = $false; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
