@@ -21,6 +21,7 @@ namespace InjectionScript.Runtime
         public Interpreter Interpreter => interpreter.Value;
         public Globals Globals { get; } = new Globals();
         public Objects Objects { get; } = new Objects();
+        public InjectionOptions Options { get; } = new InjectionOptions();
         public InjectionApi Api { get; }
         public ScriptFile CurrentScript { get; private set; }
 
