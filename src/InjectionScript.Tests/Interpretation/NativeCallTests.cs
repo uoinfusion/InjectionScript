@@ -41,6 +41,16 @@ namespace InjectionScript.Tests.Interpretation
         }
 
         [TestMethod]
+        public void Calls_parameterless_version_and_ignores_parameters_When_overload_doesnt_exist()
+        {
+            TestSubrutine(2, @"return UO.sub1(""0x123,1,2,3,4"")", new[]
+            {
+                new NativeSubrutineDefinition("UO.sub1", (Func<int>)(() => 2)),
+            });
+
+        }
+
+        [TestMethod]
         public void Intrinsic_variable_can_call_native_subrutine()
         {
             TestSubrutine(123, @"return UO.IntrinsicVar", intrinsicVariables: new[]

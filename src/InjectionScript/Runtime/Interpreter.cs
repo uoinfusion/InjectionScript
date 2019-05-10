@@ -475,6 +475,10 @@ namespace InjectionScript.Runtime
             {
                 result = nativeSubrutine.Call(argumentValues);
             }
+            else if (argumentValues.Any() && metadata.TryGetNativeSubrutine(name, Array.Empty<InjectionValue>(), out nativeSubrutine))
+            {
+                result = nativeSubrutine.Call(Array.Empty<InjectionValue>());
+            }
             else
             {
                 if (metadata.TryGetSubrutine(name, argumentValues.Length, out var customSubrutine))
