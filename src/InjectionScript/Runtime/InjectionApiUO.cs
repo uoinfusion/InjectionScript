@@ -246,7 +246,7 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Disarm", (Action)Disarm));
             metadata.Add(new NativeSubrutineDefinition("UO.Unequip", (Action<string>)Unequip));
             metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, int>)Equip));
-            metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, string>)Equip));
+            metadata.Add(new NativeSubrutineDefinition("UO.EquipT", (Action<InjectionValue, InjectionValue>)EquipT));
             metadata.Add(new NativeSubrutineDefinition("UO.ObjAtLayer", (Func<string, InjectionValue>)ObjAtLayer));
 
             metadata.Add(new NativeSubrutineDefinition("UO.WarMode", (Action<int>)WarMode));
@@ -791,6 +791,18 @@ namespace InjectionScript.Runtime
         }
 
         public void Unequip(string layer) => bridge.Unequip(ConvertLayer(layer));
+        public void EquipT(InjectionValue layer, InjectionValue type)
+        {
+            var obj = bridge.FindType(NumberConversions.ToInt(type), -1, bridge.Backpack, -1, true);
+            if (obj == 0)
+            {
+                SystemMessage("No item found.");
+                return;
+            }
+
+            Equip(layer.ToString(), obj);
+        }
+
         public void Equip(string layer, int id) => bridge.Equip(ConvertLayer(layer), id);
         public void Equip(string layer, string id) => Equip(layer, GetObject(id));
         public InjectionValue ObjAtLayer(string layer)
