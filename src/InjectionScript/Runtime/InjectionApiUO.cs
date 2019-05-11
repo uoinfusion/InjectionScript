@@ -107,8 +107,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.GetName", (Func<int, string>)GetName));
             metadata.Add(new NativeSubrutineDefinition("UO.GetName", (Func<string, string>)GetName));
 
-            metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<string, int>)GetGraphics));
-            metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<int, int>)GetGraphics));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<string, string>)GetGraphics));
+            metadata.Add(new NativeSubrutineDefinition("UO.GetGraphic", (Func<int, string>)GetGraphics));
 
             metadata.Add(new NativeSubrutineDefinition("UO.GetColor", (Func<InjectionValue, string>)GetColor));
             metadata.Add(new NativeSubrutineDefinition("UO.GetLayer", (Func<InjectionValue, string>)GetLayer));
@@ -449,8 +449,8 @@ namespace InjectionScript.Runtime
         public string GetName(string id) => GetName(GetObject(id));
         public string GetName(int id) => bridge.GetName(id);
 
-        public int GetGraphics(string id) => GetGraphics(GetObject(id));
-        public int GetGraphics(int id) => bridge.GetGraphics(id);
+        public string GetGraphics(string id) => GetGraphics(GetObject(id));
+        public string GetGraphics(int id) => $"0x{bridge.GetGraphics(id):X4}";
 
         public string GetColor(InjectionValue id) => NumberConversions.ToHex((short)bridge.GetColor(GetObject(id)));
         public string GetLayer(InjectionValue id) => ConvertLayer(bridge.GetLayer(GetObject(id)));
