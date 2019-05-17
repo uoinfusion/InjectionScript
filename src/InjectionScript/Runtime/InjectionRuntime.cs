@@ -24,6 +24,7 @@ namespace InjectionScript.Runtime
         public Globals Globals => state.Globals;
         public Objects Objects => state.Objects;
         public ArmSets ArmSets => state.ArmSets;
+        public DressSets DressSets => state.DressSets;
         public InjectionOptions Options { get; } = new InjectionOptions();
         public InjectionApi Api { get; }
         public ScriptFile CurrentScript { get; private set; }

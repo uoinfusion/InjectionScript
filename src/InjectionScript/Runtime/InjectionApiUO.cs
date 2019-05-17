@@ -18,6 +18,7 @@ namespace InjectionScript.Runtime
         private readonly Paths paths;
         private readonly Objects objects;
         private readonly ArmSets armSets;
+        private readonly DressSets dressSets;
 
         private int systemMessageColor = 0x0440;
 
@@ -65,6 +66,7 @@ namespace InjectionScript.Runtime
             this.paths = paths;
             this.objects = state.Objects;
             this.armSets = state.ArmSets;
+            this.dressSets = state.DressSets;
         }
 
         internal void Register(Metadata metadata)
@@ -247,6 +249,11 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.Arm", (Action<string>)Arm));
             metadata.Add(new NativeSubrutineDefinition("UO.SetArm", (Action<string>)SetArm));
             metadata.Add(new NativeSubrutineDefinition("UO.Disarm", (Action)Disarm));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.Dress", (Action<string>)Dress));
+            metadata.Add(new NativeSubrutineDefinition("UO.SetDress", (Action<string>)SetDress));
+            metadata.Add(new NativeSubrutineDefinition("UO.Undress", (Action)Undress));
+
             metadata.Add(new NativeSubrutineDefinition("UO.Unequip", (Action<string>)Unequip));
             metadata.Add(new NativeSubrutineDefinition("UO.Equip", (Action<string, int>)Equip));
             metadata.Add(new NativeSubrutineDefinition("UO.EquipT", (Action<InjectionValue, InjectionValue>)EquipT));
@@ -785,58 +792,74 @@ namespace InjectionScript.Runtime
         public void SetJournalLine(int index) => bridge.SetJournalLine(index);
         public void SetJournalLine(int index, string text) => bridge.SetJournalLine(index);
 
-        public void Arm(string name)
+        private static int[] dressLayers = { 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 18, 19, 20, 22, 23, 24 };
+        private static int[] weaponLayers = { 1, 2 };
+
+        private void Equip(string name, RuntimeDictionary<EquipSet> equipSets, int[] supportedLayers, string successMessage, string missingMessage)
         {
-            if (armSets.TryGet(name, out var armSet))
+            if (equipSets.TryGet(name, out var equipSet))
             {
-                var lhandId = armSet.GetAtLayer(1);
-                if (lhandId != 0)
-                    bridge.UseObject(lhandId);
-                else
-                    bridge.Unequip(1);
+                foreach (var layer in supportedLayers)
+                {
+                    var id = equipSet.GetAtLayer(layer);
+                    if (id != 0)
+                        bridge.UseObject(id);
+                    else
+                        bridge.Unequip(layer);
+                }
 
-                int rhandId = armSet.GetAtLayer(2);
-                if (rhandId != 0)
-                    bridge.UseObject(rhandId);
-                else
-                    bridge.Unequip(2);
-
-                SystemMessage("Weapons armed.");
+                SystemMessage(successMessage);
             }
             else
-                SystemMessage("No weapons set with setarm.");
+                SystemMessage(missingMessage);
         }
 
         public void SetArm(string name)
+            => SetEquip(name, armSets, weaponLayers, "Weapons unset.", "Cannot unset: not set with setarm", "Arm set.");
+        public void Arm(string name)
+            => Equip(name, armSets, weaponLayers, "Weapons armed.", "No weapons set with setarm.");
+        public void Disarm()
+            => Unequip(weaponLayers, "Weapons disarmed.");
+
+        public void SetDress(string name)
+            => SetEquip(name, dressSets, dressLayers, "Clothing unset.", "Cannot unset: not set with setdress", "Clothing set.");
+        public void Dress(string name)
+            => Equip(name, dressSets, dressLayers, "Clothing put on.", "No clothing set with setdress.");
+        public void Undress()
+            => Unequip(dressLayers, "Clothing removed.");
+
+        private void SetEquip(string name, RuntimeDictionary<EquipSet> equipSet, int[] supportedLayers,
+            string existsMessage, string missingMessage, string successMessage)
         {
-            IEnumerable<Equip> GetEquips()
-            {
-                var oneHanded = bridge.ObjAtLayer(1);
-                var twoHanded = bridge.ObjAtLayer(2);
-
-                if (oneHanded != 0)
-                    yield return new Equip(1, oneHanded);
-                if (twoHanded != 0)
-                    yield return new Equip(2, twoHanded);
-            }
-
-            if (armSets.Exists(name))
-                SystemMessage("Weapons unset.");
+            if (equipSet.Exists(name))
+                SystemMessage(existsMessage);
             else
-                SystemMessage("Cannot unset: not set with setarm");
+                SystemMessage(missingMessage);
 
 
-            armSets.Set(name, new EquipSet(GetEquips()));
+            equipSet.Set(name, new EquipSet(GetEquips(supportedLayers)));
 
-            SystemMessage("Arm set.");
+            SystemMessage(successMessage);
         }
 
-        public void Disarm()
+        private IEnumerable<Equip> GetEquips(int[] supportedLayers)
         {
-            Unequip("Lhand");
-            Unequip("Rhand");
+            foreach (var layer in supportedLayers)
+            {
+                var id = bridge.ObjAtLayer(layer);
+                if (id != 0)
+                    yield return new Equip(layer, id);
+            }
+        }
 
-            SystemMessage("Weapons disarmed.");
+        private void Unequip(int[] supportedMessage, string successMessage)
+        {
+            foreach (var layer in supportedMessage)
+            {
+                bridge.Unequip(layer);
+            }
+
+            SystemMessage(successMessage);
         }
 
         public void Unequip(string layer) => bridge.Unequip(ConvertLayer(layer));
