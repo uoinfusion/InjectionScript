@@ -12,6 +12,7 @@ namespace InjectionScript.Runtime
     {
         private readonly IApiBridge bridge;
         private readonly InjectionApi injectionApi;
+        private readonly InjectionRuntimeState state;
         private readonly Globals globals;
         private readonly Random random;
         private readonly ITimeSource timeSource;
@@ -55,10 +56,12 @@ namespace InjectionScript.Runtime
                 layerNumberToName.Add(pair.Value, pair.Key);
         }
 
-        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, InjectionRuntimeState state, ITimeSource timeSource, Paths paths)
+        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, InjectionRuntimeState state,
+            ITimeSource timeSource, Paths paths)
         {
             this.bridge = bridge;
             this.injectionApi = injectionApi;
+            this.state = state;
             this.globals = state.Globals;
             Register(metadata);
             random = new Random();
@@ -245,6 +248,8 @@ namespace InjectionScript.Runtime
             metadata.Add(new NativeSubrutineDefinition("UO.JournalColor", (Func<int, string>)JournalColor));
             metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int>)SetJournalLine));
             metadata.Add(new NativeSubrutineDefinition("UO.SetJournalLine", (Action<int, string>)SetJournalLine));
+
+            metadata.Add(new NativeSubrutineDefinition("UO.SetDressSpeed", (Action<int>)SetDressSpeed));
 
             metadata.Add(new NativeSubrutineDefinition("UO.Arm", (Action<string>)Arm));
             metadata.Add(new NativeSubrutineDefinition("UO.SetArm", (Action<string>)SetArm));
@@ -795,24 +800,7 @@ namespace InjectionScript.Runtime
         private static int[] dressLayers = { 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 18, 19, 20, 22, 23, 24 };
         private static int[] weaponLayers = { 1, 2 };
 
-        private void Equip(string name, RuntimeDictionary<EquipSet> equipSets, int[] supportedLayers, string successMessage, string missingMessage)
-        {
-            if (equipSets.TryGet(name, out var equipSet))
-            {
-                foreach (var layer in supportedLayers)
-                {
-                    var id = equipSet.GetAtLayer(layer);
-                    if (id != 0)
-                        bridge.UseObject(id);
-                    else
-                        bridge.Unequip(layer);
-                }
-
-                SystemMessage(successMessage);
-            }
-            else
-                SystemMessage(missingMessage);
-        }
+        public void SetDressSpeed(int delayms) => state.DressSpeed = delayms;
 
         public void SetArm(string name)
             => SetEquip(name, armSets, weaponLayers, "Weapons unset.", "Cannot unset: not set with setarm", "Arm set.");
@@ -842,6 +830,35 @@ namespace InjectionScript.Runtime
             SystemMessage(successMessage);
         }
 
+        private void Equip(string name, RuntimeDictionary<EquipSet> equipSets, int[] supportedLayers, string successMessage, string missingMessage)
+        {
+            if (equipSets.TryGet(name, out var equipSet))
+            {
+                foreach (var layer in supportedLayers)
+                {
+                    var id = equipSet.GetAtLayer(layer);
+                    bool wait = false;
+                    if (id != 0)
+                    {
+                        bridge.UseObject(id);
+                        wait = true;
+                    }
+                    else if (bridge.ObjAtLayer(layer) != 0)
+                    {
+                        bridge.Unequip(layer);
+                        wait = true;
+                    }
+
+                    if (wait && state.DressSpeed > 0)
+                        injectionApi.Wait(state.DressSpeed);
+                }
+
+                SystemMessage(successMessage);
+            }
+            else
+                SystemMessage(missingMessage);
+        }
+
         private IEnumerable<Equip> GetEquips(int[] supportedLayers)
         {
             foreach (var layer in supportedLayers)
@@ -852,11 +869,16 @@ namespace InjectionScript.Runtime
             }
         }
 
-        private void Unequip(int[] supportedMessage, string successMessage)
+        private void Unequip(int[] supportedLayers, string successMessage)
         {
-            foreach (var layer in supportedMessage)
+            foreach (var layer in supportedLayers)
             {
-                bridge.Unequip(layer);
+                if (bridge.ObjAtLayer(layer) != 0)
+                {
+                    bridge.Unequip(layer);
+                    if (state.DressSpeed > 0)
+                        injectionApi.Wait(state.DressSpeed);
+                }
             }
 
             SystemMessage(successMessage);

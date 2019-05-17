@@ -17,14 +17,14 @@ namespace InjectionScript.Runtime
         private readonly ITimeSource timeSource;
         private readonly Func<CancellationToken?> retrieveCancellationToken;
         private readonly Paths paths;
-        private readonly InjectionRuntimeState state = new InjectionRuntimeState();
+        public InjectionRuntimeState State { get; } = new InjectionRuntimeState();
 
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter => interpreter.Value;
-        public Globals Globals => state.Globals;
-        public Objects Objects => state.Objects;
-        public ArmSets ArmSets => state.ArmSets;
-        public DressSets DressSets => state.DressSets;
+        public Globals Globals => State.Globals;
+        public Objects Objects => State.Objects;
+        public ArmSets ArmSets => State.ArmSets;
+        public DressSets DressSets => State.DressSets;
         public InjectionOptions Options { get; } = new InjectionOptions();
         public InjectionApi Api { get; }
         public ScriptFile CurrentScript { get; private set; }
@@ -38,7 +38,7 @@ namespace InjectionScript.Runtime
         {
             paths = new Paths(() => Path.GetDirectoryName(CurrentScript.FileName));
 
-            Api = new InjectionApi(bridge, Metadata, state, timeSource, paths);
+            Api = new InjectionApi(bridge, Metadata, State, timeSource, paths);
             RegisterNatives();
             this.bridge = bridge;
             this.debuggerServer = debuggerServer;

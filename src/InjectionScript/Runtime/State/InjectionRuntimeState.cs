@@ -10,5 +10,7 @@ namespace InjectionScript.Runtime.State
         public DressSets DressSets { get; } = new DressSets();
         public Objects Objects { get; } = new Objects();
         public Globals Globals { get; } = new Globals();
+
+        public int DressSpeed { get; set; }
     }
 }
