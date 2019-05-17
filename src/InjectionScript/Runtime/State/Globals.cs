@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InjectionScript.Runtime
+namespace InjectionScript.Runtime.State
 {
     public class Globals
     {
@@ -16,7 +16,7 @@ namespace InjectionScript.Runtime
 
         public string GetGlobal(string name)
         {
-            if (globals.TryGetValue(name, out string value))
+            if (globals.TryGetValue(name, out var value))
                 return value;
             else
                 return "N/A";

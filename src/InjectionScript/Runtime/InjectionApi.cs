@@ -1,4 +1,5 @@
 ﻿using InjectionScript.Runtime.ObjectTypes;
+using InjectionScript.Runtime.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,10 @@ namespace InjectionScript.Runtime
         private readonly ITimeSource timeSource;
         public InjectionApiUO UO { get; }
 
-        public InjectionApi(IApiBridge bridge, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths, Objects objects)
+        public InjectionApi(IApiBridge bridge, Metadata metadata, InjectionRuntimeState state, ITimeSource timeSource, Paths paths)
         {
             this.bridge = bridge;
-            UO = new InjectionApiUO(bridge, this, metadata, globals, timeSource, paths, objects);
+            UO = new InjectionApiUO(bridge, this, metadata, state, timeSource, paths);
             Register(metadata);
             this.timeSource = timeSource;
         }

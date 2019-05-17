@@ -1,6 +1,7 @@
 ﻿using InjectionScript.Analysis;
 using InjectionScript.Parsing;
 using InjectionScript.Parsing.Syntax;
+using InjectionScript.Runtime.State;
 using System;
 using System.IO;
 using System.Linq;
@@ -16,11 +17,13 @@ namespace InjectionScript.Runtime
         private readonly ITimeSource timeSource;
         private readonly Func<CancellationToken?> retrieveCancellationToken;
         private readonly Paths paths;
+        private readonly InjectionRuntimeState state = new InjectionRuntimeState();
 
         public Metadata Metadata { get; } = new Metadata();
         public Interpreter Interpreter => interpreter.Value;
-        public Globals Globals { get; } = new Globals();
-        public Objects Objects { get; } = new Objects();
+        public Globals Globals => state.Globals;
+        public Objects Objects => state.Objects;
+        public ArmSets ArmSets => state.ArmSets;
         public InjectionOptions Options { get; } = new InjectionOptions();
         public InjectionApi Api { get; }
         public ScriptFile CurrentScript { get; private set; }
@@ -34,7 +37,7 @@ namespace InjectionScript.Runtime
         {
             paths = new Paths(() => Path.GetDirectoryName(CurrentScript.FileName));
 
-            Api = new InjectionApi(bridge, Metadata, Globals, timeSource, paths, Objects);
+            Api = new InjectionApi(bridge, Metadata, state, timeSource, paths);
             RegisterNatives();
             this.bridge = bridge;
             this.debuggerServer = debuggerServer;

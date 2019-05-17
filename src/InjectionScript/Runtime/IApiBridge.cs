@@ -86,8 +86,6 @@
         string JournalSerial(int index);
         string JournalColor(int index);
         void SetJournalLine(int index);
-        void Arm(string name);
-        void SetArm(string name);
         void Equip(int layer, int id);
         void Unequip(int layer);
         int ObjAtLayer(int layer);

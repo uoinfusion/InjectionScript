@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InjectionScript.Runtime.State;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace InjectionScript.Runtime
         private readonly ITimeSource timeSource;
         private readonly Paths paths;
         private readonly Objects objects;
+        private readonly ArmSets armSets;
 
         private int systemMessageColor = 0x0440;
 
@@ -52,16 +54,17 @@ namespace InjectionScript.Runtime
                 layerNumberToName.Add(pair.Value, pair.Key);
         }
 
-        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, Globals globals, ITimeSource timeSource, Paths paths, Objects objects)
+        internal InjectionApiUO(IApiBridge bridge, InjectionApi injectionApi, Metadata metadata, InjectionRuntimeState state, ITimeSource timeSource, Paths paths)
         {
             this.bridge = bridge;
             this.injectionApi = injectionApi;
-            this.globals = globals;
+            this.globals = state.Globals;
             Register(metadata);
             random = new Random();
             this.timeSource = timeSource;
             this.paths = paths;
-            this.objects = objects;
+            this.objects = state.Objects;
+            this.armSets = state.ArmSets;
         }
 
         internal void Register(Metadata metadata)
@@ -782,12 +785,58 @@ namespace InjectionScript.Runtime
         public void SetJournalLine(int index) => bridge.SetJournalLine(index);
         public void SetJournalLine(int index, string text) => bridge.SetJournalLine(index);
 
-        public void Arm(string name) => bridge.Arm(name);
-        public void SetArm(string name) => bridge.SetArm(name);
+        public void Arm(string name)
+        {
+            if (armSets.TryGet(name, out var armSet))
+            {
+                var lhandId = armSet.GetAtLayer(1);
+                if (lhandId != 0)
+                    bridge.UseObject(lhandId);
+                else
+                    bridge.Unequip(1);
+
+                int rhandId = armSet.GetAtLayer(2);
+                if (rhandId != 0)
+                    bridge.UseObject(rhandId);
+                else
+                    bridge.Unequip(2);
+
+                SystemMessage("Weapons armed.");
+            }
+            else
+                SystemMessage("No weapons set with setarm.");
+        }
+
+        public void SetArm(string name)
+        {
+            IEnumerable<Equip> GetEquips()
+            {
+                var oneHanded = bridge.ObjAtLayer(1);
+                var twoHanded = bridge.ObjAtLayer(2);
+
+                if (oneHanded != 0)
+                    yield return new Equip(1, oneHanded);
+                if (twoHanded != 0)
+                    yield return new Equip(2, twoHanded);
+            }
+
+            if (armSets.Exists(name))
+                SystemMessage("Weapons unset.");
+            else
+                SystemMessage("Cannot unset: not set with setarm");
+
+
+            armSets.Set(name, new EquipSet(GetEquips()));
+
+            SystemMessage("Arm set.");
+        }
+
         public void Disarm()
         {
             Unequip("Lhand");
             Unequip("Rhand");
+
+            SystemMessage("Weapons disarmed.");
         }
 
         public void Unequip(string layer) => bridge.Unequip(ConvertLayer(layer));
@@ -802,6 +851,13 @@ namespace InjectionScript.Runtime
 
             Equip(layer.ToString(), obj);
         }
+
+        private void Equip(EquipSet equipSet)
+        {
+            foreach (var equip in equipSet.Equips)
+                Equip(equip);
+        }
+        private void Equip(Equip equip) => bridge.UseObject(equip.Id);
 
         public void Equip(string layer, int id) => bridge.Equip(ConvertLayer(layer), id);
         public void Equip(string layer, string id) => Equip(layer, GetObject(id));

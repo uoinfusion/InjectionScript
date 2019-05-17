@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using InjectionScript.Runtime;
+using InjectionScript.Runtime.State;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -17,8 +18,8 @@ namespace InjectionScript.Tests.Runtime.InjectionApi
         public void Initialize()
         {
             timeSource = new TestTimeSource();
-            injectionApi = new InjectionScript.Runtime.InjectionApi(null, new Metadata(), new Globals(), timeSource,
-                new Paths(() => string.Empty), new Objects());
+            injectionApi = new InjectionScript.Runtime.InjectionApi(null, new Metadata(), new InjectionRuntimeState(), timeSource,
+                new Paths(() => string.Empty));
         }
 
         [TestMethod]
