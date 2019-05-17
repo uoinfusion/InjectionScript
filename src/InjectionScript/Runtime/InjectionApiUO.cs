@@ -393,7 +393,13 @@ namespace InjectionScript.Runtime
         public void Set(string name, int value)
         {
             if (name.Equals("finddistance", StringComparison.OrdinalIgnoreCase))
+            {
                 bridge.SetFindDistance(value);
+            }
+            else if (name.Equals("equipfordress", StringComparison.OrdinalIgnoreCase))
+            {
+                state.UseEquipForDress = value;
+            }
         }
 
         public void Set(string name, string valueStr)
@@ -407,6 +413,10 @@ namespace InjectionScript.Runtime
             else if (name.Equals("grabdelay", StringComparison.OrdinalIgnoreCase))
             {
                 bridge.SetGrabDelay(valueInt);
+            }
+            else if (name.Equals("equipfordress", StringComparison.OrdinalIgnoreCase))
+            {
+                state.UseEquipForDress = valueInt;
             }
         }
 
@@ -840,7 +850,10 @@ namespace InjectionScript.Runtime
                     bool wait = false;
                     if (id != 0)
                     {
-                        bridge.UseObject(id);
+                        if (state.UseEquipForDress != 0)
+                            bridge.Equip(layer, id);
+                        else
+                            bridge.UseObject(id);
                         wait = true;
                     }
                     else if (bridge.ObjAtLayer(layer) != 0)

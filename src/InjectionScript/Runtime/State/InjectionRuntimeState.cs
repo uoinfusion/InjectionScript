@@ -12,5 +12,6 @@ namespace InjectionScript.Runtime.State
         public Globals Globals { get; } = new Globals();
 
         public int DressSpeed { get; set; }
+        public int UseEquipForDress { get; set; }
     }
 }
