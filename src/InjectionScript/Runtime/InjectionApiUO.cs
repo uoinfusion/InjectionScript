@@ -727,7 +727,7 @@ namespace InjectionScript.Runtime
         public int Count(InjectionValue type) 
             => Count(NumberConversions.ToInt(type), -1, -1);
         public int Count(InjectionValue type, InjectionValue color) 
-            => Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), 0);
+            => Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), -1);
         public int Count(InjectionValue type, InjectionValue color, InjectionValue container)
             => Count(NumberConversions.ToInt(type), NumberConversions.ToInt(color), ConvertContainer(container));
         public int Count(int type, int color, int container)
